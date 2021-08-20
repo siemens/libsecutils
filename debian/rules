@@ -1,0 +1,33 @@
+#!/usr/bin/make -f
+
+# libsecutils
+#
+# Copyright (c) Siemens Mobility GmbH, 2021
+# 
+# Authors:
+#  David von Oheimb <david.von.oheimb@siemens.com>
+#
+# This work is licensed under the terms of the Apache Software License 2.0.  See
+# the COPYING file in the top-level directory.           
+#               
+# SPDX-License-Identifier: Apache-2.0
+
+CC=$(DEB_HOST_GNU_TYPE)-gcc
+CXX=$(DEB_HOST_GNU_TYPE)-g++
+AR=$(DEB_HOST_GNU_TYPE)-ar
+%:
+	dh $@
+
+# Tests are often placeholders, disabling
+override_dh_auto_test:
+
+# adding compile flags as, defaults are commonly debug flags
+override_dh_auto_build:
+	$(MAKE) build_all -j4 CC=$(CC) CXX=$(CXX) AR=$(AR) CFLAGS="-O2 -DNDEBUG" CXXFLAGS="-O2 -DNDEBUG" LDFLAGS=""
+
+# adding correct fake rootfs directories
+override_dh_auto_install:
+	$(MAKE) install DESTDIR=debian/libsecutils ROOTFS=debian/libsecutils
+	$(MAKE) headers_install DESTDIR=debian/libsecutils-dev ROOTFS=debian/libsecutils-dev
+	mkdir -p debian/libsecutils-bins/usr/bin
+	cp util/icvutil debian/libsecutils-bins/usr/bin
