@@ -70,10 +70,10 @@ override CFLAGS += -Wformat -Wformat-security -Wno-declaration-after-statement -
 CC ?= gcc
 OUTBIN=$(OUT_DIR)/libsecutils$(DLL)
 LOCAL_CFLAGS=-std=gnu90 -fPIC
-override CFLAGS+=-D_FORTIFY_SOURCE=2
-override CFLAGS+=-isystem $(OPENSSL)/include# # # use of -isystem is critical for selecting wanted OpenSSL version
-override CFLAGS+=-Iinclude
-override CFLAGS+=-Iinclude/secutils
+override CFLAGS += -D_FORTIFY_SOURCE=2
+override CFLAGS += -isystem $(OPENSSL)/include# # # use of -isystem is critical for selecting wanted OpenSSL version
+override CFLAGS += -Iinclude
+override CFLAGS += -Iinclude/secutils
 ifdef SECUTILS_USE_UTA 
     override CFLAGS += -DSECUTILS_USE_UTA=1
 endif
@@ -82,7 +82,7 @@ ifdef SECUTILS_CONFIG_USE_ICV
 endif
 
 override LDFLAGS += $(DEBUG_FLAGS) # needed for -fsanitize=...
-override LDFLAGS+=-L$(OPENSSL_LIB) -L$(OPENSSL) -Wl,-rpath=$(OPENSSL_LIB) # needed for genCMPClient
+override LDFLAGS += -L$(OPENSSL_LIB) -L$(OPENSSL) -Wl,-rpath=$(OPENSSL_LIB) # needed for genCMPClient
 ifdef SECUTILS_USE_UTA 
     override LDFLAGS += -luta
 endif
@@ -109,15 +109,15 @@ BUILDDIR=tmp
 
 # Path for automatic lookup of source files by Make
 # Note: sort removes duplicate entries
-VPATH:=src
-VPATH+=$(sort $(dir $(wildcard src/*/)))
+VPATH := src
+VPATH += $(sort $(dir $(wildcard src/*/)))
 
 ################################################################################
 # Objects lists
 ################################################################################
 
 # Target object files lookup in src directory (and mapping to build directory)
-OBJS:=$(patsubst %.c,$(BUILDDIR)/%$(OBJ),$(notdir $(wildcard src/*/*.c)))
+OBJS := $(patsubst %.c,$(BUILDDIR)/%$(OBJ),$(notdir $(wildcard src/*/*.c)))
 
 ################################################################################
 # Targets
