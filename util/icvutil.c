@@ -19,6 +19,10 @@
 #include "../include/secutils/storage/files_icv.h"
 #include "../include/secutils/storage/uta_api.h"
 
+#ifndef SECUTILS_USE_UTA
+# error Use of UTA lib is not enabled; need to define SECUTILS_USE_UTA
+#endif
+
 #define ARG_OPTION    1
 #define ARG_FILE      2
 #define ARG_FILE_LOC  3
