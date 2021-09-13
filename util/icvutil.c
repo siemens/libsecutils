@@ -62,5 +62,6 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "       %s -help\n", prog);
     }
 
+    uta_close(uta_ctx);
     return ret;
 }
