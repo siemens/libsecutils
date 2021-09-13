@@ -124,7 +124,7 @@ OBJS:=$(patsubst %.c,$(BUILDDIR)/%$(OBJ),$(notdir $(wildcard src/*/*.c)))
 ################################################################################
 
 # Phony (non-file) targets
-.PHONY: all doc build build_all clean clean_all clean_uta install headers_install deb debdir coverage
+.PHONY: all doc util build build_all clean clean_all clean_uta install headers_install deb debdir coverage
 
 # Default target
 all: build_all doc
@@ -135,10 +135,12 @@ ifeq ($(COV_ENABLED), 1)
 endif
 	$(MAKE) COMPILE_TYPE=$(COMPILE_TYPE) $(OUTBIN)
 
-build_all: | build
+util:
 ifdef SECUTILS_USE_UTA 
-	$(MAKE) -C util
+	$(MAKE) CFLAGS="$(CFLAGS) $(LOCAL_CFLAGS)" -C util
 endif
+
+build_all: util | build
 
 # Binary output target
 $(OUTBIN): $(OBJS)
