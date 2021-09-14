@@ -23,7 +23,7 @@ override_dh_auto_test:
 
 # adding compile flags as, defaults are commonly debug flags
 override_dh_auto_build:
-	$(MAKE) build_all -j4 CC=$(CC) CXX=$(CXX) AR=$(AR) CFLAGS="-O2 -DNDEBUG" CXXFLAGS="-O2 -DNDEBUG" LDFLAGS=""
+	$(MAKE) build_all CC=$(CC) CXX=$(CXX) AR=$(AR) CFLAGS="-O2 -DNDEBUG" CXXFLAGS="-O2 -DNDEBUG" LDFLAGS=""
 
 # adding correct fake rootfs directories
 override_dh_auto_install:

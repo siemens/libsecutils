@@ -1,0 +1,15 @@
+debian/.debhelper/
+debian/files
+debian/libsecutils-bins.debhelper.log
+debian/libsecutils-bins.substvars
+debian/libsecutils-bins/
+debian/libsecutils-dev.debhelper.log
+debian/libsecutils-dev.substvars
+debian/libsecutils-dev/
+debian/libsecutils.debhelper.log
+debian/libsecutils.substvars
+debian/libsecutils/
+libsecutils.so
+tmp/
+util/icvutil
+util/icvutil.o
