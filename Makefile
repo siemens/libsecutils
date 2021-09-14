@@ -140,7 +140,7 @@ ifdef SECUTILS_USE_UTA
 	$(MAKE) CFLAGS="$(CFLAGS) $(LOCAL_CFLAGS)" -C util
 endif
 
-build_all: util | build
+build_all: build util
 
 # Binary output target
 $(OUTBIN): $(OBJS)
@@ -157,7 +157,7 @@ endif
 
 # Build directory generation
 $(BUILDDIR):
-	mkdir $(BUILDDIR) || true
+	mkdir -p $(BUILDDIR)
 
 # Order-only dependency for objects on build dir - prevents unnecessary rebuilds
 # (directories are flagged as changed on every object build)

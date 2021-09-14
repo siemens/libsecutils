@@ -50,8 +50,6 @@ jobs:
           sudo dpkg -i libuta-dev_1.*
           cd ..
           export SECUTILS_USE_UTA=1
-          pwd
-          ls -al
           make build_all
 
   build-debian:
@@ -77,8 +75,6 @@ jobs:
           rsync -av --exclude='debian-packaging' . debian-packaging/
           cd debian-packaging
           export SECUTILS_USE_UTA=1
-          pwd
-          ls -al
           dpkg-buildpackage -uc -us
 
   doc:
