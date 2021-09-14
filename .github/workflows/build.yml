@@ -1,0 +1,103 @@
+# GitHub Actions
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) Siemens Mobility GmbH, 2021
+
+name: CI
+
+on: push
+
+jobs:
+  build-make:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: build-make
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libssl-dev 
+          make build_all
+
+  build-cmake:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: build-cmake
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake git libssl-dev 
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build .
+
+  build-with-uta:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: build-with-uta
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y debhelper rsync libssl-dev git pkg-config
+          mkdir dependencies
+          cd dependencies
+          git clone https://github.com/siemens/libuta.git
+          cd libuta 
+          ./bootstrap
+          ./debian/configure sim
+          dpkg-buildpackage -uc -us
+          cd ..
+          sudo dpkg -i libuta-sim_1.*
+          sudo dpkg -i libuta-dev_1.*
+          cd ..
+          export SECUTILS_USE_UTA=1
+          pwd
+          ls -al
+          make build_all
+
+  build-debian:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: build-debian
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y debhelper rsync libssl-dev git pkg-config
+          mkdir dependencies
+          cd dependencies
+          git clone https://github.com/siemens/libuta.git
+          cd libuta 
+          ./bootstrap
+          ./debian/configure sim
+          dpkg-buildpackage -uc -us
+          cd ..
+          sudo dpkg -i libuta-sim_1.*
+          sudo dpkg -i libuta-dev_1.*
+          cd ..
+          mkdir -p debian-packaging
+          rsync -av --exclude='debian-packaging' . debian-packaging/
+          cd debian-packaging
+          export SECUTILS_USE_UTA=1
+          pwd
+          ls -al
+          dpkg-buildpackage -uc -us
+
+  doc:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: doc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential doxygen graphviz
+          make doc
+  
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: coverage
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential doxygen libssl-dev graphviz
+          make coverage
+  
