@@ -13,3 +13,16 @@ libsecutils.so
 tmp/
 util/icvutil
 util/icvutil.o
+build/
+debian-packaging/
+dependencies/
+libsecutils-bins-dbgsym_1.0_amd64.deb
+libsecutils-bins_1.0_amd64.deb
+libsecutils-dbgsym_1.0_amd64.deb
+libsecutils-dev_1.0_all.deb
+libsecutils_1.0.dsc
+libsecutils_1.0.tar.gz
+libsecutils_1.0_amd64.buildinfo
+libsecutils_1.0_amd64.changes
+libsecutils_1.0_amd64.deb
+ 

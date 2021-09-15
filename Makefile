@@ -181,7 +181,7 @@ clean_uta:
 	rm -f $(BUILDDIR)/uta_api$(OBJ) $(BUILDDIR)/files_icv$(OBJ) $(BUILDDIR)/files_dv$(OBJ) $(OUTBIN)
 
 clean:
-	rm -rf $(OUTBIN) $(BUILDDIR) debian/libsecutils debian/libsecutils-dev debian/libsecutils*
+	rm -rf $(OUTBIN) $(BUILDDIR) debian/libsecutils debian/libsecutils-dev debian/libsecutils* debian/files debian/.debhelper
 
 clean_all: clean
 	$(MAKE) -C util clean
