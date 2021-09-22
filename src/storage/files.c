@@ -662,10 +662,10 @@ STACK_OF(X509)
 {
     X509* cert = 0;
     STACK_OF(X509)* certs = 0;
-    BIO* bio = bio_open_default(file, 'r', format);
     char* pass = FILES_get_pass(source, desc);
 
     LOG(FL_TRACE, "opening file '%s' for loading %s", file, desc not_eq 0 ? desc : "certs");
+    BIO* bio = bio_open_default(file, 'r', format);
     if(bio is_eq 0)
     {
         goto end;
