@@ -32,20 +32,26 @@
 X509_CRL* CONN_load_crl_http(const char* url, int timeout,
                              unsigned long max_resp_len, OPTIONAL const char* desc)
 {
+    severity level = desc is_eq 0 ? LOG_DEBUG: LOG_ERR;
+    const char* desc_default = desc is_eq 0 ? "(unknown)" : desc;
+
     if(timeout < 0)
     {
         timeout = CRL_DOWNLOAD_DEFAULT_TIMEOUT;
     }
 #if !defined(OPENSSL_NO_OCSP) && !defined(OPENSSL_NO_SOCK) && !defined(SEC_NO_CRL_DOWNLOAD)
-    LOG(FL_DEBUG, "tryping to download crl via %s", url);
     X509_CRL *crl = (X509_CRL*)CONN_load_ASN1_http(url, timeout, max_resp_len, 0, 0, 0, ASN1_ITEM_rptr(X509_CRL), desc);
-    if (crl == NULL)
-        LOG(FL_DEBUG, "did not get CRL for %s", desc);
+    if(crl == NULL)
+    {
+        LOG(LOG_FUNC_FILE_LINE, level, "did not get CRL for %s", desc_default);
+    }
     else
-        LOG(FL_DEBUG, "got CRL for %s", desc);
+    {
+        LOG(FL_DEBUG, "got CRL for %s", desc_default);
+    }
     return crl;
 #else
-    LOG(FL_ERR, "fetching for %s via HTTP not supported by this build", desc);
+    LOG(LOG_FUNC_FILE_LINE, level, "fetching CRLs for %s via HTTP not supported by this build", desc_default);
     return 0;
 #endif
 }
