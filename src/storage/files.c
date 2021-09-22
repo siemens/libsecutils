@@ -180,11 +180,11 @@ static BIO* bio_open_default_(const char* filename, char mode, file_format_t for
     if(/* filename is_eq 0 or */ strcmp(filename, "-") is_eq 0)
     {
         ret = mode is_eq 'r' ? dup_bio_in(format) : dup_bio_out(format);
-        if(quiet not_eq 0)
+        if(quiet)
         {
             ERR_clear_error();
         }
-        if(quiet not_eq 0 or ret not_eq 0)
+        if(quiet or ret not_eq 0)
         {
             return ret;
         }
@@ -196,11 +196,11 @@ static BIO* bio_open_default_(const char* filename, char mode, file_format_t for
         char modestr[MODESTR_LEN1];
         snprintf(modestr, MODESTR_LEN1, "%c%c", mode, istext(format) ? '\0' : 'b');
         ret = BIO_new_file(filename, modestr);
-        if(quiet not_eq 0)
+        if(quiet)
         {
             ERR_clear_error();
         }
-        if(quiet not_eq 0 or ret not_eq 0)
+        if(quiet or ret not_eq 0)
         {
             return ret;
         }
@@ -649,7 +649,7 @@ end:
 static int load_certs_crls(const char* file, file_format_t format, const char* pass, const char* desc,
                            STACK_OF(X509) * *pcerts, STACK_OF(X509_CRL) * *pcrls)
 {
-    BIO* bio = bio_open_default(file, 'r', format);
+    BIO* bio = bio_open_default_(file, 'r', format, desc is_eq 0);
     int res = load_certs_crls_BIO(bio /* may be 0 */, format, pass, desc, pcerts, pcrls);
     BIO_free(bio);
     return res;
