@@ -1561,20 +1561,30 @@ X509_CRL* FILES_load_crl_autofmt(const char* src, file_format_t format,
 STACK_OF(X509_CRL) * FILES_load_crls_autofmt(const char* src, file_format_t format, int timeout, OPTIONAL const char* desc)
 {
     STACK_OF(X509_CRL)* crls = 0;
-    (void)ERR_set_mark(); /* remember any existing diagnostic info */
-
+    LOG(FL_TRACE, "loading %s from '%s'", desc not_eq 0 ? desc : "CRL", src);
     format = adjust_format(&src, format, false);
-    (void)load_crls(src, &crls, format, timeout, 0 /* desc */);
-    if(crls is_eq 0 and format not_eq FORMAT_HTTP)
+    if(format is_eq FORMAT_HTTP)
     {
-        ERR_clear_error();
-        (void)load_crls(src, &crls, format is_eq FORMAT_PEM ? FORMAT_ASN1 : FORMAT_PEM, timeout, desc);
+        (void)load_crls(src, &crls, format, timeout, desc);
     }
-    (void)ERR_pop_to_mark(); /* discard any new diagnostic info */
-    if(crls is_eq 0)
+    else
     {
-        (void)ERR_print_errors(bio_err);
-        LOG(FL_ERR, "unable to load %s from '%s'", desc not_eq 0 ? desc : "CRLs", src);
+         (void)ERR_set_mark(); /* remember any existing diagnostic info */
+         (void)load_crls(src, &crls, format, timeout, 0 /* desc */);
+         if(crls is_eq 0)
+         {
+             (void)ERR_pop_to_mark(); /* discard any new diagnostic info */
+             (void)load_crls(src, &crls, format is_eq FORMAT_PEM ? FORMAT_ASN1 : FORMAT_PEM, timeout, desc);
+         }
+         else
+         {
+             (void)ERR_clear_last_mark();
+         }
+         if(crls is_eq 0)
+         {
+             (void)ERR_print_errors(bio_err);
+             LOG(FL_ERR, "unable to load %s from '%s'", desc not_eq 0 ? desc : "CRLs", src);
+         }
     }
     return crls;
 }
