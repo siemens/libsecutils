@@ -183,20 +183,25 @@ ASN1_VALUE* CONN_load_ASN1_http(const char* url, int req_timeout,
     int use_ssl;
     BIO* cbio = 0;
     time_t max_time = req_timeout > 0 ? time(0) + req_timeout : 0;
-    int rv = -5;
+    int rv = -4; /* other error */
     ASN1_VALUE* res = 0;
+    severity level = desc is_eq 0 ? LOG_DEBUG: LOG_ERR;
 
+    if(desc is_eq 0)
+    {
+        desc = "ASN.1 item";
+    }
     if(url is_eq 0)
     {
-        LOG(FL_ERR, "null URL argument");
+        LOG(FL_ERR, "null URL argument for downloading %s", desc);
         return 0;
     }
     if(not OCSP_parse_url(url, &host, &port, &path, &use_ssl))
     {
-        LOG(FL_ERR, "cannot parse HTTP server URL: %s", url);
+        LOG(FL_ERR, "cannot parse URL: '%s' for downloading %s", url, desc);
         goto err;
     }
-    rv = -4;
+    LOG(FL_TRACE, "trying to download %s via %s", desc, url);
     cbio = CONN_new(host, port);
     if(cbio is_eq 0)
     {
@@ -243,8 +248,6 @@ ASN1_VALUE* CONN_load_ASN1_http(const char* url, int req_timeout,
     OPENSSL_free(port);
     if(rv not_eq 1)
     {
-        severity level = desc is_eq 0 ? LOG_DEBUG: LOG_ERR;
-        desc = desc is_eq 0 ? "ASN.1 item" : desc;
         LOG(LOG_FUNC_FILE_LINE, level, "%s loading %s from '%s'",
             rv is_eq -5 ? "connect error" :
             rv is_eq  0 ? "timeout" :
@@ -252,7 +255,7 @@ ASN1_VALUE* CONN_load_ASN1_http(const char* url, int req_timeout,
             rv is_eq -2 ? "receive error" :
             rv is_eq -3 ? "send error" : "other error",
             desc, url);
-        if(rv not_eq -1 and ERR_peek_error() is_eq 0)
+        if(rv is_eq -5 and ERR_peek_error() is_eq 0)
         {
             LOG(LOG_FUNC_FILE_LINE, level, "server has disconnected%s",
                 use_ssl ? " violating the protocol" : ", maybe because it requires TLS");
