@@ -215,6 +215,8 @@ SSL_CTX* TLS_CTX_new(OPTIONAL SSL_CTX* ssl_ctx,
                            /* Do not allow outdated SSl/TLS protocol versions: */
                            bitor SSL_OP_NO_SSLv2 bitor SSL_OP_NO_SSLv3 bitor SSL_OP_NO_TLSv1 bitor SSL_OP_NO_TLSv1_1
                            bitor SSL_OP_NO_COMPRESSION
+                           /* Disable TLS Renegotiation
+                           bitor SSL_OP_NO_RENEGOTIATION
                            bitor (long)
 #endif
         SSL_OP_ALL; /*!< bug workarounds */
