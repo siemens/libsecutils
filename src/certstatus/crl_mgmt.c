@@ -185,6 +185,7 @@ static int put_crl_into_cache(X509_CRL * crl, const char * cachefile)
         if (!res) {
             BIO_printf(bio_err, "unable to write CRL\n");
         }
+        BIO_free(out);
     }
 
     return res;
