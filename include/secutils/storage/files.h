@@ -70,7 +70,8 @@ static const int MAX_FORMAT_RETRIES = 3;
 /*!
  * @brief derive the (most likely) file contents format from the given file name
  *
- * @param filename file (path) name, should end on ".p12", ".pem", ".der", ".crt", or ".crt"
+ * @param filename file (path) name, should end with ".p12", ".pkcs12", ".pem",
+ * ".der", ".crt", ".cer", ".crl", or ".csr", ".key", ".priv", or ".pub".
  * @return format as specified above, or FORMAT_UNDEF on error
  */
 file_format_t FILES_get_format(const char* filename);

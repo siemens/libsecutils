@@ -74,8 +74,8 @@ static file_format_t next_format(file_format_t last_format, const char* s)
     { /* ASN.1/DER */
         format = FORMAT_ASN1;
     }
-    else if(strcasecmp(s, "crt") is_eq 0 or strcasecmp(s, "crl") is_eq 0 or
-            strcasecmp(s, "csr") is_eq 0)
+    else if(strcasecmp(s, "crt") is_eq 0 or strcasecmp(s, "cer") is_eq 0 or
+            strcasecmp(s, "crl") is_eq 0 or strcasecmp(s, "csr") is_eq 0)
     {
         /* weak recognition of DER format with fallback to PEM */
         format = last_format is_eq FORMAT_PEM ? FORMAT_ASN1 : FORMAT_PEM;
@@ -115,7 +115,7 @@ file_format_t FILES_get_format(const char* filename)
         result = next_format(FORMAT_UNDEF, UTIL_file_ext(filename));
         if(result is_eq FORMAT_UNDEF)
         {
-            LOG(FL_ERR, "bad input format specification for '%.40s', use 'PEM', 'DER', or 'P12'/'PKCS12'", filename);
+            LOG(FL_ERR, "bad input format for '%.40s', should be PEM, DER, or PKCS12", filename);
         }
     }
     return result;
