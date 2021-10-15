@@ -274,7 +274,12 @@ X509_STORE* STORE_load_trusted(const char* files, OPTIONAL const char* desc, OPT
     for(file = names; file not_eq 0; file = next)
     {
         next = UTIL_next_item(file); /* must do this here to split string */
-        STORE_load_more(&store, file, FORMAT_PEM, desc, ctx);
+        if(not STORE_load_more(&store, file, FORMAT_PEM, desc, ctx))
+        {
+            X509_STORE_free(store);
+            store = 0;
+            break;
+        }
     }
 
     OPENSSL_free(names);
