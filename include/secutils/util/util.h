@@ -278,7 +278,7 @@ const char* UTIL_skip_string(const char* s, OPTIONAL const char* p);
 
 
 /*!*****************************************************************************
- * @brief successively split string of items separated by commas and/or whitespace
+ * @brief successively split string of items separated by commas and/or whitespace, which may be escapted using '\'
  *
  * @param str input string, which is split by overwriting separator(s) by '\0'
  * @return pointer to next item in string, or null at end of input
