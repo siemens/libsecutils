@@ -110,9 +110,9 @@ const char *CRLMGMT_DATA_get_crl_cache_dir(
 
 /*!
  * @brief The function sets the cache directory in the CRL management context.
- * @note  The cache directory is not copied into the structure. Therefore the
+ * @note  The directory name is not copied into the structure. Therefore the
  *        parameter cache directory must exist during the lifetime of the context.
- *        The cache directory must end with the platform specific path separator.
+ *        If not null, it must end with the (potentally platform-specific) path separator.
  *
  * @param cmdat pointer to the CRL management data structure
  * @param crl_cache_dir the cache directory

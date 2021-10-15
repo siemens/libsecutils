@@ -100,12 +100,12 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
         // crl = PEM_read_bio_X509_CRL(in, NULL, NULL, NULL);
         if (crl == NULL) {
             // do not unlink an unknown file that is not loadable as CRL
-            LOG(FL_ERR, "error loading the CRL from cachefile: %s", cachefile);
+            LOG(FL_ERR, "error loading the CRL from cache file: %s", cachefile);
         }
         BIO_free(in);
     }
     else {
-        LOG(FL_INFO, "cache file could not be opened: %s", cachefile);
+        LOG(FL_DEBUG, "cache file could not be opened: %s", cachefile);
     }
 
     if (crl) {
@@ -115,11 +115,11 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
         const ASN1_TIME *nextUpdate = X509_CRL_get0_nextUpdate(crl);
 
         CDP_get_x509_time(now, time_buf, sizeof(time_buf));
-        LOG(FL_DEBUG, "current time: %s", time_buf);
+        LOG(FL_TRACE, "current time: %s", time_buf);
         CDP_get_x509_time(lastUpdate, time_buf, sizeof(time_buf));
-        LOG(FL_DEBUG, "CRL lastUpdate: %s", time_buf);
+        LOG(FL_TRACE, "CRL lastUpdate: %s", time_buf);
         CDP_get_x509_time(nextUpdate, time_buf, sizeof(time_buf));
-        LOG(FL_DEBUG, "CRL nextUpdate: %s", time_buf);
+        LOG(FL_TRACE, "CRL nextUpdate: %s", time_buf);
 
         int isBeforeStart = ASN1_TIME_compare(now, lastUpdate) < 0;
         int isAfterEnd = ASN1_TIME_compare(nextUpdate, now) <= 0;
@@ -131,7 +131,7 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
             ASN1_OCTET_STRING *data = X509_EXTENSION_get_data(ex);
             if (B_ASN1_T61STRING == ASN1_STRING_type(data)) {
 #if OPENSSL_VERSION_NUMBER < 0x10101000L
-                    LOG(FL_ERR, "CRL nextPublish extension is present, but ASN1_TIME_set_string_X509 is not supported for OpenSSL version <1.1, sorry");
+                LOG(FL_ERR, "CRL nextPublish extension is present, but ASN1_TIME_set_string_X509 is not supported for OpenSSL version <1.1, sorry");
 #else
                 const char *nextPublishString = (const char*)ASN1_STRING_get0_data(data);
                 while (*nextPublishString && !((*nextPublishString) & 0xE0)) {
@@ -140,10 +140,9 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
                 ASN1_TIME *nextPublish = ASN1_TIME_new();
                 if (ASN1_TIME_set_string_X509(nextPublish, nextPublishString)) {
                     CDP_get_x509_time(nextPublish, time_buf, sizeof(time_buf));
-                    LOG(FL_DEBUG, "CRL nextPublish: %s", time_buf);
+                    LOG(FL_TRACE, "CRL nextPublish: %s", time_buf);
                     isAfterPublish = ASN1_TIME_compare(nextPublish, now) <= 0;
-                }
-                else {
+                } else {
                     LOG(FL_ERR, "CRL nextPublish extension is present, but time cannot be determined");
                 }
                 ASN1_TIME_free(nextPublish);
@@ -151,12 +150,12 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
             }
         }
         else {
-            LOG(FL_DEBUG, "Next Publish extension not present in CRL");
+            LOG(FL_TRACE, "Next Publish extension not present in CRL");
         }
 
         LOG(FL_DEBUG, "CRL timecheck: isBeforeStart: %d, isAfterEnd: %d, isAfterPublish: %d", isBeforeStart, isAfterEnd, isAfterPublish);
         if (isBeforeStart || isAfterEnd || isAfterPublish) {
-            LOG(FL_INFO, "the CRL is expired, it is deleted from the cache");
+            LOG(FL_INFO, "CRL is expired, so deleting it from the cache");
             // crl not within time frame, remove it
             X509_CRL_free(crl);
             crl = NULL;
@@ -164,7 +163,7 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
             unlink(cachefile);
         }
         else {
-            LOG(FL_INFO, "the CRL has been successfully loaded from the cache");
+            LOG(FL_INFO, "CRL has been successfully loaded from the cache");
         }
         ASN1_TIME_free(now);
     }
