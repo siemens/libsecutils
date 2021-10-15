@@ -79,7 +79,7 @@ void CRLMGMT_DATA_set_proxy_url(
  *        management context.
  *
  * @param cmdat pointer to the CRL management data structure
- * @return the maximum download size in bytes
+ * @return the maximum download size in bytes, or 0 for the default
  */
 unsigned long CRLMGMT_DATA_get_crl_max_download_size(
     CRLMGMT_DATA *cmdat
@@ -90,7 +90,7 @@ unsigned long CRLMGMT_DATA_get_crl_max_download_size(
  *        context.
  *
  * @param cmdat pointer to the CRL management data structure
- * @param max_download_size the maximum download size in bytes
+ * @param max_download_size the size limit for downloading CRLs in bytes, or 0 for the OpenSSL default: 100 kiB
  */
 void CRLMGMT_DATA_set_crl_max_download_size(
     CRLMGMT_DATA    *cmdat,

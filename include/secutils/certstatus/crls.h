@@ -23,7 +23,7 @@
  *
  * @param url the location of the CDP
  * @param timeout number of seconds the HTTP transaction may take, or 0 for infinite or -1 for default
- * @param max_resp_len the maximal size of the response message, or 0 for the default: 100k
+ * @param max_resp_len the maximal size of the response message, or 0 for the OpenSSL default: 100 kiB
  * @param desc description of the CRL to use for any error messages, or null
  * @return pointer to downloaded CRL, or null on error
  */

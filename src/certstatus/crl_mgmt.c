@@ -263,6 +263,7 @@ unsigned long CRLMGMT_DATA_get_crl_max_download_size(
 {
     return cmdat->max_download_size;
 }
+
 void CRLMGMT_DATA_set_crl_max_download_size(
     CRLMGMT_DATA    *cmdat,
     unsigned long   max_download_size)
