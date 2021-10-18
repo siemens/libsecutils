@@ -215,8 +215,10 @@ SSL_CTX* TLS_CTX_new(OPTIONAL SSL_CTX* ssl_ctx,
                            /* Do not allow outdated SSl/TLS protocol versions: */
                            bitor SSL_OP_NO_SSLv2 bitor SSL_OP_NO_SSLv3 bitor SSL_OP_NO_TLSv1 bitor SSL_OP_NO_TLSv1_1
                            bitor SSL_OP_NO_COMPRESSION
-                           /* Disable TLS Renegotiation */
+# if 0x10101000L <= OPENSSL_VERSION_NUMBER && OPENSSL_VERSION_NUMBER < 0x101010bfL
+                           /* Disable TLS renegotiation as workaround for CVE-2021-3449 in OpenSSL 1.1.1 before patch 'k' */
                            bitor SSL_OP_NO_RENEGOTIATION
+# endif
                            bitor (long)
 #endif
         SSL_OP_ALL; /*!< bug workarounds */
