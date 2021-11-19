@@ -1,13 +1,13 @@
-# libsecutils
+# Makefile for libsecutils
 #
 # Copyright (c) Siemens Mobility GmbH, 2021
-# 
-# Authors:
-#  David von Oheimb <david.von.oheimb@siemens.com>
 #
-# This work is licensed under the terms of the Apache Software License 2.0.  See
-# the COPYING file in the top-level directory.           
-#               
+# Authors:
+#  David von Oheimb <David.von.Oheimb@siemens.com>
+#
+# This work is licensed under the terms of the Apache Software License 2.0.
+# See the COPYING file in the top-level directory.
+#
 # SPDX-License-Identifier: Apache-2.0
 
 # Optional OPENSSL_DIR defines absolute or relative (to ../) path to OpenSSL installation.
@@ -74,7 +74,7 @@ override CFLAGS += -D_FORTIFY_SOURCE=2
 override CFLAGS += -isystem $(OPENSSL)/include# # # use of -isystem is critical for selecting wanted OpenSSL version
 override CFLAGS += -Iinclude
 override CFLAGS += -Iinclude/secutils
-ifdef SECUTILS_USE_UTA 
+ifdef SECUTILS_USE_UTA
     override CFLAGS += -DSECUTILS_USE_UTA=1
 endif
 ifdef SECUTILS_CONFIG_USE_ICV
@@ -82,8 +82,8 @@ ifdef SECUTILS_CONFIG_USE_ICV
 endif
 
 override LDFLAGS += $(DEBUG_FLAGS) # needed for -fsanitize=...
-override LDFLAGS += -L$(OPENSSL_LIB) -L$(OPENSSL) -Wl,-rpath=$(OPENSSL_LIB) # needed for genCMPClient
-ifdef SECUTILS_USE_UTA 
+override LDFLAGS += -L$(OPENSSL_LIB) -L$(OPENSSL) -Wl,-rpath=$(OPENSSL_LIB) -Wl,-rpath=$(OPENSSL) # needed for genCMPClient
+ifdef SECUTILS_USE_UTA
     override LDFLAGS += -luta
 endif
 ifdef SECUTILS_NO_TLS
@@ -136,7 +136,7 @@ endif
 	$(MAKE) COMPILE_TYPE=$(COMPILE_TYPE) $(OUTBIN)
 
 util:
-ifdef SECUTILS_USE_UTA 
+ifdef SECUTILS_USE_UTA
 	$(MAKE) CFLAGS="$(CFLAGS) $(LOCAL_CFLAGS)" -C util
 endif
 
