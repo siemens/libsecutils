@@ -44,7 +44,8 @@ Clone the git repository, e.g., with
 
 To build the library, the following libraries must be present on the system, including their headers:
 
-* OpenSSL at least version 1.0.2. Tested, among others, with 1.0.2u, 1.1.0f, 1.1.0g, 1.1.1d, 1.1.1i, 1.1.1l, and 3.0.0.<br>
+* OpenSSL development edition, at least version 1.0.2. Tested, among others,
+  with 1.0.2u, 1.1.0f, 1.1.0g, 1.1.1d, 1.1.1i, 1.1.1l, and 3.0.0.<br>
   **Warning:** OpenSSL 1.1.1 (on Mint 19) contains a bug where used cipher suite (level 3) is empty (1.1.1d on Buster works correctly)
 
 * optionally: [siemens/libuta](https://github.com/siemens/libuta)
@@ -67,7 +68,7 @@ The TLS-related functions may be disabled by defining `SECUTILS_NO_TLS`.
 ### Installing
 
 The library will be installed (with `make install`)
-to `/usr/local` if not specified otherwise.
+to `/usr/local`, unless specified otherwise by `ROOTFS`.
 
 ### Building Debian packages
 
@@ -83,7 +84,8 @@ To build the Debian packages, the following dependencies have to be installed:
 
 Then the packages can be built by
 ```
-dpkg-buildpackage -uc -us
+make clean_all
+OPENSSL_DIR= DEBUG_FLAGS= SECUTILS_USE_UTA=1 dpkg-buildpackage -uc -us
 ```
 
 ### Building the documentation
@@ -129,6 +131,6 @@ Copyright (c) Siemens Mobility GmbH, 2021
 ## License
 
 This work is licensed under the terms of the Apache Software License 2.0.
-See the COPYING file in the top-level directory.
+See the [COPYING](COPYING) file in the top-level directory.
 
 SPDX-License-Identifier: Apache-2.0
