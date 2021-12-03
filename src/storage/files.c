@@ -1268,7 +1268,8 @@ int FILES_store_certs(const STACK_OF(X509) * certs, const char* file, file_forma
     int i;
     X509* cert = 0;
 
-    LOG(FL_INFO, "storing %d certificate%s in file '%s'", n, n is_eq 1 ? "" : "s", file);
+    LOG(FL_INFO, "storing %d certificate%s%s%s in file '%s'", n < 0 ? 0: n, n is_eq 1 ? "" : "s",
+        desc == 0 ? "" : " of ", desc == 0 ? "" : desc, file);
     if(format is_eq FORMAT_PKCS12)
     {
         return FILES_store_pkcs12(0, 0, certs, file, 0, desc);
@@ -1330,7 +1331,8 @@ int FILES_store_crls(const STACK_OF(X509_CRL) * crls, const char* file, file_for
     int i;
     X509_CRL* crl = 0;
 
-    LOG(FL_INFO, "storing %d CRL%s in file '%s'", n, n is_eq 1 ? "" : "s", file);
+    LOG(FL_INFO, "storing %d CRL%s%s%s in file '%s'", n < 0 ? 0: n, n is_eq 1 ? "" : "s",
+        desc == 0 ? "" : " of ", desc == 0 ? "" : desc, file);
     if(format not_eq FORMAT_ASN1 and format not_eq FORMAT_PEM)
     {
         LOG(FL_ERR, "unsupported output format (%d) for %s", format, desc not_eq 0 ? desc : "CRLs");
