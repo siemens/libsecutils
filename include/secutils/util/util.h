@@ -220,6 +220,31 @@ void UTIL_print_store_certs(OPTIONAL BIO* bio, OPTIONAL const X509_STORE* store)
 
 
 /*!*****************************************************************************
+ * @brief warn if certificate is expired, optionally also if it is not of a CA
+ *
+ * @param uri The source of the certificate, e.g., a URL or file name
+ * @param cert certificate to be be checked, or NULL for no checks
+ * @param warn_EE warn also for non-CA cert
+ * @param vpm verification parameters, or NULL, governing if and how to check cert times,
+ * depending on 509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
+ *******************************************************************************/
+void UTIL_warn_cert(const char *uri, OPTIONAL X509 *cert, bool warn_EE,
+                    OPTIONAL X509_VERIFY_PARAM *vpm);
+
+
+/*!*****************************************************************************
+ * @brief warn if a cert list member is expired, optionally also if it is not of a CA
+ *
+ * @param uri The source of the certificates, e.g., a URL or file name
+ * @param certs list of certificates to be be checked, or NULL for no checks
+ * @param warn_EE warn also for non-CA certs
+ * @param vpm verification parameters, or NULL, governing if and how to check cert times,
+ * depending on 509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
+ *******************************************************************************/
+void UTIL_warn_certs(const char *uri, OPTIONAL STACK_OF(X509) *certs, bool warn_EE,
+                     OPTIONAL X509_VERIFY_PARAM *vpm);
+
+/*!*****************************************************************************
  * @brief retrieves number of certificates in a cert store
  *
  * @param store cert store with certificates to be printed

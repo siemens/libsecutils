@@ -493,6 +493,13 @@ bool FILES_load_credentials(OPTIONAL const char* certs, OPTIONAL OPTIONAL const 
             }
         }
     }
+
+    X509_VERIFY_PARAM *vpm = NULL; /* unfortunately no VPM available */
+    if(cert != NULL)
+        UTIL_warn_cert(certs, *cert, false, vpm);
+    if(chain != NULL)
+        UTIL_warn_certs(certs, *chain, true /* warn on non-CA certs */, vpm);
+
     return true;
 
 err:

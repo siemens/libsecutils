@@ -608,6 +608,46 @@ void UTIL_print_certs(OPTIONAL BIO* bio, OPTIONAL const STACK_OF(X509) * certs)
     }
 }
 
+/* This is similar to LOG_cert() from ../certstatus/certstatus.c */
+static void warn_cert_msg(const char *uri, X509 *cert, const char *msg)
+{
+    char *subj = X509_NAME_oneline(X509_get_subject_name(cert), NULL, 0);
+
+    if (cert == NULL)
+        LOG_err("null pointer uri argument");
+    if (cert == NULL)
+        LOG_err("null pointer msg argument");
+    LOG(FL_WARN, "Certificate from '%s' with subject '%s' %s\n", uri, subj, msg);
+    OPENSSL_free(subj);
+}
+
+void UTIL_warn_cert(const char *uri, OPTIONAL X509 *cert, bool warn_EE,
+                    OPTIONAL X509_VERIFY_PARAM *vpm)
+{
+    if (cert == NULL)
+        return;
+    uint32_t ex_flags = X509_get_extension_flags(cert);
+    int res = 0;
+
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+    res = X509_cmp_timeframe(vpm, X509_get0_notBefore(cert),
+                             X509_get0_notAfter(cert));
+#endif
+    if (res != 0)
+        warn_cert_msg(uri, cert, res > 0 ? "has expired" : "not yet valid");
+    if (warn_EE && (ex_flags & EXFLAG_V1) == 0 && (ex_flags & EXFLAG_CA) == 0)
+        warn_cert_msg(uri, cert, "is not a CA cert");
+}
+
+void UTIL_warn_certs(const char *uri, OPTIONAL STACK_OF(X509) *certs, bool warn_EE,
+                     OPTIONAL X509_VERIFY_PARAM *vpm)
+{
+    int i;
+
+    for (i = 0; i < sk_X509_num(certs /* may be NULL */); i++)
+        UTIL_warn_cert(uri, sk_X509_value(certs, i), warn_EE, vpm);
+}
+
 
 /** get a copy of all certificates in a store */
 STACK_OF(X509) * X509_STORE_get_certs(X509_STORE* store)

@@ -241,6 +241,7 @@ bool STORE_load_more(X509_STORE** pstore, const char* file, file_format_t format
             goto err;
         }
 
+        UTIL_warn_certs(file, certs, 1, NULL /* unfortunately no VPM available */);
         *pstore = STORE_create(*pstore, 0, certs);
         sk_X509_pop_free(certs, X509_free);
         return *pstore not_eq 0;
@@ -480,7 +481,8 @@ bool STORE_set1_host_ip(X509_STORE* ts, const char* name, const char* ip)
     }
 
     X509_VERIFY_PARAM_set_hostflags(ts_vpm,
-                                    X509_CHECK_FLAG_ALWAYS_CHECK_SUBJECT bitor X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS);
+                                    X509_CHECK_FLAG_ALWAYS_CHECK_SUBJECT |
+                                    X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS);
     bool res = true;
     if(ip_str not_eq 0 and X509_VERIFY_PARAM_set1_ip_asc(ts_vpm, ip_str) is_eq 0)
     {
