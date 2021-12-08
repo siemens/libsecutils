@@ -664,7 +664,8 @@ bool UTIL_warn_certs(const char *uri, OPTIONAL STACK_OF(X509) *certs, bool warn_
     bool ret = true;
 
     for (i = 0; i < sk_X509_num(certs /* may be NULL */); i++)
-        ret = UTIL_warn_cert(uri, sk_X509_value(certs, i), warn_EE, vpm) && ret;
+        ret = UTIL_warn_cert(uri, sk_X509_value(certs, i), warn_EE, vpm)
+            && ret; /* Having 'ret' after the '&&', all certs are checked. */
     return ret;
 }
 

@@ -138,7 +138,8 @@ X509_STORE* STORE_create(OPTIONAL X509_STORE* store, OPTIONAL const X509* cert, 
  * @param file name of file (in PEM or PKCS#12 or DER format) holding trusted certificates
  * @param format the format to try first when reading the file contents
  * @param desc description of file contents to use for any error messages, or null to ignore load errors
- * @param vpm verification parameters, or null, governing if and how to check cert times,
+ * @param vpm verification parameters; unless null, this enables checks whether
+ * all loaded certs are CA certs and are currently within their validity period,
  * depending on X509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
  * @param ctx (optional) pointer to UTA context for checking file integrity&authenticity using ICV
  * @return true on success, false on error
@@ -157,7 +158,7 @@ bool STORE_load_more_check(X509_STORE** pstore, const char* file,
  * @param files name(s) of PEM or PKCS#12 or DER file(s) holding trusted certificates
  * @param desc description of file contents to use for any error messages, or null to ignore load errors
  * @param vpm verification parameters; unless null, this enables checks whether
- * all loaded certs are CA certs and are currently in their validity period,
+ * all loaded certs are CA certs and are currently within their validity period,
  * depending on X509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
  * @param ctx (optional) pointer to UTA context for checking file integrity&authenticity using ICV
  * @return pointer to a new X509_STORE structure, or null on error
@@ -177,7 +178,7 @@ X509_STORE* STORE_load_check(const char* files, OPTIONAL const char* desc,
  * @param desc        description of trusted certs to use for error reporting, or null
  * @param recursive   if true, use recursive search in subdirectories
  * @param vpm verification parameters; unless null, this enables checks whether
- * all loaded certs are CA certs and are currently in their validity period,
+ * all loaded certs are CA certs and are currently within their validity period,
  * depending on X509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
  * @param ctx (optional) pointer to UTA context for checking file integrity&authenticity using ICV
  * @note at least one valid certificate file must be found in all tested directories
