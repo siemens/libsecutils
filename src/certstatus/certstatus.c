@@ -29,6 +29,7 @@
 
 #include <operators.h>
 
+/* This is similar to static warn_cert_msg() from ../util/util.c */
 void LOG_cert(OPTIONAL const char* func, OPTIONAL const char* file, int lineno, severity level,
               const char* msg, const X509* cert)
 {

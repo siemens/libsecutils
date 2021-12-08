@@ -220,8 +220,9 @@ bool X509_STORE_add0_certs(X509_STORE* store, STACK_OF(X509) * certs)
 /*
  * extend or create cert store structure with cert(s) read from file
  */
-bool STORE_load_more(X509_STORE** pstore, const char* file, file_format_t format, OPTIONAL const char* desc,
-                     OPTIONAL uta_ctx* ctx)
+bool STORE_load_more_check(X509_STORE** pstore, const char* file,
+                           file_format_t format, OPTIONAL const char* desc,
+                           OPTIONAL X509_VERIFY_PARAM *vpm, OPTIONAL uta_ctx* ctx)
 {
     if(pstore is_eq 0 or file is_eq 0)
     {
@@ -241,6 +242,11 @@ bool STORE_load_more(X509_STORE** pstore, const char* file, file_format_t format
             goto err;
         }
 
+        if (!UTIL_warn_certs(file, certs, 1, vpm)
+                && vpm != NULL /* strict checking */) {
+            sk_X509_pop_free(certs, X509_free);
+            goto err;
+        }
         *pstore = STORE_create(*pstore, 0, certs);
         sk_X509_pop_free(certs, X509_free);
         return *pstore not_eq 0;
@@ -252,7 +258,8 @@ err:
 }
 
 
-X509_STORE* STORE_load_trusted(const char* files, OPTIONAL const char* desc, OPTIONAL uta_ctx* ctx)
+X509_STORE* STORE_load_check(const char* files, OPTIONAL const char* desc,
+                             OPTIONAL X509_VERIFY_PARAM *vpm, OPTIONAL uta_ctx* ctx)
 {
     X509_STORE* store = 0;
 
@@ -274,7 +281,7 @@ X509_STORE* STORE_load_trusted(const char* files, OPTIONAL const char* desc, OPT
     for(file = names; file not_eq 0; file = next)
     {
         next = UTIL_next_item(file); /* must do this here to split string */
-        if(not STORE_load_more(&store, file, FORMAT_PEM, desc, ctx))
+        if(not STORE_load_more_check(&store, file, FORMAT_PEM, desc, vpm, ctx))
         {
             X509_STORE_free(store);
             store = 0;
@@ -287,8 +294,9 @@ X509_STORE* STORE_load_trusted(const char* files, OPTIONAL const char* desc, OPT
 }
 
 
-bool STORE_load_trusted_dir(X509_STORE** pstore, const char* trust_dir, OPTIONAL const char* desc, bool recursive,
-                            OPTIONAL uta_ctx* ctx)
+bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
+                          OPTIONAL const char* desc, bool recursive,
+                          OPTIONAL X509_VERIFY_PARAM *vpm, OPTIONAL uta_ctx* ctx)
 {
     DIR* p_dir = 0;
     bool found = false;
@@ -322,14 +330,14 @@ bool STORE_load_trusted_dir(X509_STORE** pstore, const char* trust_dir, OPTIONAL
         {
             if(f_stat.st_mode bitand S_IFREG)
             {
-                if(STORE_load_more(pstore, full_path, FORMAT_PEM, 0 /* do not report load errors twice */, ctx))
+                if(STORE_load_more_check(pstore, full_path, FORMAT_PEM, 0 /* do not report load errors twice */, vpm, ctx))
                 {
                     found = true;
                 }
             }
             else if(recursive and (f_stat.st_mode bitand S_IFDIR) and (0 not_eq strncmp(p_dirent->d_name, ".", 1)))
             {
-                if(not STORE_load_trusted_dir(pstore, full_path, desc, recursive, ctx))
+                if(not STORE_load_check_dir(pstore, full_path, desc, recursive, vpm, ctx))
                 {
                     found = false;
                     goto err;
@@ -480,7 +488,8 @@ bool STORE_set1_host_ip(X509_STORE* ts, const char* name, const char* ip)
     }
 
     X509_VERIFY_PARAM_set_hostflags(ts_vpm,
-                                    X509_CHECK_FLAG_ALWAYS_CHECK_SUBJECT bitor X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS);
+                                    X509_CHECK_FLAG_ALWAYS_CHECK_SUBJECT |
+                                    X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS);
     bool res = true;
     if(ip_str not_eq 0 and X509_VERIFY_PARAM_set1_ip_asc(ts_vpm, ip_str) is_eq 0)
     {

@@ -220,6 +220,33 @@ void UTIL_print_store_certs(OPTIONAL BIO* bio, OPTIONAL const X509_STORE* store)
 
 
 /*!*****************************************************************************
+ * @brief warn if certificate is expired, optionally also if it is not of a CA
+ *
+ * @param uri The source of the certificate, e.g., a URL or file name
+ * @param cert certificate to be be checked, or null for no checks
+ * @param warn_EE warn also for non-CA cert
+ * @param vpm verification parameters, or null, governing if and how to check cert times,
+ * depending on X509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
+ * @return whether no cert given or all checks passed
+ *******************************************************************************/
+bool UTIL_warn_cert(const char *uri, OPTIONAL X509 *cert, bool warn_EE,
+                    OPTIONAL X509_VERIFY_PARAM *vpm);
+
+
+/*!*****************************************************************************
+ * @brief warn if a cert list member is expired, optionally also if it is not of a CA
+ *
+ * @param uri The source of the certificates, e.g., a URL or file name
+ * @param certs list of certificates to be be checked, or null for no checks
+ * @param warn_EE warn also for non-CA certs
+ * @param vpm verification parameters, or null, governing if and how to check cert times,
+ * depending on X509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
+ * @return whether no certs given or all checks passed
+ *******************************************************************************/
+bool UTIL_warn_certs(const char *uri, OPTIONAL STACK_OF(X509) *certs, bool warn_EE,
+                     OPTIONAL X509_VERIFY_PARAM *vpm);
+
+/*!*****************************************************************************
  * @brief retrieves number of certificates in a cert store
  *
  * @param store cert store with certificates to be printed
@@ -445,7 +472,7 @@ size_t UTIL_url_encode(
  * @param uppercase indicate whether the hex string should be capitalized
  * @param separator a single character to be inserted every separator_count chars
  * @param separator_count the number of chars between separators, or 0 for no separator
- * @param out pointer to the output buffer, or NULL (used to just determine the size needed)
+ * @param out pointer to the output buffer, or null (used to just determine the size needed)
  * @param out_len number of chars (including the trailing NUL) in the output buffer
  * @param size_needed optional pointer to the exact size needed for the
  *        converted string. If the size_needed is null the size is not returned
