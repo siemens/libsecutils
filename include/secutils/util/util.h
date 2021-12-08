@@ -226,7 +226,7 @@ void UTIL_print_store_certs(OPTIONAL BIO* bio, OPTIONAL const X509_STORE* store)
  * @param cert certificate to be be checked, or null for no checks
  * @param warn_EE warn also for non-CA cert
  * @param vpm verification parameters, or null, governing if and how to check cert times,
- * depending on 509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
+ * depending on X509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
  * @return whether no cert given or all checks passed
  *******************************************************************************/
 bool UTIL_warn_cert(const char *uri, OPTIONAL X509 *cert, bool warn_EE,
@@ -240,7 +240,7 @@ bool UTIL_warn_cert(const char *uri, OPTIONAL X509 *cert, bool warn_EE,
  * @param certs list of certificates to be be checked, or null for no checks
  * @param warn_EE warn also for non-CA certs
  * @param vpm verification parameters, or null, governing if and how to check cert times,
- * depending on 509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
+ * depending on X509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
  * @return whether no certs given or all checks passed
  *******************************************************************************/
 bool UTIL_warn_certs(const char *uri, OPTIONAL STACK_OF(X509) *certs, bool warn_EE,

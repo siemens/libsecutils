@@ -632,8 +632,22 @@ bool UTIL_warn_cert(const char *uri, OPTIONAL X509 *cert, bool warn_EE,
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
     res = X509_cmp_timeframe(vpm, X509_get0_notBefore(cert),
                              X509_get0_notAfter(cert));
+#else
+    unsigned long flags = vpm == NULL ? 0 : X509_VERIFY_PARAM_get_flags(vpm);
+    if ((flags & X509_V_FLAG_NO_CHECK_TIME) == 0) {
+        time_t ref_time;
+        time_t *time = NULL;
+        if ((flags & X509_V_FLAG_USE_CHECK_TIME) != 0) {
+            ref_time = X509_VERIFY_PARAM_get_time(vpm);
+            time = &ref_time;
+        }
+        if (X509_cmp_time(X509_get0_notAfter(cert), time) < 0)
+            res = 1;
+        else if (X509_cmp_time(X509_get0_notBefore(cert), time) > 0)
+            res = -1;
+    }
 #endif
-    bool ret = res != 0;
+    bool ret = res == 0;
     if (!ret)
         warn_cert_msg(uri, cert, res > 0 ? "has expired" : "not yet valid");
     if (warn_EE && (ex_flags & EXFLAG_V1) == 0 && (ex_flags & EXFLAG_CA) == 0) {
@@ -650,7 +664,7 @@ bool UTIL_warn_certs(const char *uri, OPTIONAL STACK_OF(X509) *certs, bool warn_
     bool ret = true;
 
     for (i = 0; i < sk_X509_num(certs /* may be NULL */); i++)
-        ret = ret && UTIL_warn_cert(uri, sk_X509_value(certs, i), warn_EE, vpm);
+        ret = UTIL_warn_cert(uri, sk_X509_value(certs, i), warn_EE, vpm) && ret;
     return ret;
 }
 
