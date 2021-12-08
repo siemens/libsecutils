@@ -242,8 +242,8 @@ bool STORE_load_more_check(X509_STORE** pstore, const char* file,
             goto err;
         }
 
-        bool res = UTIL_warn_certs(file, certs, 1, vpm);
-        if (vpm != NULL && !res) {
+        if (!UTIL_warn_certs(file, certs, 1, vpm)
+                && vpm != NULL /* strict checking */) {
             sk_X509_pop_free(certs, X509_free);
             goto err;
         }
