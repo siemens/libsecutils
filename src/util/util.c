@@ -621,11 +621,11 @@ static void warn_cert_msg(const char *uri, X509 *cert, const char *msg)
     OPENSSL_free(subj);
 }
 
-void UTIL_warn_cert(const char *uri, OPTIONAL X509 *cert, bool warn_EE,
+bool UTIL_warn_cert(const char *uri, OPTIONAL X509 *cert, bool warn_EE,
                     OPTIONAL X509_VERIFY_PARAM *vpm)
 {
     if (cert == NULL)
-        return;
+        return true;
     uint32_t ex_flags = X509_get_extension_flags(cert);
     int res = 0;
 
@@ -633,19 +633,25 @@ void UTIL_warn_cert(const char *uri, OPTIONAL X509 *cert, bool warn_EE,
     res = X509_cmp_timeframe(vpm, X509_get0_notBefore(cert),
                              X509_get0_notAfter(cert));
 #endif
-    if (res != 0)
+    bool ret = res != 0;
+    if (!ret)
         warn_cert_msg(uri, cert, res > 0 ? "has expired" : "not yet valid");
-    if (warn_EE && (ex_flags & EXFLAG_V1) == 0 && (ex_flags & EXFLAG_CA) == 0)
+    if (warn_EE && (ex_flags & EXFLAG_V1) == 0 && (ex_flags & EXFLAG_CA) == 0) {
         warn_cert_msg(uri, cert, "is not a CA cert");
+        ret = false;
+    }
+    return ret;
 }
 
-void UTIL_warn_certs(const char *uri, OPTIONAL STACK_OF(X509) *certs, bool warn_EE,
+bool UTIL_warn_certs(const char *uri, OPTIONAL STACK_OF(X509) *certs, bool warn_EE,
                      OPTIONAL X509_VERIFY_PARAM *vpm)
 {
     int i;
+    bool ret = true;
 
     for (i = 0; i < sk_X509_num(certs /* may be NULL */); i++)
-        UTIL_warn_cert(uri, sk_X509_value(certs, i), warn_EE, vpm);
+        ret = ret && UTIL_warn_cert(uri, sk_X509_value(certs, i), warn_EE, vpm);
+    return ret;
 }
 
 
