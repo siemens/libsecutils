@@ -171,6 +171,10 @@ typedef unsigned char uint8_t;
 #define SSL_CTX_set1_cert_store(c, t) (X509_STORE_up_ref(t), SSL_CTX_set_cert_store(c, t))
 #endif
 
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
+STACK_OF(X509) *X509_STORE_get1_all_certs(X509_STORE *store);
+#endif
+
 /*!*****************************************************************************
  * @brief initialize the OpenSSL crypto library
  * @param version expected OpenSSL version number
@@ -180,109 +184,6 @@ typedef unsigned char uint8_t;
  *******************************************************************************/
 /* this function is used by the genCMPClient API implementation */
 void UTIL_setup_openssl(long version, OPTIONAL const char* build_name);
-
-
-/*!*****************************************************************************
- * @brief print the most interesting parts of a CRL
- *
- * @param bio BIO to print to, e.g., bio_err, or null
- * @param crl certificate revocation list to be printed, or null
- *******************************************************************************/
-void UTIL_print_crl(OPTIONAL BIO* bio, OPTIONAL const X509_CRL* crl);
-
-
-/*!*****************************************************************************
- * @brief print a certificate
- *
- * @param bio BIO to print to, e.g., bio_err, or null
- * @param cert certificate to be printed, or null
- * @param neg_cflags indicates elements not to be printed
- *******************************************************************************/
-void UTIL_print_cert(OPTIONAL BIO* bio, OPTIONAL const X509* cert, unsigned long neg_cflags);
-
-
-/*!*****************************************************************************
- * @brief print a list of certificates
- *
- * @param bio BIO to print to, e.g., bio_err, or null
- * @param certs list of certificates to be printed, or null
- *******************************************************************************/
-void UTIL_print_certs(OPTIONAL BIO* bio, OPTIONAL const STACK_OF(X509) * certs);
-
-
-/*!*****************************************************************************
- * @brief print the certificates in a cert store
- *
- * @param bio BIO to print to, e.g., bio_err, or null
- * @param store cert store with certificates to be printed, or null
- *******************************************************************************/
-void UTIL_print_store_certs(OPTIONAL BIO* bio, OPTIONAL const X509_STORE* store);
-
-
-/*!*****************************************************************************
- * @brief warn if certificate is expired, optionally also if it is not of a CA
- *
- * @param uri The source of the certificate, e.g., a URL or file name
- * @param cert certificate to be be checked, or null for no checks
- * @param warn_EE warn also for non-CA cert
- * @param vpm verification parameters, or null, governing if and how to check cert times,
- * depending on X509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
- * @return whether no cert given or all checks passed
- *******************************************************************************/
-bool UTIL_warn_cert(const char *uri, OPTIONAL X509 *cert, bool warn_EE,
-                    OPTIONAL X509_VERIFY_PARAM *vpm);
-
-
-/*!*****************************************************************************
- * @brief warn if a cert list member is expired, optionally also if it is not of a CA
- *
- * @param uri The source of the certificates, e.g., a URL or file name
- * @param certs list of certificates to be be checked, or null for no checks
- * @param warn_EE warn also for non-CA certs
- * @param vpm verification parameters, or null, governing if and how to check cert times,
- * depending on X509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
- * @return whether no certs given or all checks passed
- *******************************************************************************/
-bool UTIL_warn_certs(const char *uri, OPTIONAL STACK_OF(X509) *certs, bool warn_EE,
-                     OPTIONAL X509_VERIFY_PARAM *vpm);
-
-/*!*****************************************************************************
- * @brief retrieves number of certificates in a cert store
- *
- * @param store cert store with certificates to be printed
- * @return number of certificates in the cert store
- *******************************************************************************/
-int UTIL_store_certs_num(const X509_STORE* store);
-
-
-/*!*****************************************************************************
- * @brief add certificate to given stack, optionally only if not already contained
- *
- * @param sk stack of certificates
- * @param cert certificate to be pushed to the stack
- * @param no_duplicate flag governing whether to add cert if it is a duplicate
- * @return true on success, else false
- *******************************************************************************/
-bool UTIL_sk_X509_add1_cert(STACK_OF(X509) * sk, X509* cert, bool no_duplicate);
-
-
-/*!*****************************************************************************
- * @brief add stack of certificates to given stack,
- * optionally only if not self-signed and optionally if not already contained
- *
- * @param sk stack of certificates
- * @param certs (optional) stack of certificates to be pushed to the stack
- * @param no_self_signed flag governing whether to add self-signed certs
- * @param no_duplicates flag governing whether to add cert if it is a duplicate
- * @return true on success, else false
- *******************************************************************************/
-/* this function is used by the genCMPClient API implementation */
-int UTIL_sk_X509_add1_certs(STACK_OF(X509) * sk, OPTIONAL const STACK_OF(X509) * certs, int no_self_signed,
-                            int no_duplicates);
-
-
-/** get a copy of all certificates in a store */ /* TODO remove when available in library */
-STACK_OF(X509) * X509_STORE_get_certs(X509_STORE* store);
 
 
 /*!*****************************************************************************
@@ -353,18 +254,6 @@ bool UTIL_write_file(const char* filename, const void* data, size_t len);
  * in the sense of https://wiki.sei.cmu.edu/confluence/display/c/FIO30-C.+Exclude+user+input+from+format+strings
  *******************************************************************************/
 bool UTIL_iterate_dir(bool (*fn)(const char* file, void* arg), void* arg, const char* path, bool recursive);
-
-
-/*!*****************************************************************************
- * @brief parse an X.500 Distinguished Name (DN)
- *
- * @param dn string to be parsed, format /type0=value0/type1=value1/type2=... where characters may be escaped by \
- * @param chtype type of the string, e.g., MBSTRING_ASC, as defined in openssl/asn1.h
- * @param multirdn flag whether to allow multi-valued RDNs
- * @return ASN.1 representation of the DN, or null on error
- *******************************************************************************/
-/* this function is used by the genCMPClient API implementation */
-X509_NAME* UTIL_parse_name(const char* dn, long chtype, bool multirdn);
 
 
 /*!*****************************************************************************

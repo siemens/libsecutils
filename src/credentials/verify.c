@@ -16,8 +16,10 @@
 #include <openssl/ssl.h>
 #include <openssl/x509v3.h>
 
+#include <credentials/cert.h>
 #include <credentials/store.h>
 #include <credentials/verify.h>
+#include <certstatus/crls.h>
 #include <util/log.h>
 #include <storage/uta_api.h>
 
@@ -141,7 +143,7 @@ int CREDENTIALS_print_cert_verify_cb(int ok, X509_STORE_CTX* store_ctx)
                 depth, cert_error, error_str, expected not_eq 0 ? "; expected: " : "",
                 expected not_eq 0 ? expected : "");
             LOG_cert(LOG_FUNC_FILE_LINE, level, "verification unsuccessful for", cert);
-            UTIL_print_cert(bio, cert, X509_FLAG_NO_EXTENSIONS);
+            CERT_print(cert, bio, X509_FLAG_NO_EXTENSIONS);
             if(certstatus_error)
             {
                 LOG_certstatus_sources(FL_ERR, ts, "have checked", cert);
@@ -159,7 +161,7 @@ int CREDENTIALS_print_cert_verify_cb(int ok, X509_STORE_CTX* store_ctx)
                     case X509_V_ERR_UNABLE_TO_GET_CRL_ISSUER:
                     case X509_V_ERR_STORE_LOOKUP:
                         LOG(LOG_FUNC_FILE_LINE, level, "\nchain store:");
-                        UTIL_print_certs(bio, X509_STORE_CTX_get0_untrusted(store_ctx));
+                        CERTS_print(X509_STORE_CTX_get0_untrusted(store_ctx), bio);
                         LOG(LOG_FUNC_FILE_LINE, level, "\ntrust store:");
                         UTIL_print_store_certs(bio, X509_STORE_CTX_get0_store(store_ctx));
                         break;

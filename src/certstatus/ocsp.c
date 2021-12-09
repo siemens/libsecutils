@@ -21,6 +21,7 @@
 
 # include <certstatus/ocsp.h>
 # include <certstatus/crls.h>
+# include <credentials/cert.h>
 # include <credentials/store.h>
 # include <credentials/verify.h>
 # include <connections/http.h>
@@ -335,7 +336,7 @@ int ocsp_stapling_cb(SSL* ssl, OPTIONAL STACK_OF(X509) *untrusted)
                      return code < 0 as internal error: malloc failure */
 
     LOG_cert(FL_TRACE, "checking OCSP stapling for", cert);
-    UTIL_print_cert(bio_trace, cert, X509_FLAG_NO_EXTENSIONS);
+    CERT_print(cert, bio_trace, X509_FLAG_NO_EXTENSIONS);
     if(resp_der is_eq 0)
     {
         LOG(FL_DEBUG, "no OCSP response has been stapled\n");

@@ -29,6 +29,83 @@
 
 #include <operators.h>
 
+/* adapted from OpenSSL:crypto/x509/t_crl.c */
+void UTIL_print_crl(OPTIONAL BIO* bio, OPTIONAL const X509_CRL* crl)
+{
+    unsigned long flags =
+        ASN1_STRFLGS_RFC2253 bitor ASN1_STRFLGS_ESC_QUOTE bitor XN_FLAG_SEP_CPLUS_SPC bitor XN_FLAG_FN_SN;
+
+    if(bio is_eq 0)
+    {
+        return;
+    }
+    if(crl not_eq 0)
+    {
+        BIO_printf(bio, "    Certificate Revocation List (CRL):\n");
+#if 0
+        long ver = X509_CRL_get_version(crl);
+        if(ver >= 0 and ver <= 1)
+        {
+            BIO_printf(bio, "%8sVersion %ld (0x%lx)\n", "", ver + 1, (unsigned long)ver);
+        }
+        else
+        {
+            BIO_printf(bio, "%8sVersion unknown (%ld)\n", "", ver);
+        }
+        const X509_ALGOR* sig_alg;
+        const ASN1_BIT_STRING* sig;
+        X509_CRL_get0_signature(crl, &sig, &sig_alg);
+        BIO_puts(bio, "    ");
+        X509_signature_print(bio, sig_alg, NULL);
+#endif
+        BIO_printf(bio, "%8sIssuer: ", "");
+        X509_NAME_print_ex(bio, X509_CRL_get_issuer(crl), 0, flags);
+        BIO_puts(bio, "\n");
+        BIO_printf(bio, "%8sLast Update: ", "");
+        ASN1_TIME_print(bio, X509_CRL_get0_lastUpdate(crl));
+        BIO_printf(bio, "\n%8sNext Update: ", "");
+        if (X509_CRL_get0_nextUpdate(crl))
+        {
+            ASN1_TIME_print(bio, X509_CRL_get0_nextUpdate(crl));
+        }
+        else
+        {
+            BIO_printf(bio, "NONE");
+        }
+        BIO_printf(bio, "\n");
+
+#if 0
+        X509V3_extensions_print(bio, "CRL extensions",
+                                X509_CRL_get0_extensions(crl), 0, 8);
+#endif
+
+        STACK_OF(X509_REVOKED) * rev = X509_CRL_get_REVOKED((X509_CRL*) crl);
+        BIO_printf(bio, "    Number of revoked Certificates: %d\n",
+                   rev is_eq 0 ? 0 : sk_X509_REVOKED_num(rev));
+
+#if 0
+        int i;
+        for(i = 0; i < sk_X509_REVOKED_num(rev); i++)
+        {
+            X509_REVOKED* r = sk_X509_REVOKED_value(rev, i);
+            BIO_printf(bio, "    Serial Number: ");
+            i2a_ASN1_INTEGER(bio, X509_REVOKED_get0_serialNumber(r));
+            BIO_printf(bio, "\n        Revocation Date: ");
+            ASN1_TIME_print(bio, X509_REVOKED_get0_revocationDate(r));
+            BIO_printf(bio, "\n");
+            X509V3_extensions_print(bio, "CRL entry extensions",
+                                    X509_REVOKED_get0_extensions(r), 0, 8);
+        }
+        X509_signature_print(bio, sig_alg, sig);
+#endif
+    }
+    else
+    {
+        BIO_printf(bio, "    (no CRL)\n");
+    }
+    BIO_flush(bio);
+}
+
 X509_CRL* CONN_load_crl_http(const char* url, int timeout,
                              unsigned long max_resp_len, OPTIONAL const char* desc)
 {

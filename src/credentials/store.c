@@ -16,8 +16,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
-#include <openssl/x509v3.h>
-
+#include <credentials/cert.h>
 #include <credentials/store.h>
 #include <credentials/verify.h>
 #include <certstatus/crls.h> /* for CONN_load_crl_http() */
@@ -208,11 +207,11 @@ bool X509_STORE_add0_certs(X509_STORE* store, STACK_OF(X509) * certs)
     {
         if(0 is_eq X509_STORE_add_cert(store, sk_X509_value(certs, i)))
         {
-            sk_X509_pop_free(certs, X509_free);
+            CERTS_free(certs);
             return false;
         }
     }
-    sk_X509_pop_free(certs, X509_free);
+    CERTS_free(certs);
     return true;
 }
 #endif
@@ -242,13 +241,13 @@ bool STORE_load_more_check(X509_STORE** pstore, const char* file,
             goto err;
         }
 
-        if (!UTIL_warn_certs(file, certs, 1, vpm)
+        if (!CERT_check_all(file, certs, 1 /* should be CA certs */, vpm)
                 && vpm != NULL /* strict checking */) {
-            sk_X509_pop_free(certs, X509_free);
+            CERTS_free(certs);
             goto err;
         }
         *pstore = STORE_create(*pstore, 0, certs);
-        sk_X509_pop_free(certs, X509_free);
+        CERTS_free(certs);
         return *pstore not_eq 0;
     }
 
@@ -360,7 +359,7 @@ err:
         closedir(p_dir);
     }
 
-    int cert_num = UTIL_store_certs_num(*pstore);
+    int cert_num = STORE_certs_num(*pstore);
     if(not found and cert_num is_eq 0)
     {
         STORE_free(*pstore);
@@ -823,6 +822,77 @@ const revstatus_access* STORE_get0_ocsp(X509_STORE* store)
 {
     const STORE_EX* ex_data = STORE_get_ex_data(store);
     return ex_data not_eq 0 ? &ex_data->ocsp : 0;
+}
+
+
+#if OPENSSL_VERSION_NUMBER < 0x30000000L
+/** get a copy of all certificates in a store */
+STACK_OF(X509) *X509_STORE_get1_all_certs(X509_STORE *store)
+{
+    int i = 0;
+    STACK_OF(X509) * sk;
+    STACK_OF(X509_OBJECT) * objs;
+
+    if(0 is_eq store)
+    {
+        return 0;
+    }
+    if(0 is_eq(sk = sk_X509_new_null()))
+    {
+        return 0;
+    }
+    objs = X509_STORE_get0_objects(store);
+    for(i = 0; i < sk_X509_OBJECT_num(objs); i++)
+    {
+        X509* cert = X509_OBJECT_get0_X509(sk_X509_OBJECT_value(objs, i));
+        if(cert not_eq 0)
+        {
+            if(0 is_eq UTIL_sk_X509_add1_cert(sk, cert, 0))
+            {
+                CERTS_free(sk);
+                return 0;
+            }
+        }
+    }
+    return sk;
+}
+#endif
+
+void STORE_print_certs(OPTIONAL const X509_STORE* store, OPTIONAL BIO* bio)
+{
+    if(bio is_eq 0)
+    {
+        return;
+    }
+    if(store not_eq 0)
+    {
+        STACK_OF(X509)* certs = X509_STORE_get1_all_certs((X509_STORE*)store);
+        CERTS_print(certs, bio);
+        CERTS_free(certs);
+    }
+    else
+    {
+        BIO_printf(bio, "    (no certificate store)\n");
+        BIO_flush(bio);
+    }
+}
+
+int STORE_certs_num(const X509_STORE* store)
+{
+    if(store is_eq 0)
+    {
+        return 0;
+    }
+
+    int result = 0;
+    STACK_OF(X509)* certs = X509_STORE_get1_all_certs((X509_STORE*)store);
+    if(certs)
+    {
+        result = sk_X509_num(certs);
+        CERTS_free(certs);
+    }
+
+    return result;
 }
 
 
