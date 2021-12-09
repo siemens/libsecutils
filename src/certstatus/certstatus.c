@@ -19,6 +19,7 @@
 #endif
 
 #include <util/log.h>
+#include <credentials/cert.h>
 #include <credentials/store.h>
 #include <credentials/verify.h>
 #include <certstatus/certstatus.h>
@@ -28,15 +29,6 @@
 #endif
 
 #include <operators.h>
-
-/* This is similar to static warn_cert_msg() from ../util/util.c */
-void LOG_cert(OPTIONAL const char* func, OPTIONAL const char* file, int lineno, severity level,
-              const char* msg, const X509* cert)
-{
-    char* s = X509_NAME_oneline(X509_get_subject_name(cert), 0, 0);
-    LOG(func, file, lineno, level, "%s cert with subject = %s", msg, s);
-    OPENSSL_free(s);
-}
 
 static unsigned int num_CDPs(const X509* cert)
 {
@@ -167,7 +159,7 @@ bool check_cert_revocation(X509_STORE_CTX* ctx, OPTIONAL OCSP_RESPONSE* resp)
     int ok = 0;
 
     LOG_cert(FL_DEBUG, "start checking revocation status for", cert);
-    UTIL_print_cert(bio_trace, cert, X509_FLAG_NO_EXTENSIONS);
+    CERT_print(cert, bio_trace, X509_FLAG_NO_EXTENSIONS);
     LOG_certstatus_sources(FL_TRACE, ts, "will check", cert);
     LOG_certstatus_methods(FL_DEBUG, ctx, "will try checking", true);
     /* status checking issues will be reported as errors only for last enabled method */
@@ -279,7 +271,7 @@ bool check_cert_revocation(X509_STORE_CTX* ctx, OPTIONAL OCSP_RESPONSE* resp)
            or not UTIL_sk_X509_add1_certs(sk, chain, 1 /*no self-signed */, 0)
            or not UTIL_sk_X509_add1_certs(sk, untrusted, 1 /*no self-signed */, 1/* no dups */))
         {
-            sk_X509_pop_free(sk, X509_free);
+            CERTS_free(sk);
             return false;
         }
         const bool final = not crl_check;
@@ -288,7 +280,7 @@ bool check_cert_revocation(X509_STORE_CTX* ctx, OPTIONAL OCSP_RESPONSE* resp)
             X509_VERIFY_PARAM_clear_flags(param, X509_V_FLAG_NONFINAL_CHECK);
         }
         ok = check_cert_status_ocsp(ctx, sk, cert, issuer);
-        sk_X509_pop_free(sk, X509_free);
+        CERTS_free(sk);
         if(ok is_eq 1) /* cert status ok */
         {
             ERR_clear_error();

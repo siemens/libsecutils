@@ -19,6 +19,7 @@
 
 #include <openssl/engine.h>
 
+#include <credentials/cert.h>
 #include <credentials/store.h>
 #include <credentials/verify.h>
 #include <storage/files.h>
@@ -211,7 +212,7 @@ void CREDENTIALS_free(OPTIONAL CREDENTIALS* creds)
     {
         EVP_PKEY_free(creds->pkey);
         X509_free(creds->cert);
-        sk_X509_pop_free(creds->chain, X509_free);
+        CERTS_free(creds->chain);
         UTIL_cleanse(creds->pwd);
         OPENSSL_free(creds->pwd);
         OPENSSL_free(creds->pwdref);
@@ -275,7 +276,7 @@ CREDENTIALS* CREDENTIALS_load(OPTIONAL const char* certs, OPTIONAL const char* k
     CREDENTIALS* res = CREDENTIALS_new(pkey, cert, chain, 0, 0);
     EVP_PKEY_free(pkey);
     X509_free(cert);
-    sk_X509_pop_free(chain, X509_free);
+    CERTS_free(chain);
     return res;
 }
 

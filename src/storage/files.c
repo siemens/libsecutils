@@ -28,6 +28,7 @@ _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 #include <sys/stat.h>
 #include <storage/files.h>
 #include <certstatus/crls.h>
+#include <credentials/cert.h>
 #include <util/log.h>
 # include <connections/conn.h>
 
@@ -489,16 +490,16 @@ bool FILES_load_credentials(OPTIONAL const char* certs, OPTIONAL OPTIONAL const 
             }
             else
             {
-                sk_X509_pop_free(certs_, X509_free);
+                CERTS_free(certs_);
             }
         }
     }
 
     X509_VERIFY_PARAM *vpm = NULL; /* unfortunately no VPM available */
     if(cert != NULL)
-        UTIL_warn_cert(certs, *cert, false, vpm);
+        (void)CERT_check(certs, *cert, 0 /* tentatively warn on CA cert */, vpm);
     if(chain != NULL)
-        UTIL_warn_certs(certs, *chain, true /* warn on non-CA certs */, vpm);
+        (void)CERT_check_all(certs, *chain, 1 /* warn on non-CA certs */, vpm);
 
     return true;
 
@@ -634,7 +635,7 @@ end:
     {
         if(pcerts not_eq 0)
         {
-            sk_X509_pop_free(*pcerts, X509_free);
+            CERTS_free(*pcerts);
             *pcerts = 0;
         }
         if(pcrls not_eq 0)
@@ -716,7 +717,7 @@ end:
     UTIL_cleanse_free(pass);
     if(cert is_eq 0)
     {
-        sk_X509_pop_free(certs, X509_free);
+        CERTS_free(certs);
         certs = 0;
         if(desc not_eq 0)
         {
@@ -791,7 +792,7 @@ STACK_OF(X509)
         {
             goto oom;
         }
-        sk_X509_pop_free(certs, X509_free);
+        CERTS_free(certs);
     }
     OPENSSL_free(names);
     return result;
@@ -799,8 +800,8 @@ STACK_OF(X509)
 oom:
     LOG_err("Out of memory");
 err:
-    sk_X509_pop_free(certs, X509_free);
-    sk_X509_pop_free(result, X509_free);
+    CERTS_free(certs);
+    CERTS_free(result);
     OPENSSL_free(names);
     return 0;
 }
@@ -810,7 +811,7 @@ X509* FILES_load_cert(const char* file, file_format_t format, OPTIONAL const cha
 {
     STACK_OF(X509)* certs = FILES_load_certs(file, format, source, desc);
     X509* cert = sk_X509_shift(certs);
-    sk_X509_pop_free(certs, X509_free);
+    CERTS_free(certs);
     return cert;
 }
 

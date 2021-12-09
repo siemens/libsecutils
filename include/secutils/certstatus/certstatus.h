@@ -44,19 +44,6 @@ typedef struct revstatus_access_st
 #define X509_V_FLAG_NONFINAL_CHECK  0x10000000 /* do not log failure as error */
 
 /*!*****************************************************************************
- * @brief log messsage about the given certificate, printing its subject
- *
- * @param func the name of the reporting function or component, or null
- * @param file the current source file path name, or null
- * @param lineno the current line number, or 0
- * @param level the nature of the message, i.e., its severity level
- * @param msg the message to be logged
- * @param cert the certificate the message referts to
- */
-void LOG_cert(OPTIONAL const char* func, OPTIONAL const char* file, int lineno, severity level,
-              const char* msg, const X509* cert);
-
-/*!*****************************************************************************
  * @brief log messsage about the given certificate, focusing on CDP contents
  * in extensions with NID_crl_distribution_points or NID_freshest_crl
  *

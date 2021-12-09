@@ -138,11 +138,12 @@ X509_STORE* STORE_create(OPTIONAL X509_STORE* store, OPTIONAL const X509* cert, 
  * @param file name of file (in PEM or PKCS#12 or DER format) holding trusted certificates
  * @param format the format to try first when reading the file contents
  * @param desc description of file contents to use for any error messages, or null to ignore load errors
- * @param vpm verification parameters; unless null, this enables checks whether
- * all loaded certs are CA certs and are currently within their validity period,
+ * @param vpm verification parameters, or null, governing if and how to check cert times,
  * depending on X509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
  * @param ctx (optional) pointer to UTA context for checking file integrity&authenticity using ICV
  * @return true on success, false on error
+ * @note For loaded certs their validity period and their CA flag are checked.
+ *       Failures are logged as a warning if vpm is null, otherwise as an error.
  */
 bool STORE_load_more_check(X509_STORE** pstore, const char* file,
                            file_format_t format, OPTIONAL const char* desc,
@@ -157,11 +158,12 @@ bool STORE_load_more_check(X509_STORE** pstore, const char* file,
  *
  * @param files name(s) of PEM or PKCS#12 or DER file(s) holding trusted certificates
  * @param desc description of file contents to use for any error messages, or null to ignore load errors
- * @param vpm verification parameters; unless null, this enables checks whether
- * all loaded certs are CA certs and are currently within their validity period,
+ * @param vpm verification parameters, or null, governing if and how to check cert times,
  * depending on X509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
  * @param ctx (optional) pointer to UTA context for checking file integrity&authenticity using ICV
  * @return pointer to a new X509_STORE structure, or null on error
+ * @note For loaded certs their validity period and their CA flag are checked.
+ *       Failures are logged as a warning if vpm is null, otherwise as an error.
  */
 /* this function is used by the genCMPClient API implementation */
 X509_STORE* STORE_load_check(const char* files, OPTIONAL const char* desc,
@@ -177,12 +179,13 @@ X509_STORE* STORE_load_check(const char* files, OPTIONAL const char* desc,
  * @param trust_dir   directory where to search for certificates
  * @param desc        description of trusted certs to use for error reporting, or null
  * @param recursive   if true, use recursive search in subdirectories
- * @param vpm verification parameters; unless null, this enables checks whether
- * all loaded certs are CA certs and are currently within their validity period,
+ * @param vpm verification parameters, or null, governing if and how to check cert times,
  * depending on X509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
  * @param ctx (optional) pointer to UTA context for checking file integrity&authenticity using ICV
  * @note at least one valid certificate file must be found in all tested directories
  * @return true on success, false on error/failure
+ * @note For loaded certs their validity period and their CA flag are checked.
+ *       Failures are logged as a warning if vpm is null, otherwise as an error.
  ******************************************************************************/
 bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
                           OPTIONAL const char* desc, bool recursive,
@@ -282,5 +285,23 @@ const revstatus_access* STORE_get0_cdps(X509_STORE* store);
  * @return pointer to the structure, or null if unset or on failure
  */
 const revstatus_access* STORE_get0_ocsp(X509_STORE* store);
+
+/*!*****************************************************************************
+ * @brief print the certificates in a cert store
+ *
+ * @param store cert store with certificates to be printed, or null
+ * @param bio BIO to print to, e.g., bio_err, or null
+ *******************************************************************************/
+void STORE_print_certs(OPTIONAL const X509_STORE* store, OPTIONAL BIO* bio);
+#define UTIL_print_store_certs(bio, certs) STORE_print_certs(certs, bio)
+
+/*!*****************************************************************************
+ * @brief retrieves number of certificates in a cert store
+ *
+ * @param store cert store with certificates to be printed
+ * @return number of certificates in the cert store
+ *******************************************************************************/
+int STORE_certs_num(const X509_STORE* store);
+#define UTIL_store_certs_num(store) STORE_certs_num(store)
 
 #endif /* SECUTILS_STORE_H_ */

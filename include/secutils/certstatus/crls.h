@@ -18,6 +18,14 @@
 
 #include <openssl/x509.h>
 
+/*!*****************************************************************************
+ * @brief print the most interesting parts of a CRL
+ *
+ * @param bio BIO to print to, e.g., bio_err, or null
+ * @param crl certificate revocation list to be printed, or null
+ *******************************************************************************/
+void UTIL_print_crl(OPTIONAL BIO* bio, OPTIONAL const X509_CRL* crl);
+
 /*!
  * @brief retrieve CRL in DER format (ASN.1) from given CRL distribution point
  *
