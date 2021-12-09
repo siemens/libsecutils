@@ -189,7 +189,7 @@ clean_all: clean
 
 doc: doc/html refman.pdf
 
-doc/html: Doxyfile
+doc/html: Doxyfile $(wildcard include/*/*.h include/*/*/*.h)
 	doxygen Doxyfile 1>/dev/null # required packages: doxygen graphviz
 
 refman.pdf: doc/html
