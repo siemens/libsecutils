@@ -73,8 +73,9 @@ bool CERT_save(const X509 *cert, const char *file, OPTIONAL const char *desc);
  * @note duplicate certificates among different input files are included only once
  */
 /* this function is part of the genCMPClient API */
-STACK_OF(X509) *CERTS_load(const char *files, OPTIONAL const char *desc,
-                           int type_CA, OPTIONAL X509_VERIFY_PARAM *vpm);
+STACK_OF(X509)
+    *CERTS_load(const char *files, OPTIONAL const char *desc,
+                int type_CA, OPTIONAL X509_VERIFY_PARAM *vpm);
 
 
 /*!
