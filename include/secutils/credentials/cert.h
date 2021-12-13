@@ -45,7 +45,7 @@
  */
 /* this function is part of the genCMPClient API */
 X509 *CERT_load(const char *file, OPTIONAL const char *pass, OPTIONAL const char *desc,
-                int type_CA, OPTIONAL X509_VERIFY_PARAM *vpm);
+                int type_CA, OPTIONAL const X509_VERIFY_PARAM *vpm);
 
 
 /*!
@@ -75,7 +75,7 @@ bool CERT_save(const X509 *cert, const char *file, OPTIONAL const char *desc);
 /* this function is part of the genCMPClient API */
 STACK_OF(X509)
     *CERTS_load(const char *files, OPTIONAL const char *desc,
-                int type_CA, OPTIONAL X509_VERIFY_PARAM *vpm);
+                int type_CA, OPTIONAL const X509_VERIFY_PARAM *vpm);
 
 
 /*!
@@ -158,7 +158,7 @@ void CERTS_print(OPTIONAL const STACK_OF(X509) * certs, OPTIONAL BIO* bio);
  * @note Check failures are logged as a warning if vpm is null, otherwise as an error.
  *******************************************************************************/
 bool CERT_check(const char *uri, OPTIONAL X509 *cert, int type_CA,
-                OPTIONAL X509_VERIFY_PARAM *vpm);
+                OPTIONAL const X509_VERIFY_PARAM *vpm);
 
 
 /*!*****************************************************************************
@@ -173,7 +173,7 @@ bool CERT_check(const char *uri, OPTIONAL X509 *cert, int type_CA,
  * @note Check failures are logged as a warning if vpm is null, otherwise as an error.
  *******************************************************************************/
 bool CERT_check_all(const char *uri, OPTIONAL STACK_OF(X509) *certs, int type_CA,
-                    OPTIONAL X509_VERIFY_PARAM *vpm);
+                    OPTIONAL const X509_VERIFY_PARAM *vpm);
 
 
 /*!*****************************************************************************

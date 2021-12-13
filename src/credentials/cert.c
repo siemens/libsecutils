@@ -24,7 +24,7 @@
 
 X509 *CERT_load(const char *file, OPTIONAL const char *source,
                 OPTIONAL const char *desc,
-                int type_CA, OPTIONAL X509_VERIFY_PARAM *vpm)
+                int type_CA, OPTIONAL const X509_VERIFY_PARAM *vpm)
 {
     X509 *cert = FILES_load_cert(file, FILES_get_format(file), source, desc);
     if (!CERT_check(file, cert, type_CA, vpm) && vpm != NULL) {
@@ -45,7 +45,7 @@ bool CERT_save(const X509 *cert, const char *file, OPTIONAL const char *desc)
 }
 
 STACK_OF(X509) *CERTS_load(const char *files, OPTIONAL const char *desc,
-                           int type_CA, OPTIONAL X509_VERIFY_PARAM *vpm)
+                           int type_CA, const OPTIONAL X509_VERIFY_PARAM *vpm)
 {
     STACK_OF(X509) *certs =
         FILES_load_certs_multi(files, FORMAT_PEM, NULL /* pwd source */, desc);
@@ -307,7 +307,7 @@ static void cert_msg(OPTIONAL const char* func, OPTIONAL const char* file, int l
 
 
 bool CERT_check(const char *uri, OPTIONAL X509 *cert, int type_CA,
-                OPTIONAL X509_VERIFY_PARAM *vpm)
+                OPTIONAL const X509_VERIFY_PARAM *vpm)
 {
     if (cert == NULL)
         return true;
@@ -317,7 +317,8 @@ bool CERT_check(const char *uri, OPTIONAL X509 *cert, int type_CA,
     res = X509_cmp_timeframe(vpm, X509_get0_notBefore(cert),
                              X509_get0_notAfter(cert));
 #else
-    unsigned long flags = vpm == NULL ? 0 : X509_VERIFY_PARAM_get_flags(vpm);
+    unsigned long flags = vpm == NULL ? 0 :
+        X509_VERIFY_PARAM_get_flags((X509_VERIFY_PARAM *)vpm);
     if ((flags & X509_V_FLAG_NO_CHECK_TIME) == 0) {
         time_t ref_time;
         time_t *time = NULL;
@@ -350,7 +351,7 @@ bool CERT_check(const char *uri, OPTIONAL X509 *cert, int type_CA,
 
 
 bool CERT_check_all(const char *uri, OPTIONAL STACK_OF(X509) *certs, int type_CA,
-                    OPTIONAL X509_VERIFY_PARAM *vpm)
+                    OPTIONAL const X509_VERIFY_PARAM *vpm)
 {
     int i;
     bool ret = true;
