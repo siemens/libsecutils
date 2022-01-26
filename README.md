@@ -76,17 +76,25 @@ This repository can build three Debian packages.
 
 1. `libsecutils` - the shared library
 2. `libsecutils-dev` - development headers
-3. `libsecutils-bins` - helper binaries from util/
+3. `libsecutils-bins` - helper binaries from `util/` - so far, there is only `icvutil`,
+   and this is present only if `SECUTILS_USE_UTA` is defined
 
 To build the Debian packages, the following dependencies have to be installed:
 1. `libssl-dev`
 2. `libuta-dev` (from [github.com/siemens/libuta](https://github.com/siemens/libuta))
+   if `SECUTILS_USE_UTA` is defined
 
 Then the packages can be built by
 ```
-make clean_all
-OPENSSL_DIR= DEBUG_FLAGS= SECUTILS_USE_UTA=1 dpkg-buildpackage -uc -us
+dpkg-buildpackage -uc -us
 ```
+or
+```
+SECUTILS_USE_UTA=1 dpkg-buildpackage -uc -us
+```
+in case the UTA library shall be used.
+
+On success, they are placed in the parent directory (`../`).
 
 ### Building the documentation
 
@@ -102,7 +110,8 @@ make doc
 ### Using the library
 
 Most functions of the library can be used directly without specific context.
-A few functions that make use of the UTA library require a `uta_ctx` pointer.
+A few functions that make use of the UTA library require a `uta_ctx` pointer,
+which may be non-`NULL` only if `SECUTILS_USE_UTA` is defined.
 You may have a look at `util/icvutil.c` for a simple example.
 
 ## Library structure
