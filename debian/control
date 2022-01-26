@@ -7,7 +7,7 @@ Homepage: https://github.com/siemens/libsecutils
 
 Package: libsecutils
 Architecture: any
-Depends: libssl, libuta
+Depends: libssl1.1, libuta
 Build-Depends: libssl-dev
 Description: OpenSSL wrapper library
  OpenSSL wrapper library for easy re-use of commonly needen functionality
