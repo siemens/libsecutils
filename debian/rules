@@ -18,9 +18,6 @@ AR=$(DEB_HOST_GNU_TYPE)-ar
 %:
 	dh $@
 
-# Tests are often placeholders, disabling
-override_dh_auto_test:
-
 # make sure that clean_all is used
 override_dh_auto_clean:
 	make clean_all
@@ -28,6 +25,9 @@ override_dh_auto_clean:
 # adding compile flags as, defaults are commonly debug flags
 override_dh_auto_build:
 	OPENSSL_DIR=/usr $(MAKE) build_all CC=$(CC) CXX=$(CXX) AR=$(AR) CFLAGS="-O2 -DNDEBUG" CXXFLAGS="-O2 -DNDEBUG" DEBUG_FLAGS="" LDFLAGS=""
+
+override_dh_auto_test:
+# do not run any tests
 
 # adding correct fake rootfs directories
 override_dh_auto_install:
