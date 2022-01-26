@@ -21,13 +21,19 @@ AR=$(DEB_HOST_GNU_TYPE)-ar
 # Tests are often placeholders, disabling
 override_dh_auto_test:
 
+# make sure that clean_all is used
+override_dh_auto_clean:
+	make clean_all
+
 # adding compile flags as, defaults are commonly debug flags
 override_dh_auto_build:
-	$(MAKE) build_all CC=$(CC) CXX=$(CXX) AR=$(AR) CFLAGS="-O2 -DNDEBUG" CXXFLAGS="-O2 -DNDEBUG" LDFLAGS=""
+	OPENSSL_DIR=/usr $(MAKE) build_all CC=$(CC) CXX=$(CXX) AR=$(AR) CFLAGS="-O2 -DNDEBUG" CXXFLAGS="-O2 -DNDEBUG" DEBUG_FLAGS="" LDFLAGS=""
 
 # adding correct fake rootfs directories
 override_dh_auto_install:
 	$(MAKE) install DESTDIR=debian/libsecutils ROOTFS=debian/libsecutils
 	$(MAKE) headers_install DESTDIR=debian/libsecutils-dev ROOTFS=debian/libsecutils-dev
 	mkdir -p debian/libsecutils-bins/usr/bin
+ifdef SECUTILS_USE_UTA
 	cp util/icvutil debian/libsecutils-bins/usr/bin
+endif
