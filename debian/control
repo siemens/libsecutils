@@ -2,13 +2,15 @@ Source: libsecutils
 Section: libs
 Priority: optional
 Maintainer: David von Oheimb <david.von.oheimb@siemens.com>
+Build-Depends: libssl-dev, pkg-config, debhelper (>= 9)
+#, libuta-dev
 Standards-Version: 4.0.0
 Homepage: https://github.com/siemens/libsecutils
 
 Package: libsecutils
 Architecture: any
-Depends: libssl1.1, libuta
-Build-Depends: libssl-dev
+Depends: libssl1.1
+#, libuta
 Description: OpenSSL wrapper library
  OpenSSL wrapper library for easy re-use of commonly needen functionality
 
@@ -16,13 +18,11 @@ Package: libsecutils-dev
 Depends: libsecutils
 Architecture: all
 Multi-Arch: foreign
-Description: Development headers for libsecutils.
- Contains headers for libsecutils
+Description: libsecutils C headers
+ Only needed for development
 
 Package: libsecutils-bins
 Depends: libsecutils
-Build-Depends: libsecutils, libsecutils-dev
 Architecture: any
-Description: libsecutils CLI applications
- Stand-alone CLI applications using libsecutils
-
+Description: libsecutils helper binaries
+ Stand-alone helper CLI applications using libsecutils
