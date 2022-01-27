@@ -72,35 +72,31 @@ to `/usr/local`, unless specified otherwise by `ROOTFS`.
 
 ### Building Debian packages
 
-This repository can build three Debian packages.
+This repository can build the following Debian packages.
 
-1. `libsecutils` - the shared library
-2. `libsecutils-dev` - development headers
-3. `libsecutils-bins` - helper binaries from `util/` - so far, there is only `icvutil`,
+* `libsecutils` - the shared library
+* `libsecutils-dev` - development headers
+* `libsecutils-bins` - helper binaries from `util/` - so far, there is only `icvutil`,
    and this is present only if `SECUTILS_USE_UTA` is defined
 
-To build the Debian packages, the following dependencies have to be installed:
-1. `libssl-dev`
-2. `libuta-dev` (from [github.com/siemens/libuta](https://github.com/siemens/libuta))
+To build the Debian packages, the following dependencies need to be installed:
+* `libssl-dev`
+* `libuta-dev` (from [github.com/siemens/libuta](https://github.com/siemens/libuta))
    if `SECUTILS_USE_UTA` is defined
 
 Then the packages can be built by
 ```
-dpkg-buildpackage -uc -us
+make deb
 ```
-or
-```
-SECUTILS_USE_UTA=1 dpkg-buildpackage -uc -us
-```
-in case the UTA library shall be used.
+where `SECUTILS_USE_UTA=1` and `SECUTILS_CONFIG_USE_ICV=1` may be added.
 
 On success, they are placed in the parent directory (`../`).
 
 ### Building the documentation
 
-To build the documentation, the following dependencies have to be installed:
-1. `doxygen`
-2. `latex`, in case LaTeX output is desired; if so, comment out in [`Doxyfile`](Doxyfile): `GENERATE_LATEX = NO`
+To build the documentation, the following dependencies need to be installed:
+* `doxygen`
+* `latex`, in case LaTeX output is desired; if so, comment out in [`Doxyfile`](Doxyfile): `GENERATE_LATEX = NO`
 
 The documentation is built by
 ```

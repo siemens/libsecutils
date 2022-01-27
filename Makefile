@@ -13,11 +13,17 @@
 # Optional OPENSSL_DIR defines absolute or relative (to ../) path to OpenSSL installation.
 # Optional OUT_DIR defines absolute or relative (to ./) path where library be produced.
 # Optional DEBUG_FLAGS may set to prepend to local CFLAGS and LDFLAGS (default see below).
+
+ROOTFS ?= $(DESTDIR)$(prefix)
+
 OUT_DIR ?= .
 
-PACKAGENAME=libsecutils
-VERSION=0.9
-DIRNAME=$(PACKAGENAME)-$(VERSION)
+VERSION=1.0
+# must be kept in sync with latest version in debian/changelog
+# PACKAGENAME=libsecutils
+# DIRNAME=$(PACKAGENAME)-$(VERSION)
+
+SHELL=bash # This is needed for supporting extended file name globbing
 
 ifeq ($(OS),Windows_NT)
     EXE=.exe
@@ -68,7 +74,11 @@ override CFLAGS += -Wformat -Wformat-security -Wno-declaration-after-statement -
 ################################################################################
 
 CC ?= gcc
-OUTBIN=$(OUT_DIR)/libsecutils$(DLL)
+OUTLIB=libsecutils$(DLL)
+DEST_LIB=$(ROOTFS)/usr/lib
+DEST_DOC=$(ROOTFS)/usr/share/doc/libsecutils# TODO improve
+OUTBIN=icvutil$(EXE)
+DEST_BIN=$(ROOTFS)/usr/bin
 LOCAL_CFLAGS=-std=gnu90 -fPIC
 override CFLAGS += -D_FORTIFY_SOURCE=2
 override CFLAGS += -isystem $(OPENSSL)/include# # # use of -isystem is critical for selecting wanted OpenSSL version
@@ -82,7 +92,10 @@ ifdef SECUTILS_CONFIG_USE_ICV
 endif
 
 override LDFLAGS += $(DEBUG_FLAGS) # needed for -fsanitize=...
-override LDFLAGS += -L$(OPENSSL_LIB) -L$(OPENSSL) -Wl,-rpath=$(OPENSSL_LIB) -Wl,-rpath=$(OPENSSL) # needed for genCMPClient
+override LDFLAGS += -L$(OPENSSL_LIB) -L$(OPENSSL)
+ifeq ($(DEB_TARGET_ARCH),) # not during Debian packaging
+    override LDFLAGS += -Wl,-rpath=$(OPENSSL_LIB) -Wl,-rpath=$(OPENSSL) # needed for genCMPClient
+endif
 ifdef SECUTILS_USE_UTA
     override LDFLAGS += -luta
 endif
@@ -124,27 +137,31 @@ OBJS := $(patsubst %.c,$(BUILDDIR)/%$(OBJ),$(notdir $(wildcard src/*/*.c)))
 ################################################################################
 
 # Phony (non-file) targets
-.PHONY: all doc util build build_all clean clean_all clean_uta install headers_install deb debdir coverage
+.PHONY: all doc util build build_only build_all clean clean_all clean_uta install uninstall deb clean_deb coverage
 
 # Default target
 all: build_all doc
+
+build_only: $(OUT_DIR)/$(OUTLIB)
 
 build:
 ifeq ($(COV_ENABLED), 1)
 	COMPILE_TYPE=code_coverage
 endif
-	$(MAKE) COMPILE_TYPE=$(COMPILE_TYPE) $(OUTBIN)
+	$(MAKE) COMPILE_TYPE=$(COMPILE_TYPE) build_only
 
 util:
-ifdef SECUTILS_USE_UTA
-	$(MAKE) CFLAGS="$(CFLAGS) $(LOCAL_CFLAGS)" -C util
-endif
+	$(MAKE) -C util SECUTILS_USE_UTA="$(SECUTILS_USE_UTA)" \
+	   CFLAGS="$(CFLAGS) $(LOCAL_CFLAGS)" LDFLAGS="$(LDFLAGS)"
 
 build_all: build util
 
 # Binary output target
-$(OUTBIN): $(OBJS)
-	$(CC) $(OBJS) $(LDFLAGS) -o $@
+$(OUT_DIR)/$(OUTLIB).$(VERSION): $(OBJS)
+	$(CC) $(OBJS) $(LDFLAGS) -o $@ -Wl,-soname,$(OUTLIB).$(VERSION)
+
+$(OUT_DIR)/$(OUTLIB): $(OUT_DIR)/$(OUTLIB).$(VERSION)
+	ln -sf $(OUTLIB).$(VERSION) $(OUT_DIR)/$(OUTLIB)
 
 # Individual object targets; also provide dependencies on header files of the project (not on system headers)
 $(BUILDDIR)/%$(OBJ): %.c
@@ -163,25 +180,47 @@ $(BUILDDIR):
 # (directories are flagged as changed on every object build)
 $(OBJS): | $(BUILDDIR)
 
+deb:
+ifeq ($(SECUTILS_CONFIG_USE_ICV)$(SECUTILS_USE_UTA),)
+#	debuild unfortunately does not pass environment variables
+	debuild -uc -us --lintian-opts --profile debian # --fail-on none
+else
+	dpkg-buildpackage -uc -us # may prepend DH_VERBOSE=1
+endif
+
+clean_deb:
+	rm -rf debian/tmp debian/libsecutils{,-dev,-bins}
+	rm -f debian/{files,debhelper-build-stamp} debian/*.{log,substvars}
+	rm -f ../libsecutils{_,-}*
+
 # installation target - append ROOTFS=<path> to install into virtual root
 # filesystem
-install: $(OUTBIN)
-	install -Dm 755 $(OUTBIN) $(ROOTFS)/usr/lib/$(OUTBIN)
-
-headers_install:
+install: doc/html # $(OUT_DIR)/$(OUTLIB)
+	install -D $(OUT_DIR)/$(OUTLIB).$(VERSION) $(DEST_LIB)/$(OUTLIB).$(VERSION)
+	ln -sf $(OUTLIB).$(VERSION) $(DEST_LIB)/$(OUTLIB)
+#install_headers:
 	find include -type d -exec install -d '$(ROOTFS)/usr/{}' ';'
 	find include -type f -exec install -Dm 0644 '{}' '$(ROOTFS)/usr/{}' ';'
+#install_bins:
+	install -D $(OUT_DIR)/util/$(OUTBIN) $(DEST_BIN)/$(OUTBIN)
+#install_doc:
+	cd doc/html && find . -type d -exec install -d '$(DEST_DOC)/{}' ';'
+	cd doc/html && find . -type f -exec install -Dm 0644 '{}' '$(DEST_DOC)/{}' ';'
 
 uninstall:
-	rm -f $(ROOTFS)/usr/lib/$(OUTBIN)
-	find include -type f -exec rm '$(ROOTFS)/usr/{}' ';'
+	rm -f $(DEST_LIB)/$(OUTLIB)*
+#	find include -type f -exec rm '$(ROOTFS)/usr/{}' ';'
 	rm -rf $(ROOTFS)/usr/include/secutils
+	rm -f $(DEST_BIN)/$(OUTBIN)
+	rm -rf $(DEST_DOC)
 
 clean_uta:
-	rm -f $(BUILDDIR)/uta_api$(OBJ) $(BUILDDIR)/files_icv$(OBJ) $(BUILDDIR)/files_dv$(OBJ) $(OUTBIN)
+	rm -f $(BUILDDIR)/uta_api$(OBJ) $(BUILDDIR)/files_icv$(OBJ) \
+          $(BUILDDIR)/files_dv$(OBJ) \
+          $(OUT_DIR)/$(OUTLIB)* $(OUT_DIR)/util/$(OUTBIN) $(OUT_DIR)/util/icvutil.o
 
 clean:
-	rm -rf $(OUTBIN) $(BUILDDIR) debian/libsecutils debian/libsecutils-dev debian/libsecutils* debian/files debian/.debhelper
+	rm -rf $(OUT_DIR)/$(OUTLIB)* $(OUT_DIR)/util/$(OUTBIN) $(BUILDDIR)
 
 clean_all: clean
 	$(MAKE) -C util clean
@@ -190,7 +229,7 @@ clean_all: clean
 doc: doc/html refman.pdf
 
 doc/html: Doxyfile $(wildcard include/*/*.h include/*/*/*.h)
-	doxygen Doxyfile 1>/dev/null # required packages: doxygen graphviz
+	doxygen Doxyfile 1>/dev/null || mkdir -p doc/html # required packages: doxygen graphviz
 
 refman.pdf: doc/html
 	mkdir -p doc/latex
