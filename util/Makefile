@@ -14,11 +14,13 @@ endif
 
 build: icvutil
 
+# CFLAGS may include -DSECUTILS_USE_UTA, LDFLAGS may include -luta
+
 icvutil: icvutil.o
 	$(CC) $(CFLAGS) icvutil$(OBJ) -o icvutil$(EXE) -L../ -lsecutils
 
 icvutil.o: icvutil.c
-	$(CC) $(CFLAGS) -I../include -DSECUTILS_USE_UTA -c icvutil.c
+	$(CC) $(CFLAGS) -I../include -c icvutil.c
 
 run: build
 	LD_LIBRARY_PATH=../ ./icvutil$(EXE) || true

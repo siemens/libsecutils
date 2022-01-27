@@ -1,0 +1,4 @@
+usr/lib/lib*.so
+usr/include/secutils/*.h
+usr/include/secutils/*/*.h
+usr/share/doc/libsecutils

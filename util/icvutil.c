@@ -19,22 +19,22 @@
 #include "../include/secutils/storage/files_icv.h"
 #include "../include/secutils/storage/uta_api.h"
 
-#ifndef SECUTILS_USE_UTA
-# error Use of UTA lib is not enabled; need to define SECUTILS_USE_UTA
-#endif
-
 #define ARG_OPTION    1
 #define ARG_FILE      2
 #define ARG_FILE_LOC  3
 
 int main(int argc, char *argv[]) {
     int ret = EXIT_FAILURE;
-    uta_ctx *uta_ctx = uta_open();
+    uta_ctx *uta_ctx = NULL;
 
-    if (NULL == uta_ctx) {
+#ifdef SECUTILS_USE_UTA
+    if ((uta_ctx = uta_open()) == NULL) {
         LOG(FL_EMERG, "failure getting UTA ctx");
         return ret;
     }
+#else
+    LOG(FL_WARN, "Not using UTA lib because SECUTILS_USE_UTA was not defined");
+#endif
 
     const char *prog = argv[0];
     const char *option = (argc > ARG_OPTION) ? argv[ARG_OPTION] : "";
@@ -66,6 +66,8 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "       %s -help\n", prog);
     }
 
+#ifdef SECUTILS_USE_UTA
     uta_close(uta_ctx);
+#endif
     return ret;
 }

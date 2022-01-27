@@ -1,11 +1,11 @@
 #!/usr/bin/make -f
 
-# libsecutils
+# rules for Debian packaging of libsecutils
 #
 # Copyright (c) Siemens Mobility GmbH, 2021
 # 
 # Authors:
-#  David von Oheimb <david.von.oheimb@siemens.com>
+#  David von Oheimb <David.von.Oheimb@siemens.com>
 #
 # This work is licensed under the terms of the Apache Software License 2.0.  See
 # the COPYING file in the top-level directory.           
@@ -15,6 +15,7 @@
 CC=$(DEB_HOST_GNU_TYPE)-gcc
 CXX=$(DEB_HOST_GNU_TYPE)-g++
 AR=$(DEB_HOST_GNU_TYPE)-ar
+
 %:
 	dh $@
 
@@ -24,16 +25,9 @@ override_dh_auto_clean:
 
 # adding compile flags as, defaults are commonly debug flags
 override_dh_auto_build:
-	OPENSSL_DIR=/usr $(MAKE) build_all CC=$(CC) CXX=$(CXX) AR=$(AR) CFLAGS="-O2 -DNDEBUG" CXXFLAGS="-O2 -DNDEBUG" DEBUG_FLAGS="" LDFLAGS=""
+#	CFLAGS="-O2 -DNDEBUG" CXXFLAGS="-O2 -DNDEBUG" DEBUG_FLAGS="" LDFLAGS=""  # can be used to avoid dependency on libasan and libubsan
+	OPENSSL_DIR=/usr CC=$(CC) CXX=$(CXX) AR=$(AR) \
+	dh_auto_build -- -j1 build_only util
 
 override_dh_auto_test:
 # do not run any tests
-
-# adding correct fake rootfs directories
-override_dh_auto_install:
-	$(MAKE) install DESTDIR=debian/libsecutils ROOTFS=debian/libsecutils
-	$(MAKE) headers_install DESTDIR=debian/libsecutils-dev ROOTFS=debian/libsecutils-dev
-	mkdir -p debian/libsecutils-bins/usr/bin
-ifdef SECUTILS_USE_UTA
-	cp util/icvutil debian/libsecutils-bins/usr/bin
-endif
