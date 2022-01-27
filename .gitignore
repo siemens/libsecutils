@@ -4,6 +4,7 @@
 *.a
 *.o
 *.so
+*.so.*
 *.pdf
 *.log
 *.bak
@@ -23,5 +24,7 @@ debian/.debhelper
 debian/debhelper-build-stamp
 debian/files
 debian/tmp
-debian/libsecutils{,-dev,-bins}
+debian/libsecutils
+debian/libsecutils-dev
+debian/libsecutils-bins
 debian/*.substvars

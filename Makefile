@@ -181,12 +181,11 @@ $(BUILDDIR):
 $(OBJS): | $(BUILDDIR)
 
 deb:
-ifeq ($(SECUTILS_CONFIG_USE_ICV)$(SECUTILS_USE_UTA),)
-#	debuild unfortunately does not pass environment variables
-	debuild -uc -us --lintian-opts --profile debian # --fail-on none
-else
-	dpkg-buildpackage -uc -us # may prepend DH_VERBOSE=1
-endif
+	debuild --preserve-envvar SECUTILS_CONFIG_USE_ICV \
+	  --preserve-envvar SECUTILS_USE_UTA -uc -us \
+	  --lintian-opts --profile debian # --fail-on none
+# alternative:
+#	LD_LIBRARY_PATH= dpkg-buildpackage -uc -us # may prepend DH_VERBOSE=1
 
 clean_deb:
 	rm -rf debian/tmp debian/libsecutils{,-dev,-bins}
