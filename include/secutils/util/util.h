@@ -169,9 +169,14 @@ _Pragma("GCC diagnostic ignored \"-Wdiscarded-qualifiers\"")
 _Pragma("GCC diagnostic ignored \"-Wunused-function\"")
 _Pragma("GCC diagnostic ignored \"-Wunused-parameter\"")
 typedef unsigned char uint8_t;
+typedef u_int32_t uint32_t;
+typedef u_int64_t uint64_t;
 #  define OPENSSL_strndup strndup
 #  define CRYPTO_free_ex_index(cls_idx, idx) /* sorry, no-op (yet no memleak) */
 #  define X509_get0_extensions(x) ((x)->cert_info->extensions)
+#  define X509_get_extension_flags(x) (X509_check_purpose((x), -1, -1), \
+                                       (x)->ex_flags)
+#  define X509_V_FLAG_NO_CHECK_TIME 0x200000
 # endif
 
 # if OPENSSL_VERSION_NUMBER < 0x10100000L && !defined(TLS_client_method)
