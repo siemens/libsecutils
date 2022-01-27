@@ -1,7 +1,11 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: libsecutils
-Upstream-Contact: David von Oheimb <david.von.oheimb@siemens.com>
+Upstream-Contact: David von Oheimb <David.von.Oheimb@siemens.com>
 
 Files: *
 Copyright: 2021 Siemens Mobility AG
 License: Apache-2.0
+ Licensed under the Apache License 2.0 (the "License").
+ You may not use this file except in compliance with the License.
+ On Debian systems, the full text of the Apache-2.0 license
+ can be found in the file '/usr/share/common-licenses/Apache-2.0'.
