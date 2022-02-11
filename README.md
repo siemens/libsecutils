@@ -76,10 +76,10 @@ This repository can build the following Debian packages.
 
 * `libsecutils` - the shared library
 * `libsecutils-dev` - development headers
-* `libsecutils-bins` - helper binaries from `util/` - so far, there is only `icvutil`,
-   and this is present only if `SECUTILS_USE_UTA` is defined
+* `libsecutils-bins` - helper binaries from `util/` - so far, there is only `icvutil`
 
 To build the Debian packages, the following dependencies need to be installed:
+* `debhelper`
 * `libssl-dev`
 * `libuta-dev` (from [github.com/siemens/libuta](https://github.com/siemens/libuta))
    if `SECUTILS_USE_UTA` is defined
