@@ -160,9 +160,9 @@ int CREDENTIALS_print_cert_verify_cb(int ok, X509_STORE_CTX* store_ctx)
                     case X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY:
                     case X509_V_ERR_UNABLE_TO_GET_CRL_ISSUER:
                     case X509_V_ERR_STORE_LOOKUP:
-                        LOG(LOG_FUNC_FILE_LINE, level, "\nchain store:");
+                        LOG(LOG_FUNC_FILE_LINE, level, "\nuntrusted certs used for chain building:");
                         CERTS_print(X509_STORE_CTX_get0_untrusted(store_ctx), bio);
-                        LOG(LOG_FUNC_FILE_LINE, level, "\ntrust store:");
+                        LOG(LOG_FUNC_FILE_LINE, level, "\ntrusted certs used as trust anchors:");
                         UTIL_print_store_certs(bio, X509_STORE_CTX_get0_store(store_ctx));
                         break;
                     default:
@@ -247,10 +247,8 @@ err: ;
     }
     else /* result == 0 */
     {
-#if 0
         (void)ERR_print_errors(bio_err);
         BIO_flush(bio_err);
-#endif
         LOG(FL_WARN, "rejecting certificate with subject '%s'; error='%s'", name, str);
         LOG_certstatus_methods(FL_WARN, store_ctx, verb, false);
     }
