@@ -221,7 +221,7 @@ clean_uta:
 clean:
 	rm -rf $(OUT_DIR)/$(OUTLIB)* $(OUT_DIR)/util/$(OUTBIN) $(BUILDDIR)
 
-clean_all: clean
+clean_all: clean clean_deb
 	$(MAKE) -C util clean
 	rm -rf doc refman.pdf *.gcov reports
 
