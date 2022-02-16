@@ -135,7 +135,7 @@ STACK_OF(X509)
 /*!
  * @brief load private key from the given file or engine in specific format
  *
- * @param key file (path) name of the input file, or engine key ID, or null
+ * @param file (path) name of the input file, or engine key ID, or null
  * @param format FORMAT_ENGINE or the format to try first for the file contents
  * @param maybe_stdin flag whether to allow reading from STDIN if 'file' parameter is null
  * @param pass (optional) password to use for decryption
@@ -143,14 +143,14 @@ STACK_OF(X509)
  * @param desc description of file contents to use for any error messages, or null
  * @return pointer to the key loaded, or null on error
  */
-EVP_PKEY* FILES_load_key(OPTIONAL const char* key, file_format_t format, bool maybe_stdin, OPTIONAL const char* pass,
+EVP_PKEY* FILES_load_key(OPTIONAL const char* file, file_format_t format, bool maybe_stdin, OPTIONAL const char* pass,
                          OPTIONAL const char* engine, OPTIONAL const char* desc);
 
 
 /*!
  * @brief load private key from the given file or engine with flexible format
  *
- * @param key file (path) name of the input file, or engine key ID, or null
+ * @param file (path) name of the input file, or engine key ID, or null
  * @param file_format the format to try first for the file contents
  * @param maybe_stdin flag whether to allow reading from STDIN if 'file' parameter is null
  * @param source the password source to use for decryption, or null
@@ -158,7 +158,7 @@ EVP_PKEY* FILES_load_key(OPTIONAL const char* key, file_format_t format, bool ma
  * @param desc description of file contents to use for any error messages, or null
  * @return pointer to the key loaded, or null on error
  */
-EVP_PKEY* FILES_load_key_autofmt(OPTIONAL const char* key, file_format_t file_format, bool maybe_stdin,
+EVP_PKEY* FILES_load_key_autofmt(OPTIONAL const char* file, file_format_t file_format, bool maybe_stdin,
                                  OPTIONAL const char* source, OPTIONAL const char* engine, OPTIONAL const char* desc);
 
 
@@ -200,6 +200,32 @@ bool FILES_load_pkcs12(const char* file, OPTIONAL const char* pass, OPTIONAL con
 bool FILES_load_credentials(OPTIONAL const char* certs, OPTIONAL OPTIONAL const char* key, file_format_t file_format,
                             OPTIONAL const char* source, OPTIONAL const char* engine, OPTIONAL const char* desc,
                             OPTIONAL EVP_PKEY** pkey, OPTIONAL X509** cert, OPTIONAL STACK_OF(X509) * *chain);
+
+
+/*!
+ * @brief load a public key from the given file in specific format
+ *
+ * @param file (path) name of the input file
+ * @param format the format to expect for the file contents - currently FORMAT_PEM or FORMAT_ASN1
+ * @param pass the password to use for decryption (currently supported for PEM only), or null
+ * @param desc description of file contents to use for any error messages, or null
+ * @return pointer to the public key loaded, or null on error
+ */
+EVP_PKEY *FILES_load_pubkey(const char *file, file_format_t format,
+                            OPTIONAL const char *pass, OPTIONAL const char *desc);
+
+
+/*!
+ * @brief load a public key from the given file with flexbile format
+ *
+ * @param file (path) name of the input file
+ * @param format the format to try first when reading the file contents - currently FORMAT_PEM or FORMAT_ASN1
+ * @param source the password source to use for decryption (currently supported for PEM only), or null
+ * @param desc description of file contents to use for any error messages, or null
+ * @return pointer to the public key loaded, or null on error
+ */
+EVP_PKEY *FILES_load_pubkey_autofmt(const char *file, file_format_t format,
+                                    OPTIONAL const char *source, OPTIONAL const char *desc);
 
 
 /*!

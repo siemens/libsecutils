@@ -935,7 +935,7 @@ static EVP_PKEY* load_key_engine(const char* keyid, const char* pass, const char
 
 
 /* adapted from OpenSSL:apps/lib/apps.c */
-EVP_PKEY* FILES_load_key(OPTIONAL const char* key, file_format_t format, bool maybe_stdin, OPTIONAL const char* pass,
+EVP_PKEY* FILES_load_key(OPTIONAL const char* file, file_format_t format, bool maybe_stdin, OPTIONAL const char* pass,
                          OPTIONAL const char* engine, OPTIONAL const char* desc)
 {
     BIO* bio = 0;
@@ -943,29 +943,29 @@ EVP_PKEY* FILES_load_key(OPTIONAL const char* key, file_format_t format, bool ma
     PW_CB_DATA cb_data;
 
     cb_data.password = pass;
-    cb_data.prompt_info = key;
+    cb_data.prompt_info = file;
 
-    if(key is_eq 0 and (0 is_eq maybe_stdin or format is_eq FORMAT_ENGINE))
+    if(file is_eq 0 and (0 is_eq maybe_stdin or format is_eq FORMAT_ENGINE))
     {
         LOG(FL_ERR, "no key input specified for %s", desc not_eq 0 ? desc : "private key");
         goto end;
     }
     if(format is_eq FORMAT_ENGINE)
     {
-        LOG(FL_TRACE, "loading %s '%s' from engine '%s'", desc, key, engine);
-        pkey = load_key_engine(key, pass, engine, desc not_eq 0 ? desc : "private key");
+        LOG(FL_TRACE, "loading %s '%s' from engine '%s'", desc, file, engine);
+        pkey = load_key_engine(file, pass, engine, desc not_eq 0 ? desc : "private key");
         goto end;
     }
     LOG(FL_TRACE, "opening file '%s' for loading %s",
-        key not_eq 0 ? key : "STDIN", desc not_eq 0 ? desc : "private key");
-    if(key is_eq 0 and maybe_stdin not_eq 0)
+        file not_eq 0 ? file : "STDIN", desc not_eq 0 ? desc : "private key");
+    if(file is_eq 0 and maybe_stdin not_eq 0)
     {
         unbuffer(stdin);
         bio = dup_bio_in(format);
     }
     else
     {
-        bio = bio_open_default(key, 'r', format);
+        bio = bio_open_default(file, 'r', format);
     }
     if(bio is_eq 0)
     {
@@ -1000,7 +1000,7 @@ end:
     BIO_free(bio);
     if(pkey is_eq 0 and desc not_eq 0)
     {
-        LOG(FL_ERR, "unable to load %s", desc);
+        LOG(FL_ERR, "unable to load %s from %s", desc, file);
         (void)ERR_print_errors(bio_err);
     }
     return pkey;
@@ -1008,7 +1008,7 @@ end:
 
 
 /** load a key from file with format retry and optional password or from engine */
-EVP_PKEY* FILES_load_key_autofmt(OPTIONAL const char* key, file_format_t file_format, bool maybe_stdin,
+EVP_PKEY* FILES_load_key_autofmt(OPTIONAL const char* file, file_format_t file_format, bool maybe_stdin,
                                  OPTIONAL const char* source, OPTIONAL const char* engine, OPTIONAL const char* desc)
 {
     EVP_PKEY* pkey = 0;
@@ -1016,9 +1016,9 @@ EVP_PKEY* FILES_load_key_autofmt(OPTIONAL const char* key, file_format_t file_fo
     char* pass = FILES_get_pass(source, desc);
     if(engine not_eq 0)
     {
-        if(key not_eq 0 and strncasecmp(key, sec_ENGINE_STR, strlen(sec_ENGINE_STR)) is_eq 0)
+        if(file not_eq 0 and strncasecmp(file, sec_ENGINE_STR, strlen(sec_ENGINE_STR)) is_eq 0)
         {
-            key += strlen(sec_ENGINE_STR);
+            file += strlen(sec_ENGINE_STR);
         }
         file_format = FORMAT_ENGINE;
     }
@@ -1027,11 +1027,11 @@ EVP_PKEY* FILES_load_key_autofmt(OPTIONAL const char* key, file_format_t file_fo
 
     do
     {
-        pkey = FILES_load_key(key, file_format, maybe_stdin, pass, engine, 0 /* desc */);
+        pkey = FILES_load_key(file, file_format, maybe_stdin, pass, engine, 0 /* desc */);
 
         if(pkey is_eq 0)
         {
-            file_format = next_format(file_format, UTIL_file_ext(key));
+            file_format = next_format(file_format, UTIL_file_ext(file));
             if((++retries < MAX_FORMAT_RETRIES) and (file_format not_eq FORMAT_UNDEF))
             {
                 ERR_clear_error();
@@ -1044,8 +1044,71 @@ EVP_PKEY* FILES_load_key_autofmt(OPTIONAL const char* key, file_format_t file_fo
     {
         (void)ERR_print_errors(bio_err);
         LOG(FL_ERR, "unable to load %s from %s", desc not_eq 0 ? desc : "credentials",
-            file_format is_eq FORMAT_ENGINE ? "engine" : key);
+            file_format is_eq FORMAT_ENGINE ? "engine" : file);
     }
+    UTIL_cleanse_free(pass);
+    return pkey;
+}
+
+
+EVP_PKEY *FILES_load_pubkey(const char *file, file_format_t format,
+                            OPTIONAL const char *pass, OPTIONAL const char *desc)
+{
+    BIO *bio = NULL;
+    EVP_PKEY *pkey = NULL;
+    PW_CB_DATA cb_data;
+
+    cb_data.password = pass;
+    cb_data.prompt_info = file;
+
+    if (file == NULL) {
+        LOG(FL_ERR, "no input file specified for %s", desc != NULL ? desc : "public key");
+        goto end;
+    }
+    LOG(FL_TRACE, "opening file '%s' for loading %s", file, desc != NULL ? desc : "public key");
+    if ((bio = bio_open_default(file, 'r', format)) == NULL)
+        goto end;
+    if(format is_eq FORMAT_ASN1)
+        pkey = d2i_PUBKEY_bio(bio, NULL);
+    else if(format is_eq FORMAT_PEM)
+        pkey = PEM_read_bio_PUBKEY(bio, NULL, password_callback, &cb_data);
+    else
+        LOG(FL_ERR, "unsupported input format specified for %s file %s",
+            desc != NULL ? desc : "public key", file);
+end:
+    BIO_free(bio);
+    if (pkey == NULL && desc != NULL) {
+        LOG(FL_ERR, "unable to load %s from %s", desc, file);
+        (void)ERR_print_errors(bio_err);
+    }
+    return pkey;
+}
+
+EVP_PKEY *FILES_load_pubkey_autofmt(const char *file, file_format_t format,
+                                    OPTIONAL const char *source, OPTIONAL const char *desc)
+{
+    EVP_PKEY *pkey = NULL;
+    int retries = 0;
+
+    LOG(FL_TRACE, "loading %s from file '%s'", desc != NULL ? desc : "public key", file != NULL ? file : "<NULL>");
+
+    char *pass = FILES_get_pass(source, desc);
+    do
+    {
+        pkey = FILES_load_pubkey(file, format, pass, NULL /* desc */);
+        if (pkey == NULL) {
+            format = next_format(format, UTIL_file_ext(file));
+            if((++retries < 2) and (format not_eq FORMAT_UNDEF))
+            {
+                ERR_clear_error();
+                continue;
+            }
+            (void)ERR_print_errors(bio_err);
+            LOG(FL_ERR, "unable to load %s from file '%s'", desc != NULL ? desc : "public key",
+                file != NULL ? file : "<NULL>");
+        }
+        break;
+    } while (1);
     UTIL_cleanse_free(pass);
     return pkey;
 }
@@ -1105,27 +1168,28 @@ end:
 }
 
 
-X509_REQ* FILES_load_csr_autofmt(const char* infile, file_format_t format, OPTIONAL const char* desc)
+X509_REQ* FILES_load_csr_autofmt(const char* file, file_format_t format, OPTIONAL const char* desc)
 {
     X509_REQ* csr = 0;
     int retries = 0;
 
-    LOG(FL_TRACE, "loading %s from file '%s'", desc not_eq 0 ? desc : "CSR", infile);
+    LOG(FL_TRACE, "loading %s from file '%s'", desc not_eq 0 ? desc : "CSR", file != NULL ? file : "<NULL>");
 
     do
     {
-        csr = FILES_load_csr(infile, format, 0 /* desc */);
+        csr = FILES_load_csr(file, format, 0 /* desc */);
 
         if(csr is_eq 0)
         {
-            format = next_format(format, UTIL_file_ext(infile));
-            if((++retries < MAX_FORMAT_RETRIES) and (format not_eq FORMAT_UNDEF))
+            format = next_format(format, UTIL_file_ext(file));
+            if((++retries < 2) and (format not_eq FORMAT_UNDEF))
             {
                 ERR_clear_error();
                 continue;
             }
             (void)ERR_print_errors(bio_err);
-            LOG(FL_ERR, "unable to load %s from file '%s'", desc not_eq 0 ? desc : "CSR", infile);
+            LOG(FL_ERR, "unable to load %s from file '%s'", desc not_eq 0 ? desc : "CSR",
+                file != NULL ? file : "<NULL>");
         }
         break;
     } while(1);
