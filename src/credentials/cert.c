@@ -270,7 +270,7 @@ void CERTS_print(OPTIONAL const STACK_OF(X509) * certs, OPTIONAL BIO* bio)
             X509* cert = sk_X509_value(certs, i);
             if(cert not_eq 0)
             {
-                CERT_print(cert, bio, 0);
+                CERT_print(cert, bio, X509_FLAG_NO_EXTENSIONS);
             }
         }
     }
