@@ -217,6 +217,9 @@ SSL_CTX* TLS_CTX_new(OPTIONAL SSL_CTX* ssl_ctx,
                            bitor SSL_OP_NO_COMPRESSION
 # if 0x10101000L <= OPENSSL_VERSION_NUMBER && OPENSSL_VERSION_NUMBER < 0x101010bfL
                            /* Disable TLS renegotiation as workaround for CVE-2021-3449 in OpenSSL 1.1.1 before patch 'k' */
+                           /* BSI TR-02102-2 also recommends to use either RFC5746 compliant renegotiation or reject renegotiation
+                              initiated by the client. Thus for the sake of simplicity and to lower the attack surface, we 
+                              completely disable renegotiation. */
                            bitor SSL_OP_NO_RENEGOTIATION
 # endif
                            bitor (long)
