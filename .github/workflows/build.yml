@@ -60,21 +60,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y debhelper rsync libssl-dev git pkg-config
-          mkdir dependencies
-          cd dependencies
-          git clone https://github.com/siemens/libuta.git
-          cd libuta 
-          ./bootstrap
-          ./debian/configure sim
-          dpkg-buildpackage -uc -us
-          cd ..
-          sudo dpkg -i libuta-sim_1.*
-          sudo dpkg -i libuta-dev_1.*
-          cd ..
           mkdir -p debian-packaging
           rsync -av --exclude='debian-packaging' . debian-packaging/
           cd debian-packaging
-          export SECUTILS_USE_UTA=1
+          unset SECUTILS_USE_UTA
           dpkg-buildpackage -uc -us
 
   doc:
