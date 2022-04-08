@@ -191,11 +191,12 @@ static int put_crl_into_cache(X509_CRL * crl, const char * cachefile)
 }
 
 static X509_CRL *get_crl_by_download_or_from_cache(const CRLMGMT_DATA *data,
+                                                   const char *url_cached,
                                                    const char *url, int timeout,
                                                    OPTIONAL const char* desc)
 {
     char cachefile[FILENAME_MAX];
-    bool usecache = get_cache_filename_from_url(data->crl_cache_dir, url,
+    bool usecache = get_cache_filename_from_url(data->crl_cache_dir, url_cached,
         cachefile, sizeof(cachefile));
 
     X509_CRL *crl;
@@ -333,22 +334,22 @@ X509_CRL *CRLMGMT_load_crl_by_url(
     LOG(FL_DEBUG, "retrieving CRL according to %s, url=%s",
         desc? desc : "(no source description)", url);
 
-    const char      *effective_uri  = url;
-    const size_t    CDP_PROXY_LEN   = 4096;
-    char            cdp_proxy[CDP_PROXY_LEN];
+    const char      *effective_url  = url;
+    const size_t    CDP_PROXY_URL_LEN   = 4096;
+    char            cdp_proxy_url[CDP_PROXY_URL_LEN];
 
     if (data->proxy_url == NULL) {
         LOG(FL_DEBUG, "no cdp proxy given, using original url");
     }
     else {
         LOG(FL_DEBUG, "cdp proxy given, appending original url to proxy %s", data->proxy_url);
-        size_t copied = UTIL_safe_string_copy(data->proxy_url, cdp_proxy, CDP_PROXY_LEN, NULL);
-        copied += UTIL_safe_string_copy(url_param_url, cdp_proxy + copied, CDP_PROXY_LEN - (size_t)copied, NULL);
-        copied += UTIL_url_encode(url, cdp_proxy + copied, CDP_PROXY_LEN - (size_t)copied, NULL);
-        effective_uri = cdp_proxy;
+        size_t copied = UTIL_safe_string_copy(data->proxy_url, cdp_proxy_url, CDP_PROXY_URL_LEN, NULL);
+        copied += UTIL_safe_string_copy(url_param_url, cdp_proxy_url + copied, CDP_PROXY_URL_LEN - (size_t)copied, NULL);
+        copied += UTIL_url_encode(url, cdp_proxy_url + copied, CDP_PROXY_URL_LEN - (size_t)copied, NULL);
+        effective_url = cdp_proxy_url;
     }
 
-    return get_crl_by_download_or_from_cache(data, effective_uri, timeout, desc);
+    return get_crl_by_download_or_from_cache(data, url, effective_url, timeout, desc);
 }
 
 X509_CRL *CRLMGMT_load_crl_by_cert(
@@ -362,21 +363,22 @@ X509_CRL *CRLMGMT_load_crl_by_cert(
         return NULL;
     }
 
-    const size_t    CDP_PROXY_LEN   = 4096;
-    char            cdp_issuer[CDP_PROXY_LEN];
+    const size_t ISSUER_NAME_LEN = 4096;
+    char issuer_name[ISSUER_NAME_LEN];
 
-    if (!CDP_get_x509_name(X509_get_issuer_name(cert), cdp_issuer, CDP_PROXY_LEN, XN_FLAG_RFC2253)) {
-        LOG(FL_ERR, "could not extract the certificate issuer");
+    if (!CDP_get_x509_name(X509_get_issuer_name(cert), issuer_name, ISSUER_NAME_LEN, XN_FLAG_RFC2253)) {
+        LOG(FL_ERR, "could not extract certificate issuer name");
         return NULL;
     }
 
-    char cdp_proxy[CDP_PROXY_LEN];
+    const size_t URL_LEN = 4096;
+    char url[URL_LEN];
     LOG(FL_DEBUG, "cdp proxy given, appending cert issuer to proxy %s", data->proxy_url);
-    size_t copied = UTIL_safe_string_copy(data->proxy_url, cdp_proxy, CDP_PROXY_LEN, NULL);
-    copied += UTIL_safe_string_copy(url_param_issuer, cdp_proxy + copied, CDP_PROXY_LEN - (size_t)copied, NULL);
-    copied += UTIL_url_encode(cdp_issuer, cdp_proxy + copied, CDP_PROXY_LEN - (size_t)copied, NULL);
+    size_t copied = UTIL_safe_string_copy(data->proxy_url, url, URL_LEN, NULL);
+    copied += UTIL_safe_string_copy(url_param_issuer, url + copied, URL_LEN - (size_t)copied, NULL);
+    copied += UTIL_url_encode(issuer_name, url + copied, URL_LEN - (size_t)copied, NULL);
 
-    return get_crl_by_download_or_from_cache(data, cdp_proxy, timeout, desc);
+    return get_crl_by_download_or_from_cache(data, url, url, timeout, desc);
 }
 
 X509_CRL *CRLMGMT_load_crl_cb(
