@@ -120,15 +120,15 @@ X509_CRL* CONN_load_crl_http(const char* url, int timeout,
     X509_CRL *crl = (X509_CRL*)CONN_load_ASN1_http(url, timeout, max_resp_len, 0, 0, 0, ASN1_ITEM_rptr(X509_CRL), desc);
     if(crl == NULL)
     {
-        LOG(LOG_FUNC_FILE_LINE, level, "did not get CRL for %s", desc_default);
+        LOG(LOG_FUNC_FILE_LINE, level, "could not download CRL for %s", desc_default);
     }
     else
     {
-        LOG(FL_DEBUG, "got CRL for %s", desc_default);
+        LOG(FL_DEBUG, "successfully downloaded CRL for %s", desc_default);
     }
     return crl;
 #else
-    LOG(LOG_FUNC_FILE_LINE, level, "fetching CRLs for %s via HTTP not supported by this build", desc_default);
+    LOG(LOG_FUNC_FILE_LINE, level, "downloading CRLs for %s via HTTP not supported by this build", desc_default);
     return 0;
 #endif
 }
@@ -334,7 +334,7 @@ static int try_cdp(X509_STORE_CTX* ctx, int timeout, const X509* cert,
     {
         return res;
     }
-    LOG(FL_TRACE, "successfully downloaded CRL from %s", url not_eq 0 ? url : "URL based on any info in cert");
+    LOG(FL_TRACE, "successfully retrieved CRL, URL %s", url not_eq 0 ? url : "based on any info in cert");
     UTIL_print_crl(bio_trace, crl);
 
     crls = sk_X509_CRL_new_null();

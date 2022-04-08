@@ -153,9 +153,9 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
             LOG(FL_TRACE, "Next Publish extension not present in CRL");
         }
 
-        LOG(FL_DEBUG, "CRL timecheck: isBeforeStart: %d, isAfterEnd: %d, isAfterPublish: %d", isBeforeStart, isAfterEnd, isAfterPublish);
+        LOG(FL_TRACE, "CRL timecheck: isBeforeStart: %d, isAfterEnd: %d, isAfterPublish: %d", isBeforeStart, isAfterEnd, isAfterPublish);
         if (isBeforeStart || isAfterEnd || isAfterPublish) {
-            LOG(FL_INFO, "CRL is expired, so deleting it from the cache");
+            LOG(FL_DEBUG, "CRL is expired, so deleting it from the cache");
             // crl not within time frame, remove it
             X509_CRL_free(crl);
             crl = NULL;
@@ -163,7 +163,7 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
             unlink(cachefile);
         }
         else {
-            LOG(FL_INFO, "CRL has been successfully loaded from the cache");
+            LOG(FL_TRACE, "CRL has been successfully loaded from the cache");
         }
         ASN1_TIME_free(now);
     }
@@ -203,7 +203,7 @@ static X509_CRL *get_crl_by_download_or_from_cache(const CRLMGMT_DATA *data,
         LOG(FL_TRACE, "trying to load CRL from cache file: %s", cachefile);
         crl = get_crl_from_cache(cachefile);
         if (crl != NULL) {
-            LOG(FL_DEBUG, "got CRL for %s", desc);
+            LOG(FL_DEBUG, "got CRL from cache for %s", desc);
             return crl;
         }
         LOG(FL_DEBUG, "did not get CRL from cache for %s", desc);
@@ -330,7 +330,8 @@ X509_CRL *CRLMGMT_load_crl_by_url(
     OPTIONAL const char *desc)
 {
     (void) cert;
-    LOG(FL_DEBUG, "url=%s, desc='%s'", url, desc? desc : "-no desc-");
+    LOG(FL_DEBUG, "retrieving CRL according to %s, url=%s",
+        desc? desc : "(no description)", url);
 
     const char      *effective_uri  = url;
     const size_t    CDP_PROXY_LEN   = 4096;
@@ -370,7 +371,7 @@ X509_CRL *CRLMGMT_load_crl_by_cert(
     }
 
     char cdp_proxy[CDP_PROXY_LEN];
-    LOG(FL_INFO, "cdp proxy given, appending cert issuer to proxy %s", data->proxy_url);
+    LOG(FL_DEBUG, "cdp proxy given, appending cert issuer to proxy %s", data->proxy_url);
     size_t copied = UTIL_safe_string_copy(data->proxy_url, cdp_proxy, CDP_PROXY_LEN, NULL);
     copied += UTIL_safe_string_copy(url_param_issuer, cdp_proxy + copied, CDP_PROXY_LEN - (size_t)copied, NULL);
     copied += UTIL_url_encode(cdp_issuer, cdp_proxy + copied, CDP_PROXY_LEN - (size_t)copied, NULL);
@@ -385,15 +386,16 @@ X509_CRL *CRLMGMT_load_crl_cb(
     OPTIONAL const X509 *cert,
     OPTIONAL const char *desc)
 {
+    const CRLMGMT_DATA *cmdat = (const CRLMGMT_DATA *)arg;
     if (desc == NULL) {
         desc = "(no description given)";
     }
-    LOG(FL_TRACE, "CRL download callback called using %s", desc);
+    LOG(FL_TRACE, "CRL retrieval callback using %s, called on certificate for %s",
+        desc, cmdat->note);
+
     if (cert != NULL) {
         LOG_cert_CDP(FL_TRACE, cert);
     }
-    const CRLMGMT_DATA *cmdat = (const CRLMGMT_DATA *)arg;
-    LOG(FL_DEBUG, "checking certificate for %s", cmdat->note);
     if (url != NULL) {
         return cmdat->use_url ?
             CRLMGMT_load_crl_by_url(cmdat, url, timeout, cert, desc)
@@ -404,6 +406,7 @@ X509_CRL *CRLMGMT_load_crl_cb(
             CRLMGMT_load_crl_by_cert(cmdat, timeout, cert, desc)
             : NULL;
     }
-    LOG(FL_WARN, "callback called with neither url nor cert: %s", desc);
+
+    LOG(FL_WARN, "CRL retrieval callback called with neither URL nor cert");
     return NULL;
 }
