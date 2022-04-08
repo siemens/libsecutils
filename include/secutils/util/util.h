@@ -307,6 +307,9 @@ void UTIL_cleanse_free(OPTIONAL char *str);
  */
 bool UTIL_get_random(void *buf, size_t len);
 
+#define HAS_PREFIX(str, pre) (strncmp(str, pre "", sizeof(pre) - 1) == 0)
+#define CHECK_AND_SKIP_PREFIX(str, pre) (HAS_PREFIX(str, pre) ? ((str) += sizeof(pre) - 1, 1) : 0)
+
 /*!
  * @brief The function copies the source string into the destination buffer
  * if given, otherwise just calculates how large it needs to be.

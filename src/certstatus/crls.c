@@ -326,7 +326,10 @@ static int try_cdp(X509_STORE_CTX* ctx, int timeout, const X509* cert,
             return res;
         }
     }
-    LOG(FL_DEBUG, "retrieving CRL from %s%s%s", desc,
+    const char *store_desc = STORE_get0_desc(ts);
+    LOG(FL_DEBUG, "attempting to retrieve CRL%s%s%s%s",
+        store_desc == NULL ? "" : " for ", store_desc == NULL ? "" : store_desc,
+        desc == NULL ? "" : " using ", desc == NULL ? "" : desc,
         url not_eq 0 ? ": " : "", url not_eq 0 ? url : "");
 
     X509_CRL* crl = STORE_fetch_crl(ts, url, timeout, cert, nonfinal ? 0 : desc);
