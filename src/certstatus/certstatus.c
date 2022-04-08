@@ -79,9 +79,12 @@ void LOG_certstatus_methods(OPTIONAL const char* func, OPTIONAL const char* file
     int ocsp_last = (flags bitand X509_V_FLAG_OCSP_LAST) not_eq 0;
     int crl_check = (flags bitand X509_V_FLAG_CRL_CHECK) not_eq 0;
 
-    LOG(func, file, lineno, level, "for%s%s cert status checks, %s %s%s%s%s%s",
+    const char *desc = STORE_get0_desc(X509_STORE_CTX_get0_store(ctx));
+    LOG(func, file, lineno, level, "for%s%s cert status checks%s%s, %s %s%s%s%s%s",
         check_single ? " single" : check_all ? " full" : check_any ? " any" : " leaf",
-        STORE_CTX_tls_active(ctx) ? " TLS" : "", verb,
+        STORE_CTX_tls_active(ctx) ? " TLS" : "",
+        desc == NULL ? "" : " for ", desc == NULL ? "" : desc,
+        verb,
         ocsp_stapling ? "OCSP stapling" : "",
         ocsp_stapling and crl_check ? " then " : "",
         crl_check ? "local CRLs" : "",

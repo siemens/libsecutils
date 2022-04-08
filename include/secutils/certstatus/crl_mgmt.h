@@ -205,7 +205,7 @@ void CRLMGMT_DATA_set_note(
  * @param url the url from where the CRL shall be downloaded
  * @param timeout the timeout of the http download
  * @param cert the certificate that is to be checked for revocation
- * @param desc a description used in log output
+ * @param desc description of the CRL source to use for diagnostics, or null
  * 
  * @return the CRL that has been downloaded (or gotten from cache) or NULL
  */
@@ -224,7 +224,7 @@ X509_CRL *CRLMGMT_load_crl_by_url(
  * @param cmdat pointer to the CRL management data structure
  * @param timeout the timeout of the http download
  * @param cert the certificate that is to be checked for revocation
- * @param desc a description used in log output
+ * @param desc description of the CRL source to use for diagnostics, or null
  * 
  * @return the CRL that has been downloaded (or gotten from cache) or NULL
  */
@@ -246,7 +246,7 @@ X509_CRL *CRLMGMT_load_crl_by_cert(
  * @param url the url of the CRL to be downloaded
  * @param timeout timeout value for the download
  * @param cert the certificate that shall be checked
- * @param desc an optional description
+ * @param desc description of the CRL source to use for diagnostics, or null
  *
  * @return pointer to the downloaded CRL, NULL in case of error
  */

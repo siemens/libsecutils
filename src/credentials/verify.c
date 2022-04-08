@@ -207,6 +207,9 @@ int CREDENTIALS_verify_cert(OPTIONAL uta_ctx* uta_ctx, X509* cert,
         LOG(FL_ERR, "failed to get certificate subject name");
         return result;
     }
+    const char *desc = STORE_get0_desc(trust_store);
+    LOG(FL_DEBUG, "attempting to verify certificate%s%s with subject %s",
+        desc == NULL ? "" : " for ", desc == NULL ? "" : desc, name);
 
     if(0 is_eq(store_ctx = X509_STORE_CTX_new()))
     {

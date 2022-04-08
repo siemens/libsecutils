@@ -33,6 +33,7 @@ typedef struct STORE_ex_st
 #ifndef SECUTILS_NO_TLS
     BIO* tls_bio; /* indicates CMP_PKIMESSAGE_http_perform() with TLS is active */
 #endif
+    const char* desc; /* description to be used for diagnostic purposes */
     const char* host; /* expected host name in cert, for diagnostic purposes */
     CONN_load_crl_cb_t crl_cb;
     OPTIONAL void* crl_cb_arg;
@@ -77,6 +78,7 @@ static void STORE_EX_free(X509_STORE* ts, STORE_EX* ex_data, CRYPTO_EX_DATA* ad,
 {
     if(0 not_eq ex_data)
     {
+        OPENSSL_free((char*)ex_data->desc);
         OPENSSL_free((char*)ex_data->host);
         OPENSSL_free((char*)ex_data->cdps.urls);
         OPENSSL_free((char*)ex_data->ocsp.urls);
@@ -232,6 +234,11 @@ bool STORE_load_more_check(X509_STORE** pstore, const char* file,
 #ifdef DEBUG
     LOG(FL_DEBUG, "Loading %s from file '%s'", desc not_eq 0 ? desc : "?", file);
 #endif
+    const char* store_desc = desc;
+    if (store_desc != NULL) {
+        CHECK_AND_SKIP_PREFIX(store_desc, "trusted certs for ");
+        CHECK_AND_SKIP_PREFIX(store_desc, "trusted certificates for ");
+    }
 
     if(ctx is_eq 0 or FILES_check_icv(ctx, file))
     {
@@ -248,7 +255,7 @@ bool STORE_load_more_check(X509_STORE** pstore, const char* file,
         }
         *pstore = STORE_create(*pstore, 0, certs);
         CERTS_free(certs);
-        return *pstore not_eq 0;
+        return *pstore not_eq 0 && STORE_set1_desc(*pstore, store_desc);
     }
 
 err:
@@ -577,6 +584,36 @@ bool STORE_add_crls(X509_STORE* ts, OPTIONAL const STACK_OF(X509_CRL) * crls)
     return X509_VERIFY_PARAM_set_flags(X509_STORE_get0_param(ts), X509_V_FLAG_CRL_CHECK);
 }
 
+
+bool STORE_set1_desc(X509_STORE* store, OPTIONAL const char *desc)
+{
+    if(0 is_eq store)
+    {
+        LOG(FL_ERR, "null argument");
+        return false;
+    }
+
+    STORE_EX* ex_data = STORE_get_ex_data(store);
+    if(ex_data is_eq 0)
+    {
+        return false;
+    }
+
+    OPENSSL_free((char*)ex_data->desc);
+    ex_data->desc = OPENSSL_strdup(desc);
+    return (ex_data->desc == NULL) == (desc == NULL);
+}
+
+const char* STORE_get0_desc(OPTIONAL X509_STORE* store)
+{
+    if(0 is_eq store)
+    {
+        return 0;
+    }
+
+    STORE_EX* ex_data = STORE_get_ex_data(store);
+    return ex_data is_eq 0 ? 0 : ex_data->desc;
+}
 
 bool STORE_set_parameters(X509_STORE* ts, OPTIONAL const X509_VERIFY_PARAM* vpm,
                           bool full_chain, bool stapling,

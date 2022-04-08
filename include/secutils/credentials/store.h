@@ -37,7 +37,6 @@
 /* this function is used by the genCMPClient API implementation */
 bool STORE_set1_host_ip(X509_STORE* truststore, const char* name, const char* ip);
 
-
 /*!*****************************************************************************
  * @brief add CRLs to trust store and enable CRL-based status checks for end-entity certificates
  *
@@ -48,6 +47,21 @@ bool STORE_set1_host_ip(X509_STORE* truststore, const char* name, const char* ip
  */
 /* this function is part of the genCMPClient API */
 bool STORE_add_crls(X509_STORE* store, OPTIONAL const STACK_OF(X509_CRL) * crls);
+
+/*!*****************************************************************************
+ * @brief set descriptive name of trust store to be used in diagnostics
+ * @param store the certificate trust store, or null
+ * @param desc description to use for diagnostics, or null
+ * @return true on success, false on failure
+ */
+bool STORE_set1_desc(X509_STORE* store, OPTIONAL const char* desc);
+
+/*!*****************************************************************************
+ * @brief get descriptive name of trust store to be used in diagnostics
+ * @param store the certificate trust store
+ * @return description to use for diagnostics, or null on failure or if not set
+ */
+const char* STORE_get0_desc(OPTIONAL X509_STORE* store);
 
 /*!*****************************************************************************
  * @brief set various optional verification parameters in the given trust store
@@ -84,7 +98,6 @@ bool STORE_set_parameters(X509_STORE* store, OPTIONAL const X509_VERIFY_PARAM* v
                           OPTIONAL const STACK_OF(X509_CRL) * crls,
                           bool use_CDP, OPTIONAL const char* cdps, int crls_timeout,
                           bool use_AIA, OPTIONAL const char* ocsp, int ocsp_timeout);
-
 
 typedef X509_CRL* (* CONN_load_crl_cb_t)(OPTIONAL void* arg,
                                          OPTIONAL const char* url, int timeout,

@@ -203,10 +203,10 @@ static X509_CRL *get_crl_by_download_or_from_cache(const CRLMGMT_DATA *data,
         LOG(FL_TRACE, "trying to load CRL from cache file: %s", cachefile);
         crl = get_crl_from_cache(cachefile);
         if (crl != NULL) {
-            LOG(FL_DEBUG, "got CRL from cache for %s", desc);
+            LOG(FL_DEBUG, "got CRL from cache using %s", desc);
             return crl;
         }
-        LOG(FL_DEBUG, "did not get CRL from cache for %s", desc);
+        LOG(FL_DEBUG, "did not get CRL from cache using %s", desc);
     }
 
     crl = CONN_load_crl_http(url, timeout, data->max_download_size, desc);
@@ -331,7 +331,7 @@ X509_CRL *CRLMGMT_load_crl_by_url(
 {
     (void) cert;
     LOG(FL_DEBUG, "retrieving CRL according to %s, url=%s",
-        desc? desc : "(no description)", url);
+        desc? desc : "(no source description)", url);
 
     const char      *effective_uri  = url;
     const size_t    CDP_PROXY_LEN   = 4096;
@@ -388,7 +388,7 @@ X509_CRL *CRLMGMT_load_crl_cb(
 {
     const CRLMGMT_DATA *cmdat = (const CRLMGMT_DATA *)arg;
     if (desc == NULL) {
-        desc = "(no description given)";
+        desc = "(no source description)";
     }
     LOG(FL_TRACE, "CRL retrieval callback using %s, called on certificate for %s",
         desc, cmdat->note);
