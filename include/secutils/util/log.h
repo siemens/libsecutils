@@ -53,7 +53,7 @@ typedef bool (*LOG_cb_t)(OPTIONAL const char* func, OPTIONAL const char* file, i
  * @note this function does not affect the application name optionally set by LOG_set_name()
  *
  * @param log_fn the callback function to use for outputting log messages, or null to keep the current one.
- * @note by default, output is sent to syslog and the console.
+ * @note by default, output is sent to syslog and the console (stdout).
  * @warning security note: the \p log_fn reporting function must be compliant with
  * https://wiki.sei.cmu.edu/confluence/display/c/FIO30-C.+Exclude+user+input+from+format+strings
  */
@@ -87,7 +87,7 @@ void LOG_set_verbosity(severity level);
 void LOG_set_name(OPTIONAL const char* name);
 
 /*!
- * @brief default logging output behavior: send to syslog and print to console
+ * @brief default logging output behavior: send to syslog and print to console (stdout)
  * @param func the name of the reporting function or component, or null
  * @param file the current source file path name, or null
  * @param lineno the current line number, or 0
@@ -104,7 +104,7 @@ bool LOG_default(OPTIONAL const char* func, OPTIONAL const char* file, int linen
                  const char* msg);
 
 /*!
- * @brief as before, but print to console only, do not send to syslog
+ * @brief as before, but print to console (stdout) only, do not send to syslog
  * @param func the name of the reporting function or component, or null
  * @param file the current source file path name, or null
  * @param lineno the current line number, or 0
@@ -123,7 +123,7 @@ bool LOG_console(OPTIONAL const char* func, OPTIONAL const char* file, int linen
  * @param level the nature of the message, i.e., its severity level
  * @param msg the message text
  * @param use_syslog enable sending to syslog
- * @param use_console enable printing to console
+ * @param use_console enable printing to console (stdout)
  * @return true success and false on failure
  */
 bool LOG_generic(OPTIONAL const char* func, OPTIONAL const char* file, int lineno, severity level,

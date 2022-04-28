@@ -173,8 +173,8 @@ bool LOG_generic(OPTIONAL const char* func, OPTIONAL const char* file, int linen
         return true;
     }
 
-    /* print errors and warnings to stderr, info and debug messages to stdout */
-    FILE* fd = level <= LOG_WARNING ? stderr : stdout;
+    /* print everything to stdout in order to prevent order mismatch with portions on stderr */
+    FILE* fd = /* level <= LOG_WARNING ? stderr : */ stdout;
 
     char loc[loc_len];
     memset(loc, 0x00, loc_len);
