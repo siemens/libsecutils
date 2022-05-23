@@ -72,8 +72,9 @@ void CERTS_free(OPTIONAL STACK_OF(X509) *certs)
 }
 
 /*
- * dn is expected to be in the format /type0=value0/type1=value1/type2=...
- * where characters may be escaped by \
+ * dn is expected to be in the format "/type0=value0/type1=value1/type2=..."
+ * where characters may be escaped by '\'.
+ * The NULL-DN may be given as "/" or "".
  */
 /* adapted from OpenSSL:apps/lib/apps.c */
 X509_NAME* UTIL_parse_name(const char* dn, long chtype, bool multirdn)
@@ -102,7 +103,7 @@ X509_NAME* UTIL_parse_name(const char* dn, long chtype, bool multirdn)
     /* no multivalued RDN by default */
     mval[ne_num] = 0;
 
-    if(*sp++ not_eq '/')
+    if(*sp not_eq '\0' and *sp++ not_eq '/')
     { /* skip leading '/' */
         LOG(FL_ERR, "DN '%s' does not start with '/'.", dn);
         goto error;
