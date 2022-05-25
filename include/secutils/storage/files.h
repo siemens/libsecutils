@@ -266,13 +266,13 @@ bool FILES_store_key(const EVP_PKEY* pkey, const char* file, file_format_t forma
 /*!
  * @brief store the given list of certificates in given file and format
  *
- * @param certs list of certificates to save
+ * @param certs list of certificates to save, or null
  * @param file (path) name of the output file. Any previous contents are overwritten.
  * @param format the output format to use
  * @param desc description of file contents to use for any error messages, or null
  * @return the number of certificates saved, or < 0 on error
  */
-int FILES_store_certs(const STACK_OF(X509) * certs, const char* file, file_format_t format,
+int FILES_store_certs(OPTIONAL const STACK_OF(X509) * certs, const char* file, file_format_t format,
                       OPTIONAL const char* desc);
 
 

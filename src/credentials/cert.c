@@ -56,7 +56,7 @@ STACK_OF(X509) *CERTS_load(const char *files, OPTIONAL const char *desc,
     return certs;
 }
 
-int CERTS_save(const STACK_OF(X509) *certs, const char *file, OPTIONAL const char *desc)
+int CERTS_save(OPTIONAL const STACK_OF(X509) *certs, const char *file, OPTIONAL const char *desc)
 {
     file_format_t format = FILES_get_format(file);
     if (format == FORMAT_UNDEF) {
