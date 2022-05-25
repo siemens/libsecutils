@@ -1333,7 +1333,7 @@ end:
  * writes out a stack of certificates in the given format to the given file
  * returns number of written certificates on success, < 0 on error
  * ########################################################################## */
-int FILES_store_certs(const STACK_OF(X509) * certs, const char* file, file_format_t format, OPTIONAL const char* desc)
+int FILES_store_certs(OPTIONAL const STACK_OF(X509) * certs, const char* file, file_format_t format, OPTIONAL const char* desc)
 {
     int n = sk_X509_num(certs);
     BIO* bio = 0;

@@ -81,13 +81,13 @@ STACK_OF(X509)
 /*!
  * @brief store the given list of certificates in given file and in format derived from file name extension
  *
- * @param certs list of certificates to save
+ * @param certs list of certificates to save, or null
  * @param file (path) name of the output file. Any previous contents are overwritten.
  * @param desc description of file contents to use for any error messages, or null
  * @return the number of certificates saved, or < 0 on error
  */
 /* this function is part of the genCMPClient API */
-int CERTS_save(const STACK_OF(X509) *certs, const char *file, OPTIONAL const char *desc);
+int CERTS_save(OPTIONAL const STACK_OF(X509) *certs, const char *file, OPTIONAL const char *desc);
 
 
 /*!
