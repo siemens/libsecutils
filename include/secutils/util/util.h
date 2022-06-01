@@ -16,7 +16,7 @@
 #ifndef SECUTILS_UTIL_H_
 # define SECUTILS_UTIL_H_
 
-/* #if OPENSSL_VERSION_NUMBER >= 0x30000000L */
+/* #if OPENSSL_VERSION_NUMBER >= OPENSSL_V_3_0_0 */
 /* #define OPENSSL_API_COMPAT 30000 */
 # define OPENSSL_NO_DEPRECATED
 
@@ -43,11 +43,12 @@ static const int UTIL_max_name_len = 128;  /*!< max length of file name */
 # define OPENSSL_V_1_0_2 0x10002000L
 # define OPENSSL_V_1_1_0 0x10100000L
 # define OPENSSL_V_1_1_1 0x10101000L
+# define OPENSSL_V_3_0_0 0x30000000L
 
 # ifndef OpenSSL_version_num
 #  if OPENSSL_VERSION_NUMBER < 0x10100000L
 #   define OpenSSL_version_num SSLeay
-#  elif OPENSSL_VERSION_NUMBER >= 0x30000000L
+#  elif OPENSSL_VERSION_NUMBER >= OPENSSL_V_3_0_0
 #   define OpenSSL_version_num() \
     ((unsigned long) \
      ((OPENSSL_version_major() << 28) | (OPENSSL_version_minor() << 20) | \
@@ -190,7 +191,7 @@ typedef u_int64_t uint64_t;
     (X509_STORE_up_ref(st), SSL_CTX_set_cert_store(ctx, st))
 # endif
 
-# if OPENSSL_VERSION_NUMBER < 0x30000000L
+# if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
 STACK_OF(X509) *X509_STORE_get1_all_certs(X509_STORE *store);
 # endif
 
@@ -201,6 +202,7 @@ STACK_OF(X509) *X509_STORE_get1_all_certs(X509_STORE *store);
  *        or null for the default: UTIL_SECUTILS_NAME
  * @note calls exit(EXIT_FAILURE) on error,
  *        e.g., version mismatch or initialization failure
+ * @note this function is called upon libarary loading via STORE_EX_init_index()
  ******************************************************************************/
 /* this function is used by the genCMPClient API implementation */
 void UTIL_setup_openssl(long version, OPTIONAL const char *build_name);

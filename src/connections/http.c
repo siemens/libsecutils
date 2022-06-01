@@ -24,7 +24,7 @@
 # endif
 
 # include <openssl/asn1.h>
-# if OPENSSL_VERSION_NUMBER >= 0x30000000L
+# if OPENSSL_VERSION_NUMBER >= OPENSSL_V_3_0_0
 #  undef OPENSSL_NO_DEPRECATED_3_0
 # endif
 # include <openssl/ocsp.h>
