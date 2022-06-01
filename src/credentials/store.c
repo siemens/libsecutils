@@ -862,7 +862,7 @@ const revstatus_access* STORE_get0_ocsp(X509_STORE* store)
 }
 
 
-#if OPENSSL_VERSION_NUMBER < 0x30000000L
+#if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
 /** get a copy of all certificates in a store */
 STACK_OF(X509) *X509_STORE_get1_all_certs(X509_STORE *store)
 {

@@ -278,7 +278,11 @@ void UTIL_setup_openssl(long version, OPTIONAL const char* build_name)
         LOG(FL_FATAL, "OpenSSL version 0x%lx is too old for %s. Must be at least 0x10002000L", OpenSSL_version_num(), build_name);
         exit(EXIT_FAILURE);
     }
+#if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
+#define MAJOR_MINOR_MASK 0xfffff000L
+#else
 #define MAJOR_MINOR_MASK 0xfff00000L
+#endif
     if((MAJOR_MINOR_MASK bitand OpenSSL_version_num()) not_eq (MAJOR_MINOR_MASK bitand version))
     {
         LOG(FL_FATAL, "OpenSSL runtime version 0x%lx does not match version 0x%lx used for compiling %s",

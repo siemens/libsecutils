@@ -20,7 +20,8 @@
 #include <openssl/engine.h>
 #endif
 
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#include <util/util.h>
+#if OPENSSL_VERSION_NUMBER >= OPENSSL_V_3_0_0
 /* compilation quirks for using crypto engines in OpenSSL >= 3.0 */
 _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 #endif

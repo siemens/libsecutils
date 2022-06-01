@@ -314,7 +314,7 @@ bool CERT_check(const char *uri, OPTIONAL X509 *cert, int type_CA,
         return true;
     int res = 0;
 
-#if OPENSSL_VERSION_NUMBER >= 0x30000000L
+#if OPENSSL_VERSION_NUMBER >= OPENSSL_V_3_0_0
     res = X509_cmp_timeframe(vpm, X509_get0_notBefore(cert),
                              X509_get0_notAfter(cert));
 #else
