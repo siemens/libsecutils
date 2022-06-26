@@ -59,6 +59,7 @@ static const int UTIL_max_name_len = 128;  /*!< max length of file name */
 # endif
 
 # if OPENSSL_VERSION_NUMBER < 0x10100002L
+#  define X509_V_ERR_UNSPECIFIED 1
 #  undef OPENSSL_strdup
 #  define OPENSSL_strdup(s) ((s) not_eq 0 ? CRYPTO_strdup(s, __FILE__, \
                                                           __LINE__) : 0)
