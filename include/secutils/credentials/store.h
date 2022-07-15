@@ -208,6 +208,7 @@ bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
 
 /*!*****************************************************************************
  * @brief search for files with CRLs in specified directory and add them to X509_STORE
+ * @note this function sets check_revocation_any_method() to be used as a callback during CRL validation
  *
  * @param pstore      pointer to trust store to be augmented with CRLs.
  *                    CRL-based status checking will be enabled in it for the full certificate chain.
@@ -219,6 +220,22 @@ bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
  * @return true on success, false on error/failure
  ******************************************************************************/
 bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const char* desc, bool recursive, OPTIONAL uta_ctx* ctx);
+
+/*!*****************************************************************************
+ * @brief search for files with CRLs in specified directory and add them to X509_STORE
+ * @note this function sets check_revocation_local_only_method() to be used as a callback during CRL validation
+ *
+ * @param pstore      pointer to trust store to be augmented with CRLs.
+ *                    CRL-based status checking will be enabled in it for the full certificate chain.
+ * @param crl_dir     directory where to search for CRLs
+ * @param desc        description of CRLs to use for error reporting, or null
+ * @param recursive   if true, use recursive search in subdirectories
+ * @param ctx pointer to UTA context for checking file integrity&authenticity using ICV, or null
+ * @note at least one valid CRL file must be found in each visited directory
+ * @return true on success, false on error/failure
+ ******************************************************************************/
+bool STORE_load_crl_dir_local_only(X509_STORE* pstore, const char* crl_dir, OPTIONAL const char* desc, bool recursive,
+                                   OPTIONAL uta_ctx* ctx);
 
 /*!*****************************************************************************
  * @brief release a trust store

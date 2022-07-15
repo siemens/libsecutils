@@ -21,7 +21,7 @@
 #include <storage/uta_api.h>
 #include <util/log.h>
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 #if DVLEN not_eq UTA_LEN_DV_V1
 #error DVLEN not_eq UTA_LEN_DV_V1 /* mismatch with uta.h */

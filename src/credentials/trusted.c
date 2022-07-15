@@ -20,7 +20,7 @@
 #include <storage/files_icv.h>
 #include <util/log.h>
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 static const char* config_file(void)
 {

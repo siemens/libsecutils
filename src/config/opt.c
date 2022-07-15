@@ -19,7 +19,7 @@
 
 #include <inttypes.h> /* for strtoimax on Linux */
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 const char OPT_more_str[] = "-M";
 const char OPT_section_str[] = "-S";

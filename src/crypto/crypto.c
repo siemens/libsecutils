@@ -13,7 +13,7 @@
 * SPDX-License-Identifier: Apache-2.0
 */
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 #include <util/log.h>
 #include <crypto/crypto.h>

@@ -27,7 +27,7 @@
 #include <credentials/verify.h>
 #include <connections/conn.h>
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 /* adapted from OpenSSL:crypto/x509/t_crl.c */
 void UTIL_print_crl(OPTIONAL BIO* bio, OPTIONAL const X509_CRL* crl)

@@ -28,7 +28,7 @@ static const char* const DV_SECTION = "dv"; /*! name of DVFILE section with DV s
 #include <storage/files_dv.h>
 #include <util/log.h>
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 /* Get device-specific password (base64 encoded) */
 static bool getBase64Password(OPTIONAL uta_ctx* ctx, const unsigned char* dv, char* pw)

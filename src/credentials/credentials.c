@@ -27,7 +27,7 @@
 #include <util/log.h>
 #include <util/util.h>
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 /* this type is part of the genCMPClient API */
 struct credentials

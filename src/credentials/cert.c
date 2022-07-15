@@ -19,7 +19,7 @@
 #include <storage/files.h>
 #include <util/log.h>
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 
 X509 *CERT_load(const char *file, OPTIONAL const char *source,
@@ -71,151 +71,6 @@ void CERTS_free(OPTIONAL STACK_OF(X509) *certs)
     sk_X509_pop_free(certs, X509_free);
 }
 
-/*
- * dn is expected to be in the format "/type0=value0/type1=value1/type2=..."
- * where characters may be escaped by '\'.
- * The NULL-DN may be given as "/" or "".
- */
-/* adapted from OpenSSL:apps/lib/apps.c */
-X509_NAME* UTIL_parse_name(const char* dn, long chtype, bool multirdn)
-{
-    size_t buflen = strlen(dn) + 1; /* to copy the types and values.
-                                     * Due to escaping, the copy can only become shorter */
-    char* buf = OPENSSL_malloc(buflen);
-    size_t max_ne = buflen / (1 + 1) + 1; /* maximum number of name elements */
-    const char** ne_types = OPENSSL_malloc(max_ne * sizeof(char*));
-    char** ne_values = OPENSSL_malloc(max_ne * sizeof(char*));
-    int* mval = OPENSSL_malloc(max_ne * sizeof(int));
-
-    const char* sp = dn;
-    char* bp = buf;
-    int i, ne_num = 0;
-
-    X509_NAME* n = 0;
-    int nid;
-
-    if(0 is_eq buf or 0 is_eq ne_types or 0 is_eq ne_values or 0 is_eq mval)
-    {
-        LOG_err("Malloc error");
-        goto error;
-    }
-
-    /* no multivalued RDN by default */
-    mval[ne_num] = 0;
-
-    if(*sp not_eq '\0' and *sp++ not_eq '/')
-    { /* skip leading '/' */
-        LOG(FL_ERR, "DN '%s' does not start with '/'.", dn);
-        goto error;
-    }
-
-    while(*sp not_eq '\0')
-    {
-        /* collect type */
-        ne_types[ne_num] = bp;
-        /* parse element name */
-        while(*sp not_eq '=')
-        {
-            if(*sp is_eq '\\')
-            { /* is there anything to escape in the * type...? */
-                if(*++sp not_eq '\0')
-                {
-                    *bp++ = *sp++;
-                }
-                else
-                {
-                    LOG(FL_ERR, "Escape character at end of DN '%s'", dn);
-                    goto error;
-                }
-            }
-            else if(*sp is_eq '\0')
-            {
-                LOG(FL_ERR, "End of string encountered while processing type of DN '%s' element #%d", dn, ne_num);
-                goto error;
-            }
-            else
-            {
-                *bp++ = *sp++;
-            }
-        }
-        sp++;
-        *bp++ = '\0';
-        /* parse element value */
-        ne_values[ne_num] = bp;
-        while(*sp not_eq '\0')
-        {
-            if(*sp is_eq '\\')
-            {
-                if(*++sp not_eq '\0')
-                {
-                    *bp++ = *sp++;
-                }
-                else
-                {
-                    LOG(FL_ERR, "Escape character at end of DN '%s'", dn);
-                    goto error;
-                }
-            }
-            else if(*sp is_eq '/')
-            { /* start of next element */
-                sp++;
-                /* no multivalued RDN by default */
-                mval[ne_num + 1] = 0;
-                break;
-            }
-            else if(*sp is_eq '+' and multirdn)
-            {
-                /* a not escaped + signals a multi-valued RDN */
-                sp++;
-                mval[ne_num + 1] = -1;
-                break;
-            }
-            else
-            {
-                *bp++ = *sp++;
-            }
-        }
-        *bp++ = '\0';
-        ne_num++;
-    }
-
-    if(0 is_eq(n = X509_NAME_new()))
-    {
-        goto error;
-    }
-
-    for(i = 0; i < ne_num; i++)
-    {
-        if((nid = OBJ_txt2nid(ne_types[i])) is_eq NID_undef)
-        {
-            LOG(FL_WARN, "DN '%s' attribute %s has no known NID, skipped", dn, ne_types[i]);
-            continue;
-        }
-
-        if(0 is_eq * ne_values[i])
-        {
-            LOG(FL_WARN, "No value provided for DN '%s' attribute %s, skipped", dn, ne_types[i]);
-            continue;
-        }
-
-        if(0 is_eq X509_NAME_add_entry_by_NID(n, nid, chtype, (unsigned char*)ne_values[i], -1, -1, mval[i]))
-        {
-            ERR_print_errors(bio_err);
-            LOG(FL_ERR, "Error adding name attribute '/%s=%s'", ne_types[i], ne_values[i]);
-            X509_NAME_free(n);
-            n = 0;
-            goto error;
-        }
-    }
-
-error:
-    OPENSSL_free(ne_values);
-    OPENSSL_free(ne_types);
-    OPENSSL_free(mval);
-    OPENSSL_free(buf);
-    return n;
-}
-
 
 void CERT_print(OPTIONAL const X509* cert, OPTIONAL BIO* bio, unsigned long neg_cflags)
 {
@@ -228,7 +83,7 @@ void CERT_print(OPTIONAL const X509* cert, OPTIONAL BIO* bio, unsigned long neg_
         unsigned long flags =
             ASN1_STRFLGS_RFC2253 bitor ASN1_STRFLGS_ESC_QUOTE bitor XN_FLAG_SEP_CPLUS_SPC bitor XN_FLAG_FN_SN;
         BIO_printf(bio, "    Certificate\n");
-        X509_print_ex(bio, (X509*)cert, flags, compl X509_FLAG_NO_SUBJECT);
+        X509_print_ex(bio, (X509*)cert, flags, compl (unsigned long)X509_FLAG_NO_SUBJECT);
         if(X509_check_issued((X509*)cert, (X509*)cert) is_eq X509_V_OK)
         {
             BIO_printf(bio, "        self-signed\n");
@@ -236,9 +91,9 @@ void CERT_print(OPTIONAL const X509* cert, OPTIONAL BIO* bio, unsigned long neg_
         else
         {
             BIO_printf(bio, " ");
-            X509_print_ex(bio, (X509*)cert, flags, compl X509_FLAG_NO_ISSUER);
+            X509_print_ex(bio, (X509*)cert, flags, compl (unsigned long)X509_FLAG_NO_ISSUER);
         }
-        X509_print_ex(bio, (X509*)cert, flags, compl(X509_FLAG_NO_SERIAL bitor X509_FLAG_NO_VALIDITY));
+        X509_print_ex(bio, (X509*)cert, flags, compl((unsigned long)X509_FLAG_NO_SERIAL bitor X509_FLAG_NO_VALIDITY));
         if(X509_cmp_current_time(X509_get0_notBefore(cert)) > 0)
         {
             BIO_printf(bio, "        not yet valid\n");
@@ -362,58 +217,3 @@ bool CERT_check_all(const char *uri, OPTIONAL STACK_OF(X509) *certs, int type_CA
             && ret; /* Having 'ret' after the '&&', all certs are checked. */
     return ret;
 }
-
-
-/* start of definitions borrowed from OpenSSL:crypto/cmp/cmp_lib.c */
-static int X509_cmp_from_ptrs(const struct x509_st* const* a, const struct x509_st* const* b)
-{
-    return X509_cmp(*a, *b);
-}
-
-bool UTIL_sk_X509_add1_cert(STACK_OF(X509) * sk, X509* cert, bool no_duplicate)
-{
-    if(no_duplicate)
-    {
-        sk_X509_set_cmp_func(sk, &X509_cmp_from_ptrs);
-        if(sk_X509_find(sk, cert) >= 0)
-        {
-            return 1;
-        }
-    }
-    if(0 is_eq sk_X509_push(sk, cert))
-    {
-        return 0;
-    }
-    return X509_up_ref(cert);
-}
-
-int UTIL_sk_X509_add1_certs(STACK_OF(X509) * sk, OPTIONAL const STACK_OF(X509) * certs, int no_self_signed,
-                            int no_duplicates)
-{
-    int i = 0;
-
-    if(sk is_eq 0)
-    {
-        return 0;
-    }
-
-    if(certs is_eq 0)
-    {
-        return 1;
-    }
-    const int n = sk_X509_num(certs);
-    for(i = 0; i < n; i++)
-    {
-        X509* cert = sk_X509_value(certs, i);
-        if((not no_self_signed or X509_check_issued(cert, cert) not_eq X509_V_OK)
-           and (not UTIL_sk_X509_add1_cert(sk, cert, no_duplicates)))
-        {
-            return 0;
-        }
-    }
-    return 1;
-}
-/* end of definitions borrowed from OpenSSL:crypto/cmp/cmp_lib.c */
-
-
-

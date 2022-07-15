@@ -16,7 +16,7 @@
 #include "util/extensions.h"
 #include "util/log.h"
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 
 X509_EXTENSIONS* EXTENSIONS_new(void)

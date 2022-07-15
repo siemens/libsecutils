@@ -13,11 +13,12 @@
 * SPDX-License-Identifier: Apache-2.0
 */
 
+#include <assert.h>
 #include <config/config_update.h>
 #include <storage/files_icv.h>
 #include <util/log.h>
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 
 static void skip_space(char** p)
@@ -29,9 +30,9 @@ static void skip_space(char** p)
 }
 
 
-static bool copy_line_substring(char* dest, const char* src, int* offset, int max_dest_len)
+static bool copy_line_substring(char* dest, const char* src, size_t* offset, size_t max_dest_len)
 {
-    int copy_len = strnlen(src, max_dest_len);
+    size_t copy_len = strnlen(src, max_dest_len);
     if(*offset + copy_len > max_dest_len)
     {
         return false;
@@ -51,9 +52,9 @@ static int file_modified;
  * Keeps any end-of-line comment.
  * Returns the length of the resulting line, or 0 in case of error.
  */
-static int refactor_entry(char* src_p, char* dest_p, const char* const key_p, const char* const val_p, int max_dest_len)
+static int refactor_entry(char* const src_p, char* dest_p, const char* const key_p, const char* const val_p, size_t max_dest_len)
 {
-    int line_len = 0;
+    size_t line_len = 0;
     char* pos_p = src_p;
 
     if(0 is_eq src_p or 0 is_eq key_p or 0 is_eq val_p)
@@ -82,8 +83,9 @@ static int refactor_entry(char* src_p, char* dest_p, const char* const key_p, co
     skip_space(&pos_p);
 
     /* found "key = ", copy in the new value */
-    int val_len = strnlen(val_p, max_dest_len);
-    line_len = pos_p - src_p;
+    const size_t val_len = strnlen(val_p, max_dest_len);
+    assert(pos_p >= src_p);
+    line_len = (size_t)(pos_p - src_p);
     if(not copy_line_substring(dest_p, val_p, &line_len, max_dest_len))
     {
         goto len_err;
@@ -151,11 +153,11 @@ static size_t read_config_until_section(FILE* file_p, const char* file_name, con
 {
     size_t file_len = 0;
     char* pos_p = 0;
-    int section_name_len = strlen(section_name);
+    const size_t section_name_len = strlen(section_name);
     LOG(FL_TRACE, "Reading configuration until section is found or end of file reached");
     while(0 not_eq fgets(input_line, c_line_buf_size, file_p))
     {
-        int line_len = strnlen(input_line, c_line_buf_size);
+        size_t line_len = strnlen(input_line, c_line_buf_size);
         copy_file_line(file_buffer, input_line, line_len);
 
         /* break if line matches "\ *\[\ *section_name\ *\]" */
@@ -199,7 +201,13 @@ static size_t add_to_config_section(size_t file_len, const key_val_section* cons
         }
         if(pair->key and not found[i])
         {
-            int line_len = snprintf(updated_line, c_line_buf_size, "%s = %s\n", pair->key, pair->val);
+            int line_len_aux = snprintf(updated_line, c_line_buf_size, "%s = %s\n", pair->key, pair->val);
+            if (line_len_aux < 0)
+            {
+                LOG(FL_ERR, "Failed to write string");
+                return 0;
+            }
+            size_t line_len = (size_t)line_len_aux;
             copy_file_line(file_buffer, updated_line, line_len);
             LOG(FL_TRACE, "Adding in config file: %s" /*\n*/, updated_line);
             file_modified = 1;
@@ -221,7 +229,7 @@ static size_t update_config_section(FILE* file_p, const char* file_name, size_t 
     LOG(FL_TRACE, "Replacing 'key = value' pairs in the section");
     while(0 not_eq fgets(input_line, c_line_buf_size, file_p))
     {
-        int line_len = strnlen(input_line, c_line_buf_size);
+        size_t line_len = strnlen(input_line, c_line_buf_size);
         if(line_len > c_line_buf_size - 1)
         {
             return 0;
@@ -261,7 +269,13 @@ static size_t update_config_section(FILE* file_p, const char* file_name, size_t 
                 return 0;
             }
             found[i] = 1;
-            line_len = refactor_entry(input_line, updated_line, pair->key, pair->val, c_line_buf_size - 1);
+            int line_len_aux = refactor_entry(input_line, updated_line, pair->key, pair->val, c_line_buf_size - 1);
+            if (line_len_aux < 0)
+            {
+                // error already logged
+                return 0;
+            }
+            line_len = (size_t)line_len_aux;
             copy_file_line(file_buffer, updated_line, line_len);
             LOG(FL_TRACE, "Updating in config file: %s" /*\n*/, updated_line);
         }
@@ -283,9 +297,9 @@ static size_t update_config_section(FILE* file_p, const char* file_name, size_t 
 
 
 /* copy the rest of the file into the buffer */
-static int copy_remaining_config(FILE* file_p, int file_len, char* input_line)
+static size_t copy_remaining_config(FILE* file_p, size_t file_len, char* input_line)
 {
-    int line_len = strnlen(input_line, c_line_buf_size); /* first line of next section already read */
+    size_t line_len = strnlen(input_line, c_line_buf_size); /* first line of next section already read */
     copy_file_line(file_buffer, input_line, line_len);
 
     while(0 not_eq fgets(input_line, c_line_buf_size, file_p))
@@ -328,7 +342,7 @@ int CONF_update_config(OPTIONAL uta_ctx* ctx, const char* file_name, const key_v
         return 0;
     }
 
-    char* found = OPENSSL_malloc(key_val_section->count);
+    char* found = OPENSSL_malloc((size_t)key_val_section->count);
     if(found is_eq 0)
     {
         LOG(FL_ERR, "Cannot update config, out of memory");
