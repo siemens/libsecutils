@@ -23,7 +23,7 @@
 #include <util/log.h>
 #include <storage/uta_api.h>
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 
 bool STORE_CTX_tls_active(const X509_STORE_CTX* ctx)
@@ -183,8 +183,7 @@ bool verify_cb_cert(X509_STORE_CTX* store_ctx, X509* cert, int err)
     return verify_cb != 0 and (*verify_cb)(0, store_ctx) != 0;
 }
 
-int CREDENTIALS_verify_cert(OPTIONAL uta_ctx* uta_ctx, X509* cert,
-                            OPTIONAL const STACK_OF(X509) * untrusted_certs, X509_STORE* trust_store)
+int CREDENTIALS_verify_cert(X509* cert, OPTIONAL const STACK_OF(X509) * untrusted_certs, X509_STORE* trust_store)
 {
     int result = -1;
     X509_STORE_CTX* store_ctx = 0;

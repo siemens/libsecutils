@@ -16,7 +16,7 @@
 #if !defined(OPENSSL_NO_OCSP) && !defined(OPENSSL_NO_SOCK)
 
 # include <util/log.h>
-# include <operators.h>
+# include "secutils/operators.h"
 # include <connections/http.h>
 # include <connections/conn.h>
 # ifndef SECUTILS_NO_TLS

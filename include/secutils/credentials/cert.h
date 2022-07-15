@@ -26,8 +26,7 @@
 #include <string.h>  /* for strcmp, strlen */
 
 #include "../basic.h"
-#include "../operators.h"
-# include "../util/log.h"
+#include "../util/log.h"
 
 #include <openssl/x509.h>
 
@@ -100,19 +99,6 @@ void CERTS_free(OPTIONAL STACK_OF(X509) *certs);
 
 
 /*!*****************************************************************************
- * @brief parse an X.500 Distinguished Name (DN)
- *
- * @param dn string to be parsed, format "/type0=value0/type1=value1/type2=..." where characters may be escaped by '\'.
- * The NULL-DN may be given as "/" or "".
- * @param chtype type of the string, e.g., MBSTRING_ASC, as defined in openssl/asn1.h
- * @param multirdn flag whether to allow multi-valued RDNs
- * @return ASN.1 representation of the DN, or null on error
- *******************************************************************************/
-/* this function is used by the genCMPClient API implementation */
-X509_NAME* UTIL_parse_name(const char* dn, long chtype, bool multirdn);
-
-
-/*!*****************************************************************************
  * @brief log messsage about the given certificate, printing its subject
  *
  * @param func the name of the reporting function or component, or null
@@ -175,32 +161,6 @@ bool CERT_check(const char *uri, OPTIONAL X509 *cert, int type_CA,
  *******************************************************************************/
 bool CERT_check_all(const char *uri, OPTIONAL STACK_OF(X509) *certs, int type_CA,
                     OPTIONAL const X509_VERIFY_PARAM *vpm);
-
-
-/*!*****************************************************************************
- * @brief add certificate to given stack, optionally only if not already contained
- *
- * @param sk stack of certificates
- * @param cert certificate to be pushed to the stack
- * @param no_duplicate flag governing whether to add cert if it is a duplicate
- * @return true on success, else false
- *******************************************************************************/
-bool UTIL_sk_X509_add1_cert(STACK_OF(X509) * sk, X509* cert, bool no_duplicate);
-
-
-/*!*****************************************************************************
- * @brief add stack of certificates to given stack,
- * optionally only if not self-signed and optionally if not already contained
- *
- * @param sk stack of certificates
- * @param certs (optional) stack of certificates to be pushed to the stack
- * @param no_self_signed flag governing whether to add self-signed certs
- * @param no_duplicates flag governing whether to add cert if it is a duplicate
- * @return true on success, else false
- *******************************************************************************/
-/* this function is used by the genCMPClient API implementation */
-int UTIL_sk_X509_add1_certs(STACK_OF(X509) * sk, OPTIONAL const STACK_OF(X509) * certs, int no_self_signed,
-                            int no_duplicates);
 
 
 #endif /* SECUTILS_CERT_H_ */

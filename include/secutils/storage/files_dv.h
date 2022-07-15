@@ -25,6 +25,8 @@
 
 #include <openssl/x509.h>
 
+#include "../util/util.h"
+
 #include "../storage/uta_api.h"
 #define MAX_UTA_PASS_LEN (MAX_B64_CHARS_PER_BYTE * TA_OUTLEN + 1)
 #include "files.h"

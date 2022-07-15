@@ -13,6 +13,7 @@
 * SPDX-License-Identifier: Apache-2.0
 */
 
+#include <assert.h>
 #include <dirent.h>
 #include <sys/stat.h>
 
@@ -24,7 +25,7 @@
 
 #include <util/log.h>
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 int UTIL_atoint(const char* str)
 {
@@ -42,7 +43,7 @@ int UTIL_atoint(const char* str)
 
 const char* UTIL_skip_string(const char* s, OPTIONAL const char* p)
 {
-    const int len_s = strlen(s);
+    const size_t len_s = strlen(s);
     if(p not_eq 0 and 0 is_eq strncmp(p, s, len_s))
     {
         p += len_s;
@@ -102,7 +103,7 @@ void* UTIL_read_file(const char* filename, int* lenp)
     FILE* fp = 0;
     struct stat st;
     unsigned char* contents = 0;
-    int contents_len = 0;
+    size_t contents_len = 0;
 
     if(stat(filename, &st) < 0)
     {
@@ -117,7 +118,7 @@ void* UTIL_read_file(const char* filename, int* lenp)
         return 0;
     }
 
-    contents_len = st.st_size;
+    contents_len = (size_t)st.st_size;
     contents = OPENSSL_malloc(contents_len + 1);
     if(contents is_eq 0)
     {
@@ -181,6 +182,7 @@ bool UTIL_write_file(const char* filename, const void* data, size_t len)
 bool UTIL_iterate_dir(bool (*fn)(const char* file, void* arg), void* arg, const char* path, bool recursive)
 {
     bool res = false;
+    int i;
 
     if(0 is_eq fn or 0 is_eq path)
     {
@@ -188,16 +190,18 @@ bool UTIL_iterate_dir(bool (*fn)(const char* file, void* arg), void* arg, const 
         return false;
     }
 
-    DIR* p_dir = opendir(path);
-    if(0 == p_dir)
+    struct dirent** namelist = 0;
+    const int count = scandir(path, &namelist, 0, alphasort);
+    if(-1 is_eq count)
     {
         LOG(FL_ERR, "cannot open directory '%s'", path);
         return false;
     }
 
-    struct dirent* p_dirent = readdir(p_dir);
-    while(0 not_eq p_dirent)
+    for(i = 0; i < count; ++i)
     {
+        const struct dirent* p_dirent = namelist[i];
+
         char full_path[UTIL_max_path_len];
         /* constant 2 takes into account end of string and format string content */
         snprintf(full_path, sizeof(full_path), "%.*s/%.*s", UTIL_max_path_len - UTIL_max_name_len - 2, path,
@@ -207,7 +211,7 @@ bool UTIL_iterate_dir(bool (*fn)(const char* file, void* arg), void* arg, const 
         memset(&f_stat, 0x00, sizeof(f_stat));
         if(-1 is_eq stat(full_path, &f_stat))
         {
-            LOG(FL_INFO, "cannot read status of %s - %s", full_path, strerror(errno));
+            LOG(FL_WARN, "cannot read status of %s - %s", full_path, strerror(errno));
         }
         else
         {
@@ -226,13 +230,163 @@ bool UTIL_iterate_dir(bool (*fn)(const char* file, void* arg), void* arg, const 
                 }
             }
         }
-        p_dirent = readdir(p_dir);
     }
     res = true;
 
 err:
-    closedir(p_dir);
+    for(i = 0; i < count; ++i)
+    {
+        free(namelist[i]);
+    }
+    free(namelist);
+
     return res;
+}
+
+
+/*
+ * dn is expected to be in the format "/type0=value0/type1=value1/type2=..."
+ * where characters may be escaped by '\'.
+ * The NULL-DN may be given as "/" or "".
+ */
+/* adapted from OpenSSL:apps/lib/apps.c */
+X509_NAME* UTIL_parse_name(const char* dn, long chtype, bool multirdn)
+{
+    size_t buflen = strlen(dn) + 1; /* to copy the types and values.
+                                     * Due to escaping, the copy can only become shorter */
+    char* buf = OPENSSL_malloc(buflen);
+    size_t max_ne = buflen / (1 + 1) + 1; /* maximum number of name elements */
+    const char** ne_types = OPENSSL_malloc(max_ne * sizeof(char*));
+    char** ne_values = OPENSSL_malloc(max_ne * sizeof(char*));
+    int* mval = OPENSSL_malloc(max_ne * sizeof(int));
+
+    const char* sp = dn;
+    char* bp = buf;
+    int i, ne_num = 0;
+
+    X509_NAME* n = 0;
+    int nid;
+
+    if(0 is_eq buf or 0 is_eq ne_types or 0 is_eq ne_values or 0 is_eq mval)
+    {
+        LOG_err("Malloc error");
+        goto error;
+    }
+
+    /* no multivalued RDN by default */
+    mval[ne_num] = 0;
+
+    if(*sp not_eq '\0' and *sp++ not_eq '/')
+    { /* skip leading '/' */
+        LOG(FL_ERR, "DN '%s' does not start with '/'.", dn);
+        goto error;
+    }
+
+    while(*sp not_eq '\0')
+    {
+        /* collect type */
+        ne_types[ne_num] = bp;
+        /* parse element name */
+        while(*sp not_eq '=')
+        {
+            if(*sp is_eq '\\')
+            { /* is there anything to escape in the * type...? */
+                if(*++sp not_eq '\0')
+                {
+                    *bp++ = *sp++;
+                }
+                else
+                {
+                    LOG(FL_ERR, "Escape character at end of DN '%s'", dn);
+                    goto error;
+                }
+            }
+            else if(*sp is_eq '\0')
+            {
+                LOG(FL_ERR, "End of string encountered while processing type of DN '%s' element #%d", dn, ne_num);
+                goto error;
+            }
+            else
+            {
+                *bp++ = *sp++;
+            }
+        }
+        sp++;
+        *bp++ = '\0';
+        /* parse element value */
+        ne_values[ne_num] = bp;
+        while(*sp not_eq '\0')
+        {
+            if(*sp is_eq '\\')
+            {
+                if(*++sp not_eq '\0')
+                {
+                    *bp++ = *sp++;
+                }
+                else
+                {
+                    LOG(FL_ERR, "Escape character at end of DN '%s'", dn);
+                    goto error;
+                }
+            }
+            else if(*sp is_eq '/')
+            { /* start of next element */
+                sp++;
+                /* no multivalued RDN by default */
+                mval[ne_num + 1] = 0;
+                break;
+            }
+            else if(*sp is_eq '+' and multirdn)
+            {
+                /* a not escaped + signals a multi-valued RDN */
+                sp++;
+                mval[ne_num + 1] = -1;
+                break;
+            }
+            else
+            {
+                *bp++ = *sp++;
+            }
+        }
+        *bp++ = '\0';
+        ne_num++;
+    }
+
+    if(0 is_eq(n = X509_NAME_new()))
+    {
+        goto error;
+    }
+
+    for(i = 0; i < ne_num; i++)
+    {
+        if((nid = OBJ_txt2nid(ne_types[i])) is_eq NID_undef)
+        {
+            LOG(FL_WARN, "DN '%s' attribute %s has no known NID, skipped", dn, ne_types[i]);
+            continue;
+        }
+
+        if(0 is_eq * ne_values[i])
+        {
+            LOG(FL_WARN, "No value provided for DN '%s' attribute %s, skipped", dn, ne_types[i]);
+            continue;
+        }
+
+        if(0 is_eq X509_NAME_add_entry_by_NID(n, nid, chtype, (unsigned char*)ne_values[i], -1, -1, mval[i]))
+        {
+            ERR_print_errors(bio_err);
+            LOG(FL_ERR, "Error adding name attribute '/%s=%s'", ne_types[i], ne_values[i]);
+            X509_NAME_free(n);
+            n = 0;
+            goto error;
+        }
+    }
+
+error:
+    OPENSSL_free(ne_values);
+    OPENSSL_free(ne_types);
+    OPENSSL_free(mval);
+    OPENSSL_free(buf);
+    return n;
 }
 
 
@@ -324,6 +478,59 @@ int ASN1_TIME_compare(const ASN1_TIME *a, const ASN1_TIME *b)
     return 0;
 }
 #endif
+
+
+/* start of definitions borrowed from OpenSSL:crypto/cmp/cmp_lib.c */
+static int X509_cmp_from_ptrs(const struct x509_st* const* a, const struct x509_st* const* b)
+{
+    return X509_cmp(*a, *b);
+}
+
+bool UTIL_sk_X509_add1_cert(STACK_OF(X509) * sk, X509* cert, bool no_duplicate)
+{
+    if(no_duplicate)
+    {
+        sk_X509_set_cmp_func(sk, &X509_cmp_from_ptrs);
+        if(sk_X509_find(sk, cert) >= 0)
+        {
+            return 1;
+        }
+    }
+    if(0 is_eq sk_X509_push(sk, cert))
+    {
+        return 0;
+    }
+    return X509_up_ref(cert);
+}
+
+int UTIL_sk_X509_add1_certs(STACK_OF(X509) * sk, OPTIONAL const STACK_OF(X509) * certs, int no_self_signed,
+                            int no_duplicates)
+{
+    int i = 0;
+
+    if(sk is_eq 0)
+    {
+        return 0;
+    }
+
+    if(certs is_eq 0)
+    {
+        return 1;
+    }
+    const int n = sk_X509_num(certs);
+    for(i = 0; i < n; i++)
+    {
+        X509* cert = sk_X509_value(certs, i);
+        if((not no_self_signed or X509_check_issued(cert, cert) not_eq X509_V_OK)
+           and (not UTIL_sk_X509_add1_cert(sk, cert, no_duplicates)))
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+/* end of definitions borrowed from OpenSSL:crypto/cmp/cmp_lib.c */
+
 
 /* Copy a NUL-terminated string from the given source
  * into an optional destination buffer, or calculate how large it needs to be.
@@ -525,18 +732,18 @@ bool UTIL_hex_to_bytes(const char** in_p, unsigned char* out, unsigned int num_o
     num_out *= HEX_CHARS_PER_BYTE;
     for(i = 0; i < num_out; i++)
     {
-        char c = *((*in_p)++);
+        int c = *((*in_p)++);
         if(('0' <= c) and (c <= '9'))
         {
-            v = c - '0';
+            v = (unsigned int)(c - '0');
         }
         else if(('A' <= c) and (c <= 'F'))
         {
-            v = (c - 'A') + (MAX_DIGIT + 1);
+            v = (unsigned int)(c - 'A') + (MAX_DIGIT + 1);
         }
         else if(('a' <= c) and (c <= 'f'))
         {
-            v = (c - 'a') + (MAX_DIGIT + 1);
+            v = (unsigned int)(c - 'a') + (MAX_DIGIT + 1);
         }
         else
         {
@@ -571,18 +778,16 @@ int UTIL_base64_encode_to_buf(const unsigned char* data, int len, char* buf, int
     BIO_write(bio_mem, data, len);
     (void)BIO_flush(bio_mem);
     BIO_get_mem_ptr(bio_mem, &bptr);
-    int encoded_len = bptr->length;
+    size_t encoded_len = bptr->length;
     if(encoded_len < buf_size)
     {
         memcpy(buf, bptr->data, encoded_len);
         buf[encoded_len] = '\0';
-    }
-    else
-    {
-        encoded_len = -1 - 1;
+        BIO_free_all(bio_mem);
+        return encoded_len;
     }
     BIO_free_all(bio_mem);
-    return encoded_len;
+    return -2;
 }
 
 
@@ -612,6 +817,7 @@ unsigned char* UTIL_base64_decode(const char* b64_data, int b64_len, int* decode
     {
         (*decoded_len)--;
     }
+    assert(*decoded_len >= 0);
 
     /* Create a base64 filter */
     BIO* bio_b64 = BIO_new(BIO_f_base64());
@@ -638,7 +844,7 @@ unsigned char* UTIL_base64_decode(const char* b64_data, int b64_len, int* decode
     BIO_push(bio_b64, bio_mem);
 
     /* Execute the base 64 decoding and store the output in the decoded_data memory++*/
-    unsigned char* decoded_data = OPENSSL_malloc(*decoded_len + 1);
+    unsigned char* decoded_data = OPENSSL_malloc((size_t)(*decoded_len) + 1);
     if(decoded_data is_eq 0)
     {
         LOG_err("Failure allocate memory for base64 decoding");
@@ -659,4 +865,87 @@ unsigned char* UTIL_base64_decode(const char* b64_data, int b64_len, int* decode
     }
     BIO_free_all(bio_b64);
     return decoded_data;
+}
+
+
+bool UTIL_calculate_icv_impl(uta_ctx* ctx, const unsigned char* data, const size_t data_len, const char* key_dv,
+                             unsigned char* mac)
+{
+    unsigned char dk[TA_OUTLEN];
+    unsigned int md_len;
+
+/* Derive an ICV key from the trust anchor */
+#ifdef SECUTILS_USE_UTA
+    const bool uta_res =
+        uta_getkey(ctx, (const unsigned char*)key_dv, strnlen(key_dv, UTIL_max_path_len), dk, TA_OUTLEN);
+    if(not uta_res)
+    {
+        LOG(FL_ERR, "Could not get key for '%s' from UTA", key_dv);
+        return false;
+    }
+#else /* SECUTILS_USE_UTA */
+    if(ctx not_eq 0)
+    {
+        LOG(FL_ERR, "UTA not available");
+        return false;
+    }
+    /* trivial emulation of trust anchor */
+#if TA_OUTLEN != SHA256_DIGEST_LENGTH
+#error Cannot produce KEY with length other than SHA256_DIGEST_LENGTH
+#endif
+    if(0 is_eq SHA256((const unsigned char*)key_dv, strlen(key_dv), dk))
+    {
+        LOG(FL_ERR, "ERROR during SHA256 calculation from: %s", key_dv);
+        return false;
+    }
+    unsigned char tmp = dk[3];
+    dk[3] = dk[25];
+    dk[25] = dk[10];
+    dk[10] = tmp;
+#endif /* SECUTILS_USE_UTA */
+
+    if(0 is_eq HMAC(EVP_sha256(), dk, TA_OUTLEN, data, data_len, mac, &md_len) or md_len < ICV_LEN16)
+    {
+        LOG(FL_ERR, "Could not calculate HMAC used as ICV for '%s'", key_dv);
+        return false;
+    }
+    return true;
+}
+
+
+bool UTIL_calculate_icv(uta_ctx* ctx, const unsigned char* data, const size_t data_len, const char* key_dv,
+                        unsigned char* icv_out)
+{
+    unsigned char mac[SHA256_DIGEST_LENGTH];
+
+    if (0 is_eq ctx)
+    {
+        LOG(FL_ERR, "No context");
+        return false;
+    }
+
+    if (0 is_eq data)
+    {
+        LOG(FL_ERR, "No data to calculate ICV from");
+        return false;
+    }
+
+    if (0 is_eq key_dv)
+    {
+        LOG(FL_ERR, "No key_dv to calculate ICV for");
+        return false;
+    }
+
+    if (0 is_eq icv_out)
+    {
+        LOG(FL_ERR, "Invalid output buffer");
+        return false;
+    }
+
+    if (false is_eq UTIL_calculate_icv_impl(ctx, data, data_len, key_dv, mac))
+    {
+        return false;
+    }
+    memcpy(icv_out, mac, ICV_LEN16);
+    return true;
 }

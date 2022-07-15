@@ -29,7 +29,7 @@
 #include <certstatus/ocsp.h>
 #endif
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 bool TLS_init(void)
 {
@@ -176,7 +176,7 @@ SSL_CTX* TLS_CTX_new(OPTIONAL SSL_CTX* ssl_ctx,
                 bak_flags = X509_VERIFY_PARAM_get_flags(vpm);
                 /* disable any cert status/revocation checking etc. */
                 X509_VERIFY_PARAM_clear_flags(vpm,
-                                              compl(X509_V_FLAG_USE_CHECK_TIME
+                                              compl((unsigned long)X509_V_FLAG_USE_CHECK_TIME
                                                 bitor X509_V_FLAG_NO_CHECK_TIME));
                 X509_VERIFY_PARAM_set_flags(vpm, X509_V_FLAG_NONFINAL_CHECK);
             }
