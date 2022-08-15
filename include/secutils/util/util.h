@@ -371,6 +371,7 @@ size_t UTIL_url_encode(const char  *source,
 # define HEX_BITS 4
 # define HEX_MASK 0x0f
 # define MAX_DIGIT 9
+# define ICV_LEN16 16
 
 /*!
  * @brief The function converts a binary string into a sequence of hex values.
@@ -435,5 +436,34 @@ int UTIL_base64_encode_to_buf(const unsigned char *data, int len,
 
 unsigned char *UTIL_base64_decode(const char *b64_data, int b64_len,
                                   int *decoded_len);
+
+/*!
+ * @brief derive integrity protection hash for data with given len, using key as DV.
+ *
+ * @param ctx pointer to uta context object
+ * @param data pointer to data from which the ICV will be calculated
+ * @param data_len size of data from which the ICV will be calculated
+ * @param key_dv The derivation value for key for which the ICV is calculated
+ * @param icv_out Pointer to a buffer where the resulting ICV will be stored. This buffer must be at least
+ * ICV_LEN16 in size.
+ * @return true if calculating the ICV is successful, false otherwise
+ */
+bool UTIL_calculate_icv(uta_ctx* ctx, const unsigned char* data, const size_t data_len, const char* key_dv,
+                        unsigned char* icv_out);
+
+/*!
+ * @brief implementation of the function UTIL_calculate_icv.
+ * @note this function was created to avoid code repetition (the same computation is needed in files_icv.c).
+ *
+ * @param ctx pointer to uta context object
+ * @param data pointer to data from which the ICV will be calculated
+ * @param data_len size of data from which the ICV will be calculated
+ * @param key_dv The derivation value for key for which the ICV is calculated
+ * @param mac Pointer to a buffer where the resulting ICV will be stored. This buffer must be at least
+ * ICV_LEN16 in size.
+ * @return true if calculating the ICV is successful, false otherwise
+ */
+bool UTIL_calculate_icv_impl(uta_ctx* ctx, const unsigned char* data, const size_t data_len, const char* key_dv,
+                             unsigned char* mac);
 
 #endif /* SECUTILS_UTIL_H_ */

@@ -127,5 +127,16 @@ bool FILES_store_cert_pem(OPTIONAL uta_ctx* ctx, const X509* cert, const char* f
  */
 bool FILES_store_crl_pem_icv(OPTIONAL uta_ctx* ctx, const X509_CRL* crl, const char* file, OPTIONAL const char* desc);
 
+/*!
+ * @brief Calculates a file's ICV and, if it is equal to the ICV stored in the file, returns the content without ICV.
+ *
+ * @param ctx pointer to UTA context, which typically is part of the libsecutils context
+ * @param path path to the file, can be relative or absolute
+ * @note if \p path is relative, it is transformed into absolute path
+ * @return \c OPENSSL_STRING containing content of the file if ICV matches, otherwise null pointer.
+ * In case of an error, message is logged and null pointer is returned.
+ * @warning Returned \c OPENSSL_STRING must be freed using function \c OPENSSL_free().
+ */
+OPENSSL_STRING FILE_get_file_content_if_existing_icv_is_valid(uta_ctx* ctx, const char* path);
 
 #endif /* SECUTILS_FILES_ICV_H_ */

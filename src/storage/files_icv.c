@@ -38,43 +38,10 @@
  */
 static bool calculate_icv_hex(OPTIONAL uta_ctx* ctx, const void* data, size_t len, const char* name, char* buf)
 {
-    unsigned char key[TA_OUTLEN];
     unsigned char md[SHA256_DIGEST_LENGTH];
-    unsigned int md_len;
 
-/* Derive an ICV key from the trust anchor */
-#ifdef SECUTILS_USE_UTA 
-    bool uta_res = uta_getkey(ctx, (const unsigned char*)name, strnlen(name, UTIL_max_path_len), key, TA_OUTLEN);
-
-    if(not uta_res)
+    if (false is_eq UTIL_calculate_icv_impl(ctx, data, len, name, md))
     {
-        LOG(FL_ERR, "Could not get key for '%s' from UTA", name);
-        return false;
-    }
-#else
-    if(ctx not_eq 0)
-    {
-        LOG(FL_ERR, "UTA not available");
-        return false;
-    }
-    /* some trivial emulation of trust anchor */
-#if TA_OUTLEN != SHA256_DIGEST_LENGTH
-#error Cannot produce KEY with length other than SHA256_DIGEST_LENGTH
-#endif
-    if(0 is_eq SHA256((const unsigned char*)name, strlen(name), key))
-    {
-        LOG(FL_ERR, "ERROR during SHA256 calculation from: %s", name);
-        return false;
-    }
-    unsigned char tmp = key[3];
-    key[3] = key[25];
-    key[25] = key[10];
-    key[10] = tmp;
-#endif
-
-    if(0 is_eq HMAC(EVP_sha256(), key, TA_OUTLEN, data, len, md, &md_len) or md_len < ICVLEN)
-    {
-        LOG(FL_ERR, "Could not calculate HMAC used as ICV for '%s'", name);
         return false;
     }
 
@@ -136,13 +103,13 @@ static bool protect_or_check_icv(OPTIONAL uta_ctx* ctx, const char* file, const 
     }
     else
     {
-        buf = OPENSSL_malloc(fsize);
+        buf = OPENSSL_malloc((size_t)fsize);
         if(buf is_eq 0)
         {
             LOG(FL_ERR, "Out of memory reading file '%s'", file);
             goto err;
         }
-        if((size_t)fsize not_eq fread(buf, 1, fsize, f))
+        if((size_t)fsize not_eq fread(buf, 1, (size_t)fsize, f))
         {
             LOG(FL_ERR, "Could not read file '%s'", file);
             goto err;
@@ -156,7 +123,7 @@ static bool protect_or_check_icv(OPTIONAL uta_ctx* ctx, const char* file, const 
         {
             if(found)
             {
-                fsize -= ICV_LINE_LEN; /* strip existing ICV */
+                fsize -= (long)ICV_LINE_LEN; /* strip existing ICV */
                 if(fseek(f, fsize, SEEK_SET) is_eq EOF)
                 {
                     LOG(FL_ERR, "Could not strip ICV from file '%s'", file);
@@ -172,7 +139,7 @@ static bool protect_or_check_icv(OPTIONAL uta_ctx* ctx, const char* file, const 
                 goto err;
             }
         }
-        if(not calculate_icv_hex(ctx, buf, fsize - (protect ? 0 : ICV_LINE_LEN), location, icv_hex))
+        if(not calculate_icv_hex(ctx, buf, (size_t)(fsize - (protect ? 0 : (long)ICV_LINE_LEN)), location, icv_hex))
         {
             LOG(FL_ERR, "Could not calculate ICV for file '%s'", file);
             goto err;
@@ -289,4 +256,105 @@ bool FILES_store_crl_pem_icv(OPTIONAL uta_ctx* ctx, const X509_CRL* crl, const c
         return false;
     }
     return true;
+}
+
+static inline long get_file_size(FILE* f)
+{
+    fseek(f, 0, SEEK_END);
+    long fsize = ftell(f);
+    fseek(f, 0, SEEK_SET);
+    return fsize;
+}
+
+OPENSSL_STRING FILE_get_file_content_if_existing_icv_is_valid(uta_ctx* ctx, const char* path)
+{
+    if(0 is_eq ctx)
+    {
+        LOG(FL_ERR, "No context");
+        return 0;
+    }
+
+    if(0 is_eq path)
+    {
+        LOG(FL_ERR, "No path to ICV file");
+        return 0;
+    }
+
+    char absolute_path[PATH_MAX];
+    if(0 is_eq realpath(path, absolute_path))
+    {
+        LOG(FL_ERR, "Could not resolve absolute path from: %s", path);
+        return 0;
+    }
+
+    // open file
+    FILE* file = fopen(absolute_path, "rb");
+    if(0 is_eq file)
+    {
+        LOG(FL_ERR, "Could not open file '%s'", absolute_path);
+        return 0;
+    }
+
+    const long file_size = get_file_size(file);
+
+    if(file_size < 0)
+    {
+        LOG(FL_ERR, "Could not get size of file '%s'", absolute_path);
+    }
+    else if(0 is_eq file_size)
+    {
+        LOG(FL_ERR, "File '%s' is empty", absolute_path);
+    }
+    else
+    {
+        OPENSSL_STRING content = OPENSSL_malloc((size_t)file_size + 1);
+        if(0 is_eq content)
+        {
+            LOG(FL_ERR, "Out of memory reading file '%s'", absolute_path);
+            goto error;
+        }
+        if((size_t)file_size not_eq fread(content, sizeof *content, (size_t)file_size, file))
+        {
+            LOG(FL_ERR, "Could not read file '%s'", absolute_path);
+            goto error;
+        }
+        content[file_size] = '\0';
+
+        const long icv_tag_start_index = file_size - (long)ICV_LINE_LEN;
+        const char* icv_tag_start = content + icv_tag_start_index;
+        const char* icv_hex_start = content + file_size - ICV_HEX_LEN - 1;
+
+        const bool found = (file_size >= ICV_LINE_LEN) and (0 is_eq strncmp(icv_tag_start, ICV_TAG, strlen(ICV_TAG)));
+        if(false is_eq found)
+        {
+            LOG(FL_ERR, "Could not find ICV at end of file '%s'", absolute_path);
+            goto error;
+        }
+
+        // read original ICV
+        char original_icv_hex[ICV_HEX_LEN + 1] = {'\0'};
+        strncpy(original_icv_hex, icv_hex_start, ICV_HEX_LEN);
+
+        // calculate ICV
+        char icv_hex[ICV_HEX_LEN + 1] = {'\0'};
+        if(not calculate_icv_hex(ctx, content, (size_t)icv_tag_start_index, absolute_path, icv_hex))
+        {
+            LOG(FL_ERR, "Could not calculate ICV for file '%s'", absolute_path);
+            goto error;
+        }
+
+        // if ICVs are equal then return whole file content without ICV
+        if(0 is_eq strncmp(original_icv_hex, icv_hex, ICV_HEX_LEN))
+        {
+            fclose(file);
+            // "remove" ICV part in string content
+            content[icv_tag_start_index] = '\0';
+            return content;
+        }
+    error:
+        OPENSSL_free(content);
+    }
+
+    fclose(file);
+    return 0;
 }

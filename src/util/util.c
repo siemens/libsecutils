@@ -660,3 +660,86 @@ unsigned char* UTIL_base64_decode(const char* b64_data, int b64_len, int* decode
     BIO_free_all(bio_b64);
     return decoded_data;
 }
+
+
+bool UTIL_calculate_icv_impl(uta_ctx* ctx, const unsigned char* data, const size_t data_len, const char* key_dv,
+                             unsigned char* mac)
+{
+    unsigned char dk[TA_OUTLEN];
+    unsigned int md_len;
+
+/* Derive an ICV key from the trust anchor */
+#ifdef SECUTILS_USE_UTA
+    const bool uta_res =
+        uta_getkey(ctx, (const unsigned char*)key_dv, strnlen(key_dv, UTIL_max_path_len), dk, TA_OUTLEN);
+    if(not uta_res)
+    {
+        LOG(FL_ERR, "Could not get key for '%s' from UTA", key_dv);
+        return false;
+    }
+#else /* SECUTILS_USE_UTA */
+    if(ctx not_eq 0)
+    {
+        LOG(FL_ERR, "UTA not available");
+        return false;
+    }
+    /* trivial emulation of trust anchor */
+#if TA_OUTLEN != SHA256_DIGEST_LENGTH
+#error Cannot produce KEY with length other than SHA256_DIGEST_LENGTH
+#endif
+    if(0 is_eq SHA256((const unsigned char*)key_dv, strlen(key_dv), dk))
+    {
+        LOG(FL_ERR, "ERROR during SHA256 calculation from: %s", key_dv);
+        return false;
+    }
+    unsigned char tmp = dk[3];
+    dk[3] = dk[25];
+    dk[25] = dk[10];
+    dk[10] = tmp;
+#endif /* SECUTILS_USE_UTA */
+
+    if(0 is_eq HMAC(EVP_sha256(), dk, TA_OUTLEN, data, data_len, mac, &md_len) or md_len < ICV_LEN16)
+    {
+        LOG(FL_ERR, "Could not calculate HMAC used as ICV for '%s'", key_dv);
+        return false;
+    }
+    return true;
+}
+
+
+bool UTIL_calculate_icv(uta_ctx* ctx, const unsigned char* data, const size_t data_len, const char* key_dv,
+                        unsigned char* icv_out)
+{
+    unsigned char mac[SHA256_DIGEST_LENGTH];
+
+    if (0 is_eq ctx)
+    {
+        LOG(FL_ERR, "No context");
+        return false;
+    }
+
+    if (0 is_eq data)
+    {
+        LOG(FL_ERR, "No data to calculate ICV from");
+        return false;
+    }
+
+    if (0 is_eq key_dv)
+    {
+        LOG(FL_ERR, "No key_dv to calculate ICV for");
+        return false;
+    }
+
+    if (0 is_eq icv_out)
+    {
+        LOG(FL_ERR, "Invalid output buffer");
+        return false;
+    }
+
+    if (false is_eq UTIL_calculate_icv_impl(ctx, data, data_len, key_dv, mac))
+    {
+        return false;
+    }
+    memcpy(icv_out, mac, ICV_LEN16);
+    return true;
+}
