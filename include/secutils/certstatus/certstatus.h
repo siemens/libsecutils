@@ -17,6 +17,7 @@
 #define SECUTILS_CERTSTATUS_H_
 
 #include <openssl/x509_vfy.h>
+
 #include "../util/log.h"
 
 #if OPENSSL_VERSION_NUMBER < 0x10101000L

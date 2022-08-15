@@ -26,7 +26,7 @@
 #include <util/log.h>
 #include <util/util.h>
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 typedef struct STORE_ex_st
 {

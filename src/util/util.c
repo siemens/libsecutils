@@ -24,7 +24,7 @@
 
 #include <util/log.h>
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 int UTIL_atoint(const char* str)
 {

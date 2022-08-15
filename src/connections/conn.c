@@ -21,7 +21,7 @@
 # include <openssl/ssl.h>
 #endif
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 static const char* skip_scheme(const char* str)
 {

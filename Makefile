@@ -57,12 +57,16 @@ endif
 # Note: stuff for testing purposes should go here
 ################################################################################
 
-ifdef NDEBUG
+ifdef DEBUG
+    DEBUG_FLAGS ?= -g -O0
+# Add this to get some additional runtime checks.
+# Warning: it's incompatible with tools like Valgrind and you have to add it to the app using this lib too
+#	DEBUG_FLAGS += -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all
+else
     DEBUG_FLAGS ?= -O2
     override DEBUG_FLAGS += -DNDEBUG=1
-else
-    DEBUG_FLAGS ?= -g -O0 -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all # not every compiler(version) supports -Og
 endif
+
 override CFLAGS += $(DEBUG_FLAGS) -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes -Wformat -Wtype-limits -Wundef -Wconversion
 override CFLAGS += -Wno-shadow -Wno-conversion -Wno-sign-conversion -Wno-sign-compare -Wno-unused-parameter # TODO clean up code and enable -Wshadow -Wconversion -Wsign-conversion -Wsign-compare -Wunused-parameter
 override CFLAGS += -Wformat -Wformat-security -Wno-declaration-after-statement -Wno-vla # -Wpointer-arith -pedantic -DPEDANTIC # -Werror
@@ -150,11 +154,13 @@ ifeq ($(COV_ENABLED), 1)
 endif
 	$(MAKE) COMPILE_TYPE=$(COMPILE_TYPE) build_only
 
-util:
+util: $(OUT_DIR)/$(OUTLIB)
 	$(MAKE) -C util SECUTILS_USE_UTA="$(SECUTILS_USE_UTA)" \
 	   CFLAGS="$(CFLAGS) $(LOCAL_CFLAGS)" LDFLAGS="$(LDFLAGS)"
 
-build_all: build util
+build_all:
+	$(MAKE) build
+	$(MAKE) util
 
 # Binary output target
 $(OUT_DIR)/$(OUTLIB).$(VERSION): $(OBJS)
@@ -219,10 +225,10 @@ clean_uta:
           $(OUT_DIR)/$(OUTLIB)* $(OUT_DIR)/util/$(OUTBIN) $(OUT_DIR)/util/icvutil.o
 
 clean:
+	$(MAKE) -C util clean
 	rm -rf $(OUT_DIR)/$(OUTLIB)* $(OUT_DIR)/util/$(OUTBIN) $(BUILDDIR)
 
 clean_all: clean clean_deb
-	$(MAKE) -C util clean
 	rm -rf doc refman.pdf *.gcov reports
 
 doc: doc/html refman.pdf

@@ -22,7 +22,7 @@
 #include <credentials/verify.h>
 #include <storage/files_icv.h>
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 /* adapted from OpenSSL:apps/include/apps.h */
 static opt_t vpm_opts[] = { OPT_V_OPTIONS, OPT_END };

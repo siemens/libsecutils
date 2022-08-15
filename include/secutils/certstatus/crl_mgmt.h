@@ -17,7 +17,8 @@
 #define SECUTILS_HEADER_CRL_MGMT_H
 
 #include <openssl/x509.h>
-#include <secutils/basic.h>
+
+#include "../basic.h"
 
 #ifdef __cplusplus
 extern "C" {

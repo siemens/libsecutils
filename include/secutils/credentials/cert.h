@@ -26,8 +26,7 @@
 #include <string.h>  /* for strcmp, strlen */
 
 #include "../basic.h"
-#include "../operators.h"
-# include "../util/log.h"
+#include "../util/log.h"
 
 #include <openssl/x509.h>
 
