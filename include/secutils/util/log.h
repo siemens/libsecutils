@@ -71,7 +71,7 @@ void LOG_close(void);
  * @brief set verbosity level of LOG_default()
  * @note this may be done before LOG_init() is called
  *
- * @param level the minimal severity of messages to be printed; default: LOG_INFO
+ * @param level the minimal severity of messages to be printed; default: LOG_WARNING
  */
 /* this function is used by the genCMPClient CLI implementation */
 void LOG_set_verbosity(severity level);
