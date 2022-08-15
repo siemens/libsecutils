@@ -132,4 +132,12 @@ bool check_cert_revocation(X509_STORE_CTX* ctx, OPTIONAL OCSP_RESPONSE* resp);
  */
 int check_revocation_any_method(X509_STORE_CTX* ctx);
 
+/*
+ * Check revocation status on certs in ctx->chain. As a generalization of
+ * check_revocation() in crypto/x509/x509_vfy.c, considers local CRLs only.
+ * To be used as a callback function to be past to
+ * X509_STORE_set_check_revocation()
+ */
+int check_revocation_local_only_method(X509_STORE_CTX* ctx);
+
 #endif /* SECUTILS_CERTSTATUS_H_ */
