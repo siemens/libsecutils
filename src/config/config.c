@@ -13,6 +13,7 @@
 * SPDX-License-Identifier: Apache-2.0
 */
 
+#include <assert.h>
 #include <config/config.h>
 #include <util/log.h>
 #include <util/util.h>
@@ -106,12 +107,16 @@ static const char* prev_item(const char* opt, const char* end)
     {
         beg--;
     }
-    int len = (int)(end - beg);
+    assert(beg <= end);
+    size_t len = (size_t)(end - beg);
     if(len > SECTION_NAME_MAX)
     {
         len = SECTION_NAME_MAX;
     }
-    strncpy(opt_item, beg, len);
+    if(len > 0)
+    {
+        strncpy(opt_item, beg, len);
+    }
     opt_item[len] = '\0';
     if(end - beg > SECTION_NAME_MAX)
     {

@@ -228,7 +228,7 @@ void CERT_print(OPTIONAL const X509* cert, OPTIONAL BIO* bio, unsigned long neg_
         unsigned long flags =
             ASN1_STRFLGS_RFC2253 bitor ASN1_STRFLGS_ESC_QUOTE bitor XN_FLAG_SEP_CPLUS_SPC bitor XN_FLAG_FN_SN;
         BIO_printf(bio, "    Certificate\n");
-        X509_print_ex(bio, (X509*)cert, flags, compl X509_FLAG_NO_SUBJECT);
+        X509_print_ex(bio, (X509*)cert, flags, compl (unsigned long)X509_FLAG_NO_SUBJECT);
         if(X509_check_issued((X509*)cert, (X509*)cert) is_eq X509_V_OK)
         {
             BIO_printf(bio, "        self-signed\n");
@@ -236,9 +236,9 @@ void CERT_print(OPTIONAL const X509* cert, OPTIONAL BIO* bio, unsigned long neg_
         else
         {
             BIO_printf(bio, " ");
-            X509_print_ex(bio, (X509*)cert, flags, compl X509_FLAG_NO_ISSUER);
+            X509_print_ex(bio, (X509*)cert, flags, compl (unsigned long)X509_FLAG_NO_ISSUER);
         }
-        X509_print_ex(bio, (X509*)cert, flags, compl(X509_FLAG_NO_SERIAL bitor X509_FLAG_NO_VALIDITY));
+        X509_print_ex(bio, (X509*)cert, flags, compl((unsigned long)X509_FLAG_NO_SERIAL bitor X509_FLAG_NO_VALIDITY));
         if(X509_cmp_current_time(X509_get0_notBefore(cert)) > 0)
         {
             BIO_printf(bio, "        not yet valid\n");
