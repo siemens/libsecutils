@@ -29,7 +29,7 @@
 static LOG_cb_t LOG_fn = 0; /*!< this variable is shared between threads */
 static const size_t loc_len = 256;
 
-static severity verbosity = LOG_INFO;
+static severity verbosity = LOG_WARNING;
 
 BIO* bio_err = 0;
 BIO* bio_trace = 0;
