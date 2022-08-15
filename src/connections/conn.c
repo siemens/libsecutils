@@ -13,6 +13,7 @@
 * SPDX-License-Identifier: Apache-2.0
 */
 
+#include <assert.h>
 #include <util/log.h>
 #include <connections/conn.h>
 
@@ -120,7 +121,8 @@ char* CONN_get_host(const char* uri)
         {
             end = strchr(uri, '/');
         }
-        int len = end not_eq 0 ? end - uri : strlen(uri);
+        assert(end is_eq 0 or end >= uri);
+        size_t len = end not_eq 0 ? (size_t)(end - uri) : strlen(uri);
         str = OPENSSL_strndup(uri, len);
         if(0 is_eq str)
         {

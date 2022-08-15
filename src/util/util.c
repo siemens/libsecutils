@@ -13,6 +13,7 @@
 * SPDX-License-Identifier: Apache-2.0
 */
 
+#include <assert.h>
 #include <dirent.h>
 #include <sys/stat.h>
 
@@ -42,7 +43,7 @@ int UTIL_atoint(const char* str)
 
 const char* UTIL_skip_string(const char* s, OPTIONAL const char* p)
 {
-    const int len_s = strlen(s);
+    const size_t len_s = strlen(s);
     if(p not_eq 0 and 0 is_eq strncmp(p, s, len_s))
     {
         p += len_s;
@@ -102,7 +103,7 @@ void* UTIL_read_file(const char* filename, int* lenp)
     FILE* fp = 0;
     struct stat st;
     unsigned char* contents = 0;
-    int contents_len = 0;
+    size_t contents_len = 0;
 
     if(stat(filename, &st) < 0)
     {
@@ -117,7 +118,7 @@ void* UTIL_read_file(const char* filename, int* lenp)
         return 0;
     }
 
-    contents_len = st.st_size;
+    contents_len = (size_t)st.st_size;
     contents = OPENSSL_malloc(contents_len + 1);
     if(contents is_eq 0)
     {
@@ -525,18 +526,18 @@ bool UTIL_hex_to_bytes(const char** in_p, unsigned char* out, unsigned int num_o
     num_out *= HEX_CHARS_PER_BYTE;
     for(i = 0; i < num_out; i++)
     {
-        char c = *((*in_p)++);
+        int c = *((*in_p)++);
         if(('0' <= c) and (c <= '9'))
         {
-            v = c - '0';
+            v = (unsigned int)(c - '0');
         }
         else if(('A' <= c) and (c <= 'F'))
         {
-            v = (c - 'A') + (MAX_DIGIT + 1);
+            v = (unsigned int)(c - 'A') + (MAX_DIGIT + 1);
         }
         else if(('a' <= c) and (c <= 'f'))
         {
-            v = (c - 'a') + (MAX_DIGIT + 1);
+            v = (unsigned int)(c - 'a') + (MAX_DIGIT + 1);
         }
         else
         {
@@ -571,18 +572,16 @@ int UTIL_base64_encode_to_buf(const unsigned char* data, int len, char* buf, int
     BIO_write(bio_mem, data, len);
     (void)BIO_flush(bio_mem);
     BIO_get_mem_ptr(bio_mem, &bptr);
-    int encoded_len = bptr->length;
+    size_t encoded_len = bptr->length;
     if(encoded_len < buf_size)
     {
         memcpy(buf, bptr->data, encoded_len);
         buf[encoded_len] = '\0';
-    }
-    else
-    {
-        encoded_len = -1 - 1;
+        BIO_free_all(bio_mem);
+        return encoded_len;
     }
     BIO_free_all(bio_mem);
-    return encoded_len;
+    return -2;
 }
 
 
@@ -612,6 +611,7 @@ unsigned char* UTIL_base64_decode(const char* b64_data, int b64_len, int* decode
     {
         (*decoded_len)--;
     }
+    assert(*decoded_len >= 0);
 
     /* Create a base64 filter */
     BIO* bio_b64 = BIO_new(BIO_f_base64());
@@ -638,7 +638,7 @@ unsigned char* UTIL_base64_decode(const char* b64_data, int b64_len, int* decode
     BIO_push(bio_b64, bio_mem);
 
     /* Execute the base 64 decoding and store the output in the decoded_data memory++*/
-    unsigned char* decoded_data = OPENSSL_malloc(*decoded_len + 1);
+    unsigned char* decoded_data = OPENSSL_malloc((size_t)(*decoded_len) + 1);
     if(decoded_data is_eq 0)
     {
         LOG_err("Failure allocate memory for base64 decoding");
