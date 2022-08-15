@@ -16,11 +16,11 @@
 #include <util/util.h>
 #include <util/log.h>
 
-#include <operators.h>
-
 #include <syslog.h>
 
 #include <assert.h>
+
+#include "secutils/operators.h"
 
 // use the GNU-specific `strerror_r`
 // https://man7.org/linux/man-pages/man3/strerror.3.html : SYNOPSIS

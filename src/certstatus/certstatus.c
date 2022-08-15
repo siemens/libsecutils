@@ -1,13 +1,13 @@
-/** 
+/**
 * @file certstatus.c
-* 
+*
 * @brief Certificate status checking using CRLs and/or OCSP
 *
 * @copyright Copyright (c) Siemens Mobility GmbH, 2021
 *
 * @author David von Oheimb <david.von.oheimb@siemens.com>
 *
-* This work is licensed under the terms of the Apache Software License 
+* This work is licensed under the terms of the Apache Software License
 * 2.0. See the COPYING file in the top-level directory.
 *
 * SPDX-License-Identifier: Apache-2.0
@@ -28,7 +28,7 @@
 # include <certstatus/ocsp.h>
 #endif
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 static unsigned int num_CDPs(const X509* cert)
 {
