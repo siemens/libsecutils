@@ -18,10 +18,8 @@ ROOTFS ?= $(DESTDIR)$(prefix)
 
 OUT_DIR ?= .
 
+# must be kept in sync with latest version in debian/changelog and with SECUTILS_VERSION in CMakeLists.txt
 VERSION=1.0
-# must be kept in sync with latest version in debian/changelog
-# PACKAGENAME=libsecutils
-# DIRNAME=$(PACKAGENAME)-$(VERSION)
 
 SHELL=bash # This is needed for supporting extended file name globbing
 

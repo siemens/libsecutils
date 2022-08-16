@@ -25,8 +25,9 @@ if (NOT YOCTO_BUILD)
 
 endif()
 
-if(NOT DEFINED SECUTILS_VERSION )
-    set(SECUTILS_VERSION 0.9)
+if(NOT DEFINED SECUTILS_VERSION)
+    # must be kept in sync with latest version in debian/changelog and with VERSION in Makefile
+    set(SECUTILS_VERSION 1.0)
 endif()
 
 set(INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include
