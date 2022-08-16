@@ -17,7 +17,7 @@
 #include <storage/files_icv.h>
 #include <util/log.h>
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 
 static void skip_space(char** p)

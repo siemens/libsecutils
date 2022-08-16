@@ -25,8 +25,9 @@ if (NOT YOCTO_BUILD)
 
 endif()
 
-if(NOT DEFINED SECUTILS_VERSION )
-    set(SECUTILS_VERSION 0.9)
+if(NOT DEFINED SECUTILS_VERSION)
+    # must be kept in sync with latest version in debian/changelog and with VERSION in Makefile
+    set(SECUTILS_VERSION 1.0)
 endif()
 
 set(INCLUDE_DIRS ${PROJECT_SOURCE_DIR}/include
@@ -43,13 +44,11 @@ set(SRC_EXAMPLE_DIR ${PROJECT_SOURCE_DIR}/test)
 
 find_package(OpenSSL REQUIRED)
 
-if(DEFINED ENV{NDEBUG})
-  add_definitions(-DNDEBUG=1 -O2)
-else()
-  add_definitions(-g -O0)
-  add_definitions(-fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all)
-  link_libraries("-fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all")
-endif()
+# Add this to get some additional runtime checks.
+# Warning: it's incompatible with tools like Valgrind and you have to add it to the app using this lib too.
+# add_definitions("-fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all")
+# link_libraries("-fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all")
+
 add_definitions(-Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes -Wformat -Wtype-limits -Wundef -Wconversion -Wno-shadow -Wno-conversion -Wno-sign-conversion -Wno-unused-parameter -Wno-sign-compare) # TODO enable -Wconversion -Wsign-conversion -Wsign-compare -Wunused-parameter
 add_definitions(-Wformat -Wformat-security -Wno-declaration-after-statement -Wno-vla) # -Wpointer-arith -pedantic -DPEDANTIC # -Werror
 
@@ -75,6 +74,7 @@ set(SECUTIL_LIB_SRC ${SRC_DIR}/certstatus/certstatus.c
     ${SRC_DIR}/connections/conn.c
     ${SRC_DIR}/connections/http.c
     ${SRC_DIR}/connections/tls.c
+    ${SRC_DIR}/credentials/cert.c
     ${SRC_DIR}/credentials/credentials.c
     ${SRC_DIR}/credentials/key.c
     ${SRC_DIR}/credentials/store.c

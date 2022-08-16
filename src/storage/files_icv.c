@@ -13,15 +13,16 @@
 * SPDX-License-Identifier: Apache-2.0
 */
 
+#include <linux/limits.h>
 #include <openssl/hmac.h>
 
+#include <credentials/verify.h>
 #include <storage/files.h>
 #include <storage/files_icv.h>
 #include <storage/uta_api.h>
 #include <util/log.h>
-#include <credentials/verify.h>
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 
 #define ICVLEN 16

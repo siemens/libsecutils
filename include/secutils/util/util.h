@@ -30,10 +30,11 @@
 # include <unistd.h>
 
 # include "../basic.h"
-# include "../operators.h"
 
 # include <openssl/err.h>
 # include <openssl/x509v3.h>
+
+# include "../storage/uta_api.h"
 
 static const char *const
 UTIL_SECUTILS_NAME = "secutils";           /*!< short name of this library */

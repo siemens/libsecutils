@@ -29,7 +29,7 @@
 #  include <connections/tls.h>
 # endif
 
-# include <operators.h>
+#include "secutils/operators.h"
 
 OCSP_RESPONSE* CONN_load_OCSP_http(const char* url, int timeout,
                                    const OCSP_REQUEST* req,

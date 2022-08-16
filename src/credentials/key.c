@@ -20,7 +20,7 @@
 #include <credentials/key.h>
 #include <util/log.h>
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 EVP_PKEY* KEY_new(const char* spec)
 {

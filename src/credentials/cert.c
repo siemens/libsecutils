@@ -19,7 +19,7 @@
 #include <storage/files.h>
 #include <util/log.h>
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 
 X509 *CERT_load(const char *file, OPTIONAL const char *source,

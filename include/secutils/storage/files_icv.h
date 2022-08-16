@@ -20,6 +20,7 @@
 #include "../storage/uta_api.h"
 
 #include <openssl/ossl_typ.h>
+#include <openssl/safestack.h>
 
 /*!
  * @brief (re-)protect integrity of file (of any type that allows appending text) with ICV derived via UTA

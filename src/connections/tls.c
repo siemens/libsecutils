@@ -29,7 +29,7 @@
 #include <certstatus/ocsp.h>
 #endif
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 bool TLS_init(void)
 {

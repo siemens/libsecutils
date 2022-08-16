@@ -16,7 +16,6 @@
 #if !defined(OPENSSL_NO_OCSP) && !defined(OPENSSL_NO_SOCK)
 
 # include <util/log.h>
-# include <operators.h>
 # include <connections/http.h>
 # include <connections/conn.h>
 # ifndef SECUTILS_NO_TLS
@@ -28,6 +27,8 @@
 #  undef OPENSSL_NO_DEPRECATED_3_0
 # endif
 # include <openssl/ocsp.h>
+
+# include "secutils/operators.h"
 
 /* TODO replace this all by new API in http.h of OpenSSL 3.0 */
 

@@ -33,7 +33,7 @@ _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 #include <util/log.h>
 # include <connections/conn.h>
 
-#include <operators.h>
+#include "secutils/operators.h"
 
 static file_format_t adjust_format(const char* * file, file_format_t format, bool engine_ok)
 {
