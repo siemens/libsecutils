@@ -439,12 +439,6 @@ bool FILES_load_credentials(OPTIONAL const char* certs, OPTIONAL OPTIONAL const 
                             OPTIONAL const char* source, OPTIONAL const char* engine, OPTIONAL const char* desc,
                             OPTIONAL EVP_PKEY** pkey, OPTIONAL X509** cert, OPTIONAL STACK_OF(X509) * *chain)
 {
-    if(certs is_eq 0 and key is_eq 0)
-    {
-        LOG_err("null pointer arguments for certs file and key input");
-        return 0;
-    }
-
     if(engine is_eq 0 and certs not_eq 0 and key not_eq 0 and strcmp(certs, key) is_eq 0)
     {
         char* pass = FILES_get_pass(source, desc);
