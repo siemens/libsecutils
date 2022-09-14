@@ -194,6 +194,7 @@ bool FILES_load_pkcs12(const char* file, OPTIONAL const char* pass, OPTIONAL con
  * @param cert pointer to variable to assign the read primary certificate, or null
  * @param chain pointer to variable to assign the read list of further certificate, or null
  * @return true on success, else false
+ * @note Both the certs and key parameters can be null, resulting in empty credentials.
  * @note On success and in case the 'chain' parameter is not null (i.e., points to a variable),
  * if the variable contains null, a new stack of certs is allocated, else the certs are appended to the given stack.
  */
