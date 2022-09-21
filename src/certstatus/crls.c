@@ -238,7 +238,9 @@ int check_cert_crls(X509_STORE_CTX* ctx, OPTIONAL STACK_OF(X509_CRL) * crls)
     {
         STACK_OF(X509_CRL) * tmp_crls = X509_STORE_CTX_get1_crls(tmp_ctx, X509_get_issuer_name(cert));
         X509_CRL *crl;
-        while ((crl = sk_X509_CRL_shift(tmp_crls)) != NULL) {
+        while(sk_X509_CRL_num(tmp_crls) > 0)
+        {
+            crl = sk_X509_CRL_shift(tmp_crls);
             warn_crl(ctx, crl);
             X509_CRL_free(crl);
         }

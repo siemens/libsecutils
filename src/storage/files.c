@@ -805,7 +805,8 @@ err:
 X509* FILES_load_cert(const char* file, file_format_t format, OPTIONAL const char* source, OPTIONAL const char* desc)
 {
     STACK_OF(X509)* certs = FILES_load_certs(file, format, source, desc);
-    X509* cert = sk_X509_shift(certs);
+    X509* cert = sk_X509_num(certs) > 0 ? sk_X509_shift(certs) : 0;
+
     CERTS_free(certs);
     return cert;
 }
@@ -1505,10 +1506,13 @@ bool FILES_store_credentials(OPTIONAL const EVP_PKEY* key, OPTIONAL const X509* 
                     return false;
                 }
             }
-            if(0 is_eq sk_X509_unshift(certs, (X509*)cert)) /* prepend cert */
+            else
             {
-                LOG(FL_ERR, "out of memory writing certs to file '%s'", file);
-                return false;
+                if(0 is_eq sk_X509_unshift(certs, (X509*)cert)) /* prepend cert */
+                {
+                    LOG(FL_ERR, "out of memory writing certs to file '%s'", file);
+                    return false;
+                }
             }
         }
         if(certs not_eq 0)
@@ -1688,8 +1692,9 @@ STACK_OF(X509_CRL) * FILES_load_crls_multi(const char* srcs, file_format_t forma
         crls = FILES_load_crls_autofmt(src, format, timeout, desc);
         if(crls is_eq 0)
             goto err;
-        while((crl = sk_X509_CRL_shift(crls)))
+        while(sk_X509_CRL_num(crls) > 0)
         {
+            crl = sk_X509_CRL_shift(crls);
             if(0 is_eq sk_X509_CRL_push(all_crls, crl))
             {
                 sk_X509_CRL_pop_free(crls, X509_CRL_free);
