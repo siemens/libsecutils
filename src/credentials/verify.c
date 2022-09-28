@@ -224,11 +224,16 @@ int CREDENTIALS_verify_cert(OPTIONAL uta_ctx* uta_ctx, X509* cert,
     }
     X509_STORE_CTX_set_verify_cb(store_ctx, CREDENTIALS_print_cert_verify_cb);
 
-    /* workaround for OpenSSL bug https://github.com/openssl/openssl/issues/1418 - TODO remove when fix is available */
+#if OPENSSL_VERSION_NUMBER < 0x10101080L
+    /*
+     * This workaround is needed only for old OpenSSL versions < 1.1.1h where
+     * the fix of https://github.com/openssl/openssl/issues/1418 is not present:
+     */
     if(X509_check_issued(cert, cert)) /* self-signed */
     {
         X509_VERIFY_PARAM_set_flags(X509_STORE_CTX_get0_param(store_ctx), X509_V_FLAG_PARTIAL_CHAIN);
     }
+#endif
 
 #ifdef USE_CRLS /* TODO */
     X509_STORE_CTX_set0_crls(store_ctx, crls);
