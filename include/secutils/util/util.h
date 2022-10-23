@@ -197,6 +197,30 @@ STACK_OF(X509) *X509_STORE_get1_all_certs(X509_STORE *store);
 # endif
 
 /*!*****************************************************************************
+ * @brief add certificate to given stack, optionally only if not already contained
+ *
+ * @param sk stack of certificates
+ * @param cert certificate to be pushed to the stack
+ * @param no_duplicate flag governing whether to add cert if it is a duplicate
+ * @return true on success, else false
+ *******************************************************************************/
+bool UTIL_sk_X509_add1_cert(STACK_OF(X509) * sk, X509* cert, bool no_duplicate);
+
+/*!*****************************************************************************
+ * @brief add stack of certificates to given stack,
+ * optionally only if not self-signed and optionally if not already contained
+ *
+ * @param sk stack of certificates
+ * @param certs (optional) stack of certificates to be pushed to the stack
+ * @param no_self_signed flag governing whether to add self-signed certs
+ * @param no_duplicates flag governing whether to add cert if it is a duplicate
+ * @return true on success, else false
+ *******************************************************************************/
+/* this function is used by the genCMPClient API implementation */
+int UTIL_sk_X509_add1_certs(STACK_OF(X509) * sk, OPTIONAL const STACK_OF(X509) * certs, int no_self_signed,
+                            int no_duplicates);
+
+/*!*****************************************************************************
  * @brief initialize the OpenSSL crypto library
  * @param version expected OpenSSL version number
  * @param build_name name of SW being built to be used in error messages,
@@ -262,6 +286,18 @@ void *UTIL_read_file(const char *filename, int *lenp);
  * @return false on failure, true on success
  ******************************************************************************/
 bool UTIL_write_file(const char *filename, const void *data, size_t len);
+
+/*!*****************************************************************************
+ * @brief parse an X.500 Distinguished Name (DN)
+ *
+ * @param dn string to be parsed, format "/type0=value0/type1=value1/type2=..." where characters may be escaped by '\'.
+ * The NULL-DN may be given as "/" or "".
+ * @param chtype type of the string, e.g., MBSTRING_ASC, as defined in openssl/asn1.h
+ * @param multirdn flag whether to allow multi-valued RDNs
+ * @return ASN.1 representation of the DN, or null on error
+ *******************************************************************************/
+/* this function is used by the genCMPClient API implementation */
+X509_NAME* UTIL_parse_name(const char* dn, long chtype, bool multirdn);
 
 /*!*****************************************************************************
  * @brief call given function on each file in dir, optionally with recursion
