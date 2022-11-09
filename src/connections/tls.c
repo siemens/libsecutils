@@ -15,6 +15,8 @@
 
 #ifndef SECUTILS_NO_TLS
 
+#include <util/util.h> /* needed here for version compatibility declarations */
+
 #include <openssl/x509v3.h>
 
 #include <connections/tls.h>
@@ -23,7 +25,6 @@
 #include <credentials/store.h>
 #include <credentials/verify.h>
 #include <util/log.h>
-#include <util/util.h> /* needed for version compatibility declarations */
 #ifndef OPENSSL_NO_OCSP
 #include <certstatus/certstatus.h>
 #include <certstatus/ocsp.h>

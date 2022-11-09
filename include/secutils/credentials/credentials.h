@@ -16,12 +16,12 @@
 #ifndef SECUTILS_CREDENTIALS_H_
 #define SECUTILS_CREDENTIALS_H_
 
-#include <openssl/x509.h>
-
 #include "../basic.h"
+#include "../util/util.h"
 #include "../storage/files_dv.h"
 #include "../storage/uta_api.h"
 
+#include <openssl/x509.h>
 
 typedef const char* component_creds_id; /**< component credentials identifier */
 /**< one system component or application may have several sets of credentials */

@@ -15,17 +15,23 @@
 
 #include <string.h>
 
+#include <util/log.h>
+#include <certstatus/crls.h>
+#include <credentials/store.h>
+#include <credentials/verify.h>
+#include <connections/conn.h>
+
 #include <openssl/x509v3.h>
 #include <openssl/x509_vfy.h>
 #ifndef SECUTILS_NO_TLS
 # include <openssl/ssl.h>
 #endif
 
-#include <util/log.h>
-#include <certstatus/crls.h>
-#include <credentials/store.h>
-#include <credentials/verify.h>
-#include <connections/conn.h>
+#include <openssl/x509v3.h>
+#include <openssl/x509_vfy.h>
+#ifndef SECUTILS_NO_TLS
+# include <openssl/ssl.h>
+#endif
 
 #include <operators.h>
 

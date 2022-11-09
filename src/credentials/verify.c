@@ -13,15 +13,15 @@
 * SPDX-License-Identifier: Apache-2.0
 */
 
-#include <openssl/ssl.h>
-#include <openssl/x509v3.h>
-
 #include <credentials/cert.h>
 #include <credentials/store.h>
 #include <credentials/verify.h>
 #include <certstatus/crls.h>
 #include <util/log.h>
 #include <storage/uta_api.h>
+
+#include <openssl/ssl.h>
+#include <openssl/x509v3.h>
 
 #include <operators.h>
 

@@ -16,6 +16,7 @@
 #ifndef SECUTILS_HEADER_CRL_MGMT_H
 #define SECUTILS_HEADER_CRL_MGMT_H
 
+#include "../util/util.h"
 #include <openssl/x509.h>
 #include <secutils/basic.h>
 

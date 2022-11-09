@@ -14,6 +14,7 @@
 */
 
 #define OPENSSL_NO_RC4 /* prevent errors on undeclared FORMAT_MSBLOB and FORMAT_PVK */
+#define OSSL_DEPRECATEDIN_3_1
 #include <openssl/pem.h>
 #include <openssl/pkcs12.h>
 #ifndef OPENSSL_NO_ENGINE
