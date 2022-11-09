@@ -13,9 +13,8 @@
 * SPDX-License-Identifier: Apache-2.0
 */
 
-#include <config/config.h>
 #include <util/log.h>
-#include <util/util.h>
+#include <config/config.h>
 
 #include <openssl/x509v3.h>
 

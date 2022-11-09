@@ -16,13 +16,13 @@
 #include <dirent.h>
 #include <sys/stat.h>
 
+#include <util/log.h>
+
 #include <openssl/buffer.h>
 #include <openssl/engine.h>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 #include <openssl/ssl.h>
-
-#include <util/log.h>
 
 #include <operators.h>
 

@@ -16,12 +16,12 @@
 #ifndef SECUTILS_CONFIG_H_
 #define SECUTILS_CONFIG_H_
 
-#include <openssl/conf.h>
-#include <openssl/x509_vfy.h>
-
 #include "../basic.h"
 #include "../storage/uta_api.h"
 #include "opt.h"
+
+#include <openssl/conf.h>
+#include <openssl/x509_vfy.h>
 
 /*!
  * @brief load configuration file, checking its ICV if SECUTILS_CONFIG_USE_ICV is defined

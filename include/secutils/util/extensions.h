@@ -16,10 +16,9 @@
 #ifndef SECUTILS_EXTENSIONS_H_
 #define SECUTILS_EXTENSIONS_H_
 
-#include <openssl/x509v3.h>
-
 #include "util.h"
 
+#include <openssl/x509v3.h>
 
 /*!*****************************************************************************
  * @brief allocate EXTENSIONS structure

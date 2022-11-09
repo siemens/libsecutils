@@ -16,6 +16,7 @@
 #ifndef HEADER_CDP_UTIL_H
 #define HEADER_CDP_UTIL_H
 
+#include <util/util.h>
 #include <openssl/x509v3.h>
 
 #ifdef __cplusplus
