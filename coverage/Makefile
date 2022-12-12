@@ -18,9 +18,6 @@ OUTPUT_DIR = libsecutils-coverage
 INPUT_DIR = ../tmp
 IGNORE_PATHS = '/usr/include/*'
 
-# Stolen from CSDiag.
-# TODO Maybe put this into interfaces so that everybody can use it?
-
 find_gcda = find $(INPUT_DIR) -type f -name '*.gcda'
 
 .PHONY: all clean open
