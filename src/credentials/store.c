@@ -243,8 +243,13 @@ bool STORE_load_more_check(X509_STORE** pstore, const char* file,
     if(ctx is_eq 0 or FILES_check_icv(ctx, file))
     {
         STACK_OF(X509)* certs = FILES_load_certs_autofmt(file, format, 0 /* source */, desc);
-        if(0 is_eq certs)
+        if(sk_X509_num(certs) <= 0)
         {
+            if (certs != 0)
+            {
+                LOG(FL_ERR, "No %s in %s", desc not_eq 0 ? desc : "certs", file);
+            }
+            CERTS_free(certs);
             goto err;
         }
 

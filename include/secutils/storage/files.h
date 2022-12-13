@@ -84,7 +84,7 @@ file_format_t FILES_get_format(const char* filename);
  * @param format the format to expect for the file contents
  * @param source the password source to use in case the input file is encrypted, or null
  * @param desc description of file contents to use for any error messages, or null
- * @return null on error, else a stack of certs with the first/primary one on top
+ * @return null on error, else a stack of certs that may be empty or has the first/primary one on top
  */
 STACK_OF(X509)
     * FILES_load_certs(const char* file, file_format_t format, OPTIONAL const char* source, OPTIONAL const char* desc);
@@ -97,7 +97,7 @@ STACK_OF(X509)
  * @param format the format to expect for the file contents
  * @param source the password source to use in case the input file is encrypted, or null
  * @param desc description of file contents to use for any error messages, or null
- * @return null on error, else the first certificate contained in the file
+ * @return null on error, else the first certificate in the file
  */
 X509* FILES_load_cert(const char* file, file_format_t format, OPTIONAL const char* source, OPTIONAL const char* desc);
 
@@ -109,7 +109,7 @@ X509* FILES_load_cert(const char* file, file_format_t format, OPTIONAL const cha
  * @param format the format to try first when reading the file contents
  * @param source the password source to use in case the input is encrypted, or null
  * @param desc description of file contents to use for any error messages, or null
- * @return null on error, else a stack of certs with the first/primary one on top
+ * @return null on error, else a stack of certs that may be empty or has the first/primary one on top
  */
 STACK_OF(X509)
     * FILES_load_certs_autofmt(const char* file, file_format_t format, OPTIONAL const char* source,
@@ -123,7 +123,7 @@ STACK_OF(X509)
  * @param format the format to try first when reading file contents
  * @param source the password source to use in case the input is encrypted, or null
  * @param desc description of file contents to use for any error messages, or null
- * @return null on error, else a stack of certs with the first/primary one on top
+ * @return null on error, else a stack of certs that may be empty or has the first/primary one on top
  * @note duplicate certificates among different input files are included only once
  */
 /* this function is used by the genCMPClient API implementation */
@@ -267,7 +267,7 @@ bool FILES_store_key(const EVP_PKEY* pkey, const char* file, file_format_t forma
 /*!
  * @brief store the given list of certificates in given file and format
  *
- * @param certs list of certificates to save, or null
+ * @param certs list of certificates to save, or null to save empty list
  * @param file (path) name of the output file. Any previous contents are overwritten.
  * @param format the output format to use
  * @param desc description of file contents to use for any error messages, or null
@@ -332,15 +332,20 @@ bool FILES_store_pkcs12(OPTIONAL const EVP_PKEY* pkey, OPTIONAL const X509* cert
  * @param key (optional) private key to save
  * @param cert (optional) related certificate to save
  * @param certs (optional) related certificate chain to save
- * @param keyfile (optional) path name of the key output file. Any previous contents are overwritten.1
- * @param file (optional) name of the cert(s) output file. Any previous contents are overwritten.
+ * @param keyfile (optional) path name of the key output file.
+ * Must not be null if key is given. Any previous content is overwritten.
+ * @param file (optional) name of the cert(s) output file.
+ * Must not be null if cert(s) are given. Any previous contents are overwritten.
  * @param format the output format to use.
- * If the 'keyfile' and 'file' arguments are present and equal, the certs and the key are written jointly to the same
- * file, where only PKCS#12 is supported.
  * @param source the password source to use for decryption, or null
  * @param desc description of file contents to use for any error messages, or null
  * @return true on success, else false
+ * @note At least one of key, cert, or certs must not be null.
  * @note If the file format is PEM or ASN1 and both cert and certs are present, the cert is stored before the certs.
+ * @note If the 'keyfile' and 'file' arguments are present and equal,
+ * all of the cert, certs, and key are written jointly to the same file;
+ * in this case the cert(s) are stored before the key if the file format is PEM or ASN1.
+ * @note A warning is given when saving multiple credentials to the same ASN.1 DER encoded file.
  */
 bool FILES_store_credentials(OPTIONAL const EVP_PKEY* key, OPTIONAL const X509* cert, OPTIONAL STACK_OF(X509) * certs,
                              OPTIONAL const char* keyfile, OPTIONAL const char* file, file_format_t format,
