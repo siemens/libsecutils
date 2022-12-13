@@ -97,6 +97,9 @@ int CREDENTIALS_print_cert_verify_cb(int ok, X509_STORE_CTX* store_ctx)
                    This works for names we set ourselves but not verify_hostname. */
                 expected = STORE_get0_host(ts);
                 break;
+            case X509_V_ERR_INVALID_PURPOSE:
+                /* TODO assign, if possible: expected = ...; */
+                break;
             default:
                 break;
         }
