@@ -659,7 +659,19 @@ static int load_certs_crls(const char* file, file_format_t format, const char* p
     return res;
 }
 
-/* returns non-null pointer if at least one certificate has been loaded successfully.
+static long bio_len(BIO *bio)
+{
+    long len = -1;
+    FILE *fp;
+
+    if (BIO_get_fp(bio, &fp) == 1 && fseek(fp, 0, SEEK_END) == 0) {
+        len = ftell(fp);
+        (void)fseek(fp, 0, SEEK_SET);
+    }
+    return len;
+}
+
+/* returns non-null pointer if file is empty or at least one certificate has been loaded successfully.
    The top element on the stack returned is the primary one. Uses format as given. */
 STACK_OF(X509)
     * FILES_load_certs(const char* file, file_format_t format, OPTIONAL const char* source, OPTIONAL const char* desc)
@@ -674,6 +686,13 @@ STACK_OF(X509)
     {
         goto end;
     }
+    if(bio_len(bio) is_eq 0) /* empty file */
+    {
+        BIO_free(bio);
+        UTIL_cleanse_free(pass);
+        return sk_X509_new_null();
+    }
+
     if(format is_eq FORMAT_PEM or format is_eq FORMAT_ASN1)
     {
         if(load_certs_crls_BIO(bio, format, pass, desc, &certs, 0 /* crls */) not_eq 0)
@@ -724,8 +743,8 @@ end:
 }
 
 
-/* returns non-null pointer if at least one certificate has been loaded successfully.
-   The top element on the stack returned is the primary one. Uses format as given. */
+/* returns non-null pointer if file is empty of at least one certificate has been loaded successfully.
+   The top element on the stack returned is the primary one. Tries the given format first. */
 STACK_OF(X509)
     * FILES_load_certs_autofmt(const char* file, file_format_t format, OPTIONAL const char* source,
                                OPTIONAL const char* desc)
@@ -1194,8 +1213,9 @@ X509_REQ* FILES_load_csr_autofmt(const char* file, file_format_t format, OPTIONA
 }
 
 
-bool FILES_store_key(const EVP_PKEY* pkey, const char* file, file_format_t format, OPTIONAL const char* source,
-                     OPTIONAL const char* desc)
+static bool
+store_key(const EVP_PKEY* pkey, const char* file, file_format_t format,
+          char mode, OPTIONAL const char* source, OPTIONAL const char* desc)
 {
     BIO* bio = 0;
     PW_CB_DATA cb_data;
@@ -1203,14 +1223,15 @@ bool FILES_store_key(const EVP_PKEY* pkey, const char* file, file_format_t forma
     bool result = false;
 
     LOG(FL_INFO, "storing private key in file '%s'", file);
-    if(format is_eq FORMAT_PKCS12)
+    if(format is_eq FORMAT_PKCS12 and mode == 'w')
     {
         result = FILES_store_pkcs12(pkey, 0, 0, file, pass, desc);
         goto end;
     }
     if(format not_eq FORMAT_PEM and format not_eq FORMAT_ASN1)
     {
-        LOG(FL_ERR, "unsupported format (%d) for storing %s", format, desc not_eq 0 ? desc : file);
+        LOG(FL_ERR, "unsupported format (%d) or mode '%c' for storing %s",
+            format, mode, desc not_eq 0 ? desc : file);
         goto end;;
     }
 
@@ -1218,7 +1239,7 @@ bool FILES_store_key(const EVP_PKEY* pkey, const char* file, file_format_t forma
     cb_data.prompt_info = file;
 
     /* create bio and connect it with the file */
-    if((bio = bio_open_default(file, 'w', format)) is_eq 0)
+    if((bio = bio_open_default(file, mode, format)) is_eq 0)
     {
         goto end;
     }
@@ -1253,6 +1274,11 @@ bool FILES_store_key(const EVP_PKEY* pkey, const char* file, file_format_t forma
     return result;
 }
 
+bool FILES_store_key(const EVP_PKEY* pkey, const char* file, file_format_t format,
+                     OPTIONAL const char* source, OPTIONAL const char* desc)
+{
+    return store_key(pkey, file, format, 'w', source, desc);
+}
 
 /*******************************************************
  * store private key, cert, and (extra) certs, as far as present, in pkcs12
@@ -1327,7 +1353,7 @@ end:
 
 
 /*!########################################################################## *
- * writes out a stack of certificates in the given format to the given file
+ * writes a stack of certificates or null in the given format to the given file
  * returns number of written certificates on success, < 0 on error
  * ########################################################################## */
 int FILES_store_certs(OPTIONAL const STACK_OF(X509) * certs, const char* file, file_format_t format, OPTIONAL const char* desc)
@@ -1337,7 +1363,9 @@ int FILES_store_certs(OPTIONAL const STACK_OF(X509) * certs, const char* file, f
     int i;
     X509* cert = 0;
 
-    LOG(FL_INFO, "storing %d certificate%s%s%s in file '%s'", n < 0 ? 0: n, n is_eq 1 ? "" : "s",
+    if (n < 0)
+        n = 0;
+    LOG(FL_INFO, "storing %d certificate%s%s%s in file '%s'", n, n is_eq 1 ? "" : "s",
         desc == 0 ? "" : " of ", desc == 0 ? "" : desc, file);
     if(format is_eq FORMAT_PKCS12)
     {
@@ -1352,7 +1380,7 @@ int FILES_store_certs(OPTIONAL const STACK_OF(X509) * certs, const char* file, f
     }
     if(n > 1 and format is_eq FORMAT_ASN1)
     {
-        LOG(FL_WARN, "saving more than one certificate in DER format");
+        LOG(FL_WARN, "jointly saving more than one certificate in DER format");
     }
 
     if((bio = bio_open_default(file, 'w', format)) is_eq 0)
@@ -1451,7 +1479,7 @@ bool FILES_store_crl(const X509_CRL* crl, const char* file, file_format_t format
 }
 
 /*******************************************************
- * store private key, cert, and (extra) certs, as far as present, with given format
+ * store private key, cert, and chain, as far as present, in given file(s) and format
  *******************************************************/
 bool FILES_store_credentials(OPTIONAL const EVP_PKEY* key, OPTIONAL const X509* cert, OPTIONAL STACK_OF(X509) * certs,
                              OPTIONAL const char* keyfile, OPTIONAL const char* file, file_format_t format,
@@ -1473,23 +1501,28 @@ bool FILES_store_credentials(OPTIONAL const EVP_PKEY* key, OPTIONAL const X509* 
         return false;
     }
 
+    char mode = 'w';
     if(0 not_eq key and 0 not_eq keyfile and 0 is_eq strcmp(keyfile, file)) /* store to same file */
     {
-        if(format not_eq FORMAT_PKCS12) /* TODO maybe support other formats */
+        if(format is_eq FORMAT_PKCS12)
         {
-            LOG(FL_ERR, "Unsupported format (%d) when jointly storing key and certs (to file '%s')", format, file);
-            return false;
+            char *pass = FILES_get_pass(source, desc);
+            bool result = FILES_store_pkcs12(key, cert, certs, file, pass, desc);
+            UTIL_cleanse_free(pass);
+            return result;
         }
-        char *pass = FILES_get_pass(source, desc);
-        bool result = FILES_store_pkcs12(key, cert, certs, file, pass, desc);
-        UTIL_cleanse_free(pass);
-        return result;
+        mode = 'a';
+        if(format is_eq FORMAT_ASN1 and key not_eq 0 and
+           (cert not_eq 0 or certs not_eq 0))
+        {
+            LOG(FL_WARN, "jointly saving certificate(s) and key in DER format");
+        }
     }
 
-    if(format is_eq FORMAT_PKCS12 and cert not_eq 0 and certs not_eq 0)
+    if(format is_eq FORMAT_PKCS12 and (cert not_eq 0 or certs not_eq 0))
     {
         char *pass = FILES_get_pass(source, desc);
-        bool result = FILES_store_pkcs12(key, cert, certs, file, pass, desc);
+        bool result = FILES_store_pkcs12(NULL, cert, certs, file, pass, desc);
         UTIL_cleanse_free(pass);
         if (not result)
         {
@@ -1498,16 +1531,16 @@ bool FILES_store_credentials(OPTIONAL const EVP_PKEY* key, OPTIONAL const X509* 
     }
     else
     {
-        if(cert not_eq 0)
+        if(cert not_eq 0 and certs is_eq 0)
         {
-            if(certs is_eq 0)
+            if(not FILES_store_cert(cert, file, format, desc))
             {
-                if(not FILES_store_cert(cert, file, format, desc))
-                {
-                    return false;
-                }
+                return false;
             }
-            else
+        }
+        else
+        {
+            if(cert not_eq 0) /* here, certs not_eq 0 holds */
             {
                 if(0 is_eq sk_X509_unshift(certs, (X509*)cert)) /* prepend cert */
                 {
@@ -1515,9 +1548,6 @@ bool FILES_store_credentials(OPTIONAL const EVP_PKEY* key, OPTIONAL const X509* 
                     return false;
                 }
             }
-        }
-        if(certs not_eq 0)
-        {
             if(FILES_store_certs(certs, file, format, desc) < 0)
             {
                 return false;
@@ -1528,7 +1558,7 @@ bool FILES_store_credentials(OPTIONAL const EVP_PKEY* key, OPTIONAL const X509* 
             }
         }
     }
-    return key is_eq 0 or FILES_store_key(key, keyfile, format, source, desc);
+    return key is_eq 0 or store_key(key, keyfile, format, mode, source, desc);
 }
 
 

@@ -337,7 +337,7 @@ bool CREDENTIALS_save(const CREDENTIALS* creds, OPTIONAL const char* certs, OPTI
         source = 0;
     }
 
-    file_format_t format = key not_eq 0 and strcmp(key, certs) is_eq 0 ? FORMAT_PKCS12 : FORMAT_PEM;
+    file_format_t format = key not_eq 0 and strcmp(key, certs) is_eq 0 ? FILES_get_format(key) : FORMAT_PEM;
     bool res = FILES_store_credentials(pkey, creds->cert, creds->chain, key, certs, format, source, desc);
     if(0 is_eq res)
     {

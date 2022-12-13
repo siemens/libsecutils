@@ -203,8 +203,9 @@ CREDENTIALS* CREDENTIALS_load_dv(OPTIONAL const char* certs, OPTIONAL const char
  *   the key is not stored because this does not apply for the engine interface.
  * @param desc (optional) is used if present for forming more descriptive error messages
  * @return true on success, else failure
- * @note If the 'certs' and 'key' arguments are equal the certs and the key are written jointly to the same PKCS#12
- *file, else they are written to PEM files.
+ * @note If the 'certs' and 'key' arguments are equal and the file name extension is ".p12" or ".pkcs12",
+ * the certs and the key are written jointly to the same PKCS#12 file.
+ * Otherwise they are written in PEM format, potentially jointly to the same file.
  *******************************************************************************/
 /* this function is part of the genCMPClient API */
 bool CREDENTIALS_save(const CREDENTIALS* creds, OPTIONAL const char* certs, OPTIONAL const char* key,
