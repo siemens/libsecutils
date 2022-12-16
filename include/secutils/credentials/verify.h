@@ -80,7 +80,7 @@ bool verify_cb_cert(X509_STORE_CTX* store_ctx, X509* cert, int err);
  * the chain of certificates between the cert and the trusted certs in the trust store
  * @param trust_store pointer to structure containing trusted (root) certs and further verification parameters
  * @note trust_store may contain CRLs loaded via STORE_load_crl_dir()
- * @return < 0 on on verification error, 0 for invalid cert, 1 for vaild cert
+ * @return < 0 on on verification error, 0 for invalid cert, 1 for valid cert
  *******************************************************************************/
 int CREDENTIALS_verify_cert(OPTIONAL uta_ctx* ctx, X509* cert,
                             OPTIONAL const STACK_OF(X509) * untrusted, X509_STORE* trust_store);

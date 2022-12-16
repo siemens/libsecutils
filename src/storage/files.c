@@ -276,7 +276,7 @@ char* FILES_get_pass(OPTIONAL const char* source, OPTIONAL const char* desc)
         {
             LOG(FL_ERR, "Cannot access file descriptor %s\n", source + strlen(sec_FD_STR));
         }
-        /* Cannott do BIO_gets on an fd BIO so add a buffering BIO */
+        /* Cannot do BIO_gets on an fd BIO so add a buffering BIO */
         bio = BIO_push(BIO_new(BIO_f_buffer()), bio);
 #endif
     }
@@ -834,7 +834,7 @@ X509* FILES_load_cert(const char* file, file_format_t format, OPTIONAL const cha
 
 /* adapted from OpenSSL:apps/lib/apps.c just for visibility reasons */
 #ifndef OPENSSL_NO_ENGINE
-/* Try to load an engine in a shareable library */
+/* Try to load an engine in a sharable library */
 static ENGINE* try_load_engine(const char* engine)
 {
     ENGINE* e = ENGINE_by_id("dynamic");
@@ -1734,7 +1734,7 @@ STACK_OF(X509_CRL) * FILES_load_crls_multi(const char* srcs, file_format_t forma
 #if 0
             if(OSSL_CMP_expired(X509_CRL_get0_nextUpdate(crl), vpm))
             {
-                /* well, should ignore expiry of base CRL if delta CRL is valid */
+                /* well, should ignore expiration of base CRL if delta CRL is valid */
                 char* issuer =
                     X509_NAME_oneline(X509_CRL_get_issuer(crl), 0, 0);
                 LOG(FL_ERR, "CRL from '%s' issued by '%s' has expired",

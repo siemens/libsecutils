@@ -24,7 +24,7 @@ typedef int (*pEVP_INIT_EX)(EVP_CIPHER_CTX *ctx, const EVP_CIPHER *type,
 typedef const EVP_CIPHER* (*pAES_GCM)(void);
 
 /*!
- * @brief The function creates and initialises the context of encryption/description
+ * @brief The function creates and initializes the context of encryption/description
  *        operation. And after that the function sets length of initialization vector (IV)
  *
  * @param key key used for encryption and integrity protection

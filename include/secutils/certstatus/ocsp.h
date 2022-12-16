@@ -48,8 +48,8 @@ static const int OCSP_DEFAULT_TIMEOUT = 10; /* in seconds */
  *
  * @param ts pointer to trust store containing verification parameters
  * @param untrusted a stack of certs that may be used for chain building, or null
- * @param cert the cerificate to check
- * @param issuer the issuer cerificate
+ * @param cert the certificate to check
+ * @param issuer the issuer certificate
  * @param resp the OCSP response to use
  * @return 1 on success, 0 on rejection (i.e., cert revoked), -1 on error
  */
@@ -62,8 +62,8 @@ int check_ocsp_resp(X509_STORE* ts, STACK_OF(X509) *untrusted,
  *
  * @param ctx verification context containing verification parameters etc.
  * @param untrusted a stack of certs that may be used for chain building, or null
- * @param cert the cerificate to check
- * @param issuer the issuer cerificate
+ * @param cert the certificate to check
+ * @param issuer the issuer certificate
  * @return 1 on success, 0 on rejection (i.e., cert revoked), -2 on no OCSP response available, -1 on other error
  */
 int check_cert_status_ocsp(X509_STORE_CTX* ctx, STACK_OF(X509) *untrusted,

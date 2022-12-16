@@ -43,7 +43,7 @@ bool STORE_set1_host_ip(X509_STORE* truststore, const char* name, const char* ip
  * @param store the trust store to be extended
  * @param crls the list of CRLs to be added, or null.
  * @return true on success, false on failure
- * @note A warning is given for each exired CRL. X509_V_FLAG_CRL_CHECK is set in the store.
+ * @note A warning is given for each expired CRL. X509_V_FLAG_CRL_CHECK is set in the store.
  */
 /* this function is part of the genCMPClient API */
 bool STORE_add_crls(X509_STORE* store, OPTIONAL const STACK_OF(X509_CRL) * crls);
@@ -119,7 +119,7 @@ bool STORE_set_crl_callback(X509_STORE* store,
 
 /*!*****************************************************************************
  * @brief use the CRL fetching function specified in the given trust store
- * @param store the certificate trust store containin the callback information
+ * @param store the certificate trust store containing the callback information
  * @param url the location of the CDP to use, or null
  * @param timeout number of seconds the HTTP transaction may take, or 0 for infinite or -1 for default
  * @param cert the certificate for which the status should be checked using the CRL
@@ -268,7 +268,7 @@ const char* STORE_get0_host(X509_STORE* store);
  * @note used to improve diagnostic output of CREDENTIALS_print_cert_verify_cb()
  *
  * @param store the affected certificate store
- * @param bio the SSL/TLS bio to set, or null to clear it
+ * @param bio the SSL/TLS BIO to set, or null to clear it
  * @return true on success, false on failure
  */
 /* this function is used by the genCMPClient API implementation */
@@ -278,7 +278,7 @@ bool STORE_set0_tls_bio(X509_STORE* store, OPTIONAL BIO* bio);
  * @brief get the SSL BIO indicating if TLS is active, for diagnostics
  *
  * @param store the certificate store to read from
- * @return the SSL/TLS bio that has been set, or null if unset or on failure
+ * @return the SSL/TLS BIO that has been set, or null if unset or on failure
  */
 BIO* STORE_get0_tls_bio(X509_STORE* store);
 # endif /* !defined(SECUTILS_NO_TLS) */

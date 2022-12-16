@@ -44,7 +44,7 @@ typedef struct revstatus_access_st
 #define X509_V_FLAG_NONFINAL_CHECK  0x10000000 /* do not log failure as error */
 
 /*!*****************************************************************************
- * @brief log messsage about the given certificate, focusing on CDP contents
+ * @brief log message about the given certificate, focusing on CDP contents
  * in extensions with NID_crl_distribution_points or NID_freshest_crl
  *
  * @note This is more of a debug function to show which cert is currently processed.
@@ -128,7 +128,7 @@ bool check_cert_revocation(X509_STORE_CTX* ctx, OPTIONAL OCSP_RESPONSE* resp);
  * but uses any stapled OCSP resp, local CRLs, else OCSP or CRLs as far as required.
  * @param ctx pointer to verification context structure including the cert(s) to check
  * @return true on success, false on rejection or checking error (inconclusive)
- * @note using result type 'int' rather than 'bool' for compatiblity with X509_STORE_set_check_revocation()
+ * @note using result type 'int' rather than 'bool' for compatibility with X509_STORE_set_check_revocation()
  */
 int check_revocation_any_method(X509_STORE_CTX* ctx);
 

@@ -217,7 +217,7 @@ EVP_PKEY *FILES_load_pubkey(const char *file, file_format_t format,
 
 
 /*!
- * @brief load a public key from the given file with flexbile format
+ * @brief load a public key from the given file with flexible format
  *
  * @param file (path) name of the input file
  * @param format the format to try first when reading the file contents - currently FORMAT_PEM or FORMAT_ASN1
@@ -241,7 +241,7 @@ X509_REQ* FILES_load_csr(const char* file, file_format_t format, OPTIONAL const 
 
 
 /*!
- * @brief load a PKCS#10 CSR from the given file with flexbile format
+ * @brief load a PKCS#10 CSR from the given file with flexible format
  *
  * @param file (path) name of the input file
  * @param format the format to try first when reading the file contents
@@ -352,7 +352,7 @@ bool FILES_store_credentials(OPTIONAL const EVP_PKEY* key, OPTIONAL const X509* 
                              OPTIONAL const char* source, OPTIONAL const char* desc);
 
 /*!
- * @brief load CRL via HTTP or from the given file, with flexbile format
+ * @brief load CRL via HTTP or from the given file, with flexible format
  *
  * @param src input file or URL (in PEM or DER format) or URL
  * @param format FORMAT_HTTP or input format to try first, FORMAT_PEM or FORMAT_ASN1
@@ -364,7 +364,7 @@ bool FILES_store_credentials(OPTIONAL const EVP_PKEY* key, OPTIONAL const X509* 
 X509_CRL* FILES_load_crl_autofmt(const char* src, file_format_t format, int timeout, const char* desc);
 
 /*!
- * @brief load CRLs via HTTP or from the given file, with flexbile format
+ * @brief load CRLs via HTTP or from the given file, with flexible format
  *
  * @param src input file or URL (in PEM or DER format) containing CRLs
  * @param format FORMAT_HTTP or input format to try first, either FORMAT_PEM or FORMAT_ASN1

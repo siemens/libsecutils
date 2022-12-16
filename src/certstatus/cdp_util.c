@@ -105,7 +105,7 @@ const char *CDP_get_crl_distribution_point_from_distpoint(
      */
     if (distpoint->reasons) {
         CDP_REASON_FLAGS reason_flags = 0;
-        CDP_REASON_FLAGS single_flag = 1;   /* this is shifted throug all flags */
+        CDP_REASON_FLAGS single_flag = 1;   /* this is shifted through all flags */
         int bit;
         for (bit = 0; bit < CDP_REASON_FLAGSCOUNT; ++bit) {
             if (ASN1_BIT_STRING_get_bit(distpoint->reasons, bit)) {
@@ -122,7 +122,7 @@ const char *CDP_get_crl_distribution_point_from_distpoint(
 
     if (distpoint->distpoint) {
         if (distpoint->distpoint->type == 0) {
-            /* type 0 means this is a fullname cdp */
+            /* type 0 means this is a full-name cdp */
             /* RFC 5280 Page 46
              * If the DistributionPointName contains a general name of type URI, the
              * following semantics MUST be assumed: the URI is a pointer to the

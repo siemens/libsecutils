@@ -113,14 +113,14 @@ X509_NAME* UTIL_parse_name(const char* dn, long chtype, bool multirdn);
 
 
 /*!*****************************************************************************
- * @brief log messsage about the given certificate, printing its subject
+ * @brief log message about the given certificate, printing its subject
  *
  * @param func the name of the reporting function or component, or null
  * @param file the current source file path name, or null
  * @param lineno the current line number, or 0
  * @param level the nature of the message, i.e., its severity level
  * @param msg the message to be logged
- * @param cert the certificate the message referts to
+ * @param cert the certificate the message refers to
  */
 void LOG_cert(OPTIONAL const char* func, OPTIONAL const char* file, int lineno, severity level,
               const char* msg, const X509* cert);

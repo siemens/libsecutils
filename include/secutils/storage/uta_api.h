@@ -37,7 +37,7 @@ uta_ctx* uta_open(void); /* may be called more than once */
 
 
 /*!
- * @brief deinitialize the given use of the UTA library
+ * @brief de-initialize the given use of the UTA library
  * @param ctx the uta context to free
  * @return true on success, else false
  */

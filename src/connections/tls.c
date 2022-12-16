@@ -322,7 +322,7 @@ err:
     OPENSSL_free(host_str);
     /* release the intermediate connection structure */
     CONN_free(conn);
-    /* on error, releasee the SSL/TLS structure */
+    /* on error, release the SSL/TLS structure */
     if(0 is_eq res)
     {
         TLS_drop(ssl);
