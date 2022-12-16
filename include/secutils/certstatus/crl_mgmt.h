@@ -27,7 +27,7 @@ extern "C" {
 typedef struct crlmgmt_data_st CRLMGMT_DATA;
 
 /*!
- * @brief The function creates and initialises the context of the CRL management.
+ * @brief The function creates and initializes the context of the CRL management.
  *        The context is used during the verification of a certificate chain
  *        and holds parameter necessary for CRL download, a potential proxy,
  *        caching and other parameters.
@@ -41,7 +41,7 @@ CRLMGMT_DATA *CRLMGMT_DATA_new(void);
  * @brief The function frees the context of the CRL management created by
  *        CRLMGMT_DATA_new(). Only the context itself is freed. Strings
  *        that have been set with the setter functions are in the
- *        responsability of the caller.
+ *        responsibility of the caller.
  *
  * @param cmdat pointer to the CRL management data structure
  */
@@ -61,7 +61,7 @@ const char *CRLMGMT_DATA_get_proxy_url(
 
 /*!
  * @brief The function sets the proxy url in the CRL management context.
- * It will be used to send CDP URLs to inr the form C<url?url=CDP_URL>
+ * It will be used to send CDP URLs in the form C<url?url=CDP_URL>
  * to send issuer Distinguished Names (DNs) to in the form C<url?issuer=DN>.
 
  * @note  The proxy url is not copied into the structure. Therefore the
@@ -113,7 +113,7 @@ const char *CRLMGMT_DATA_get_crl_cache_dir(
  * @brief The function sets the cache directory in the CRL management context.
  * @note  The directory name is not copied into the structure. Therefore the
  *        parameter cache directory must exist during the lifetime of the context.
- *        If not null, it must end with the (potentally platform-specific) path separator.
+ *        If not null, it must end with the (potentially platform-specific) path separator.
  *
  * @param cmdat pointer to the CRL management data structure
  * @param crl_cache_dir the cache directory

@@ -21,7 +21,7 @@
 
 /* all these definitions are used by the genCMPClient CLI implementation */
 
-extern const char OPT_more_str[]; /** indicates further line of help text for currenct option */
+extern const char OPT_more_str[]; /** indicates further line of help text for current option */
 extern const char OPT_section_str[]; /** marks a section header in help text */
 extern const char OPT_param_str[]; /** marks a parameter option in help text */
 #define OPT_MORE(text)    { OPT_more_str   , OPT_BOOL, {.num = 0}, {0}, text }
@@ -68,7 +68,7 @@ bool OPT_init(opt_t options[]);
  * @brief print the help strings for option/config variables to the given BIO
  * @param options list of options, terminated by a {0} entry
  * @param bio the OpenSSL BIO to print to (may be linked, e.g., to stdout)
- * @return false on error (e.g., options or bio is null), else true
+ * @return false on error (e.g., options or BIO is null), else true
  */
 bool OPT_help(opt_t options[], BIO* bio);
 

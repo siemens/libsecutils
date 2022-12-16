@@ -220,7 +220,7 @@ static X509_CRL *get_crl_by_download_or_from_cache(const CRLMGMT_DATA *data,
 CRLMGMT_DATA *CRLMGMT_DATA_new(void)
 {
     if (nidCrlNextPublish==0) {
-        // TODO this is not threadsafe
+        // TODO this is not thread-safe
         nidCrlNextPublish = OBJ_create("1.3.6.1.4.1.311.21.4",
             SN_crl_next_publish, LN_crl_next_publish);
     }

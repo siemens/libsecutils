@@ -62,7 +62,7 @@ static int refactor_entry(char* src_p, char* dest_p, const char* const key_p, co
         return -1;
     }
 
-    /* copy the whole line proactively */
+    /* copy the whole line pro-actively */
     if(not copy_line_substring(dest_p, src_p, &line_len, max_dest_len))
     {
         goto len_err;
@@ -127,7 +127,7 @@ len_err:
 #define c_line_buf_size 512   /* .5 kB including '\0' */
 
 /*
- * @warning security note: `file_buffer` is a `tained` value in the sense of
+ * @warning security note: `file_buffer` is a `tainted` value in the sense of
  * https://wiki.sei.cmu.edu/confluence/display/c/FIO30-C.+Exclude+user+input+from+format+strings
  */
 static char file_buffer[c_file_buf_size] = {0};

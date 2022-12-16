@@ -41,7 +41,7 @@ typedef enum CDP_reason_flag {
 
 typedef int CDP_REASON_FLAGS;
 
-/* Copy a oneline representation of the X509_NAME into the buffer */
+/* Copy a one-line representation of the X509_NAME into the buffer */
 int CDP_get_x509_name(
     X509_NAME       *name,
     char            *name_utf8_buf,

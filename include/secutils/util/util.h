@@ -175,7 +175,7 @@ typedef unsigned char uint8_t;
 typedef u_int32_t uint32_t;
 typedef u_int64_t uint64_t;
 #  define OPENSSL_strndup strndup
-#  define CRYPTO_free_ex_index(cls_idx, idx) /* sorry, no-op (yet no memleak) */
+#  define CRYPTO_free_ex_index(cls_idx, idx) /* sorry, no-op (yet no mem leak) */
 #  define X509_get0_extensions(x) ((x)->cert_info->extensions)
 #  define X509_get_extension_flags(x) (X509_check_purpose((x), -1, -1), \
                                        (x)->ex_flags)
@@ -204,7 +204,7 @@ STACK_OF(X509) *X509_STORE_get1_all_certs(X509_STORE *store);
  *        or null for the default: UTIL_SECUTILS_NAME
  * @note calls exit(EXIT_FAILURE) on error,
  *        e.g., version mismatch or initialization failure
- * @note this function is called upon libarary loading via STORE_EX_init_index()
+ * @note this function is called upon library loading via STORE_EX_init_index()
  ******************************************************************************/
 /* this function is used by the genCMPClient API implementation */
 void UTIL_setup_openssl(long version, OPTIONAL const char *build_name);
@@ -321,8 +321,8 @@ bool UTIL_get_random(void *buf, size_t len);
  * This function is a helper that could possibly be replaced by built-in one.
  * It respects the receiving buffer length and always NUL terminates the buffer.
  * In addition it returns the buffer size needed when requested.
- * Normaly there are equivalents to this on most platforms,
- * which unfortunately are mostly platfrom dependent. So this placeholder is
+ * Normally there are equivalents to this on most platforms,
+ * which unfortunately are mostly platform dependent. So this placeholder is
  * used here, but could possibly be replaced by a better lib function on the
  * target platform.
  *

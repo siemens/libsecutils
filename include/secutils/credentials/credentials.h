@@ -94,7 +94,7 @@ char* CREDENTIALS_get_pwdref(const CREDENTIALS* creds);
  * @brief set private key component of the given credentials
  * @note the current component value is not freed but overwritten.
  *
- * @param pkey (optiona) value to be set
+ * @param pkey (optional) value to be set
  * @param creds credentials to modify
  * @return true on success, else failure (e.g, null creds argument)
  *******************************************************************************/
@@ -236,7 +236,7 @@ static const char* const CREDS_DIR_DEFAULT = "certs/creds";
  * @note file name is derived from CREDS_DIR_ENV (defaulting to CREDS_DIR_DEFAULT), cid, and extension ".p12".
  * @note uses DV-based encryption, which also protects integrity&authenticity.
  *
- * @param cid identfier of the component credentials
+ * @param cid identifier of the component credentials
  * @return pointer to a new CREDENTIALS structure, or null on error
  *******************************************************************************/
 CREDENTIALS* CREDENTIALS_get(component_creds_id cid);
@@ -246,7 +246,7 @@ CREDENTIALS* CREDENTIALS_get(component_creds_id cid);
  * @note file name is derived from CREDS_DIR_ENV (defaulting to CREDS_DIR_DEFAULT), cid, and extension ".p12".
  * @note uses DV-based encryption, which also protects integrity&authenticity.
  *
- * @param cid identfier of the component credentials
+ * @param cid identifier of the component credentials
  * @param creds credentials to store
  * @return true on success, else failure
  *******************************************************************************/
@@ -263,7 +263,7 @@ typedef void CREDENTIALS_update_cb(const char* tag);
 /*!*****************************************************************************
  * @brief register callback to trigger when credentials are stored
  *
- * @param tag identfier of the credentials
+ * @param tag identifier of the credentials
  * @param fn (optional) callback function to be set, or null to clear entry
  * @return true on success, false on failure
  *******************************************************************************/

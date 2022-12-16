@@ -176,7 +176,7 @@ int check_ocsp_resp(X509_STORE* ts, STACK_OF(X509) *untrusted,
  * Get an OCSP_RESPONSE from a responder URL for the given cert and issuer.
  * This is a simplified version. It examines certificates each time and makes
  * one OCSP responder query for each request. A full version would store details
- * such as the OCSP certificate IDs and minimise the number of OCSP responses
+ * such as the OCSP certificate IDs and minimize the number of OCSP responses
  * by caching them until they were considered "expired".
  */
 static OCSP_RESPONSE* get_ocsp_resp(X509* cert, X509* issuer,

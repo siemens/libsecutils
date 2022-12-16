@@ -48,7 +48,7 @@ typedef bool (*LOG_cb_t)(OPTIONAL const char* func, OPTIONAL const char* file, i
                          const char* msg);
 
 /*!
- * @brief initialize the logging functionality of the secutils
+ * @brief initialize the logging functionality of libsecutils
  * @note this function may be called multiple times
  * @note this function does not affect the application name optionally set by LOG_set_name()
  *

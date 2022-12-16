@@ -34,7 +34,7 @@ static const char* const TRUST_CONFIG_ENTRY_CRLS = "crls";
  * trusted.2 = certs/trusted2.crt
  * @note the section may contain multiple entries for CRL files, with names derived from TRUST_CONFIG_ENTRY_CRLS
  *
- * @param cid identfier of the component, which indicates the config file section to use, or TRUST_CONFIG_SECTION_DEFAULT if it is 0
+ * @param cid identifier of the component, which indicates the config file section to use, or TRUST_CONFIG_SECTION_DEFAULT if it is 0
  * @param vpm OpenSSL certificate verification parameters to be taken over, or null for default
  * @param ctx (optional) pointer to UTA context for checking file integrity&authenticity using ICV
  * @return pointer to a new CREDENTIALS structure, or null on error

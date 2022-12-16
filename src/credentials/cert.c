@@ -100,7 +100,7 @@ X509_NAME* UTIL_parse_name(const char* dn, long chtype, bool multirdn)
         goto error;
     }
 
-    /* no multivalued RDN by default */
+    /* no multi-valued RDN by default */
     mval[ne_num] = 0;
 
     if(*sp not_eq '\0' and *sp++ not_eq '/')
@@ -159,7 +159,7 @@ X509_NAME* UTIL_parse_name(const char* dn, long chtype, bool multirdn)
             else if(*sp is_eq '/')
             { /* start of next element */
                 sp++;
-                /* no multivalued RDN by default */
+                /* no multi-valued RDN by default */
                 mval[ne_num + 1] = 0;
                 break;
             }
