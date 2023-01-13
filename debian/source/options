@@ -1,5 +1,6 @@
 tar-ignore = ".#*"
 tar-ignore = "*.diff"
+tar-ignore = "*.o"
 tar-ignore = debian/tmp
 tar-ignore = debian/libsecutils{,-dev,-bins}
 tar-ignore = debian/.debhelper
