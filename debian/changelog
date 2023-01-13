@@ -1,5 +1,11 @@
 libsecutils (1.0) stable; urgency=medium
 
+  * Various small improvements and extensions
+
+ -- David von Oheimb <David.von.Oheimb@siemens.com>  Fri, 13 Jan 2023 16:42:52 +0100
+
+libsecutils (1.0) stable; urgency=medium
+
   * Initial release
 
  -- David von Oheimb <David.von.Oheimb@siemens.com>  Fri, 05 Mar 2021 10:54:45 +0200
