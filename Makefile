@@ -76,6 +76,7 @@ override CFLAGS += -Wformat -Wformat-security -Wno-declaration-after-statement -
 CC ?= gcc
 OUTLIB=libsecutils$(DLL)
 DEST_LIB=$(ROOTFS)/usr/lib
+DEST_INC=$(ROOTFS)/usr/include/secutils
 DEST_DOC=$(ROOTFS)/usr/share/doc/libsecutils# TODO improve
 OUTBIN=icvutil$(EXE)
 DEST_BIN=$(ROOTFS)/usr/bin
@@ -161,7 +162,7 @@ $(OUT_DIR)/$(OUTLIB).$(VERSION): $(OBJS)
 	$(CC) $(OBJS) $(LDFLAGS) -o $@ -Wl,-soname,$(OUTLIB).$(VERSION)
 
 $(OUT_DIR)/$(OUTLIB): $(OUT_DIR)/$(OUTLIB).$(VERSION)
-	ln -sf $(OUTLIB).$(VERSION) $(OUT_DIR)/$(OUTLIB)
+	ln -sfr $(OUT_DIR)/$(OUTLIB){.$(VERSION),}
 
 # Individual object targets; also provide dependencies on header files of the project (not on system headers)
 $(BUILDDIR)/%$(OBJ): %.c
@@ -194,12 +195,13 @@ clean_deb:
 
 # installation target - append ROOTFS=<path> to install into virtual root
 # filesystem
-install: doc/html # $(OUT_DIR)/$(OUTLIB)
+install: doc/html $(OUT_DIR)/$(OUTLIB)
 	install -D $(OUT_DIR)/$(OUTLIB).$(VERSION) $(DEST_LIB)/$(OUTLIB).$(VERSION)
-	ln -sf $(OUTLIB).$(VERSION) $(DEST_LIB)/$(OUTLIB)
+	ln -sfr $(DEST_LIB)/$(OUTLIB){.$(VERSION),}
 #install_headers:
-	find include -type d -exec install -d '$(ROOTFS)/usr/{}' ';'
-	find include -type f -exec install -Dm 0644 '{}' '$(ROOTFS)/usr/{}' ';'
+	mkdir -p $(DEST_INC)
+	cd include/secutils && find . -type d -exec install -d '$(DEST_INC)/{}' ';'
+	cd include/secutils && find . -type f -exec install -Dm 0644 '{}' '$(DEST_INC)/{}' ';'
 #install_bins:
 	install -D $(OUT_DIR)/util/$(OUTBIN) $(DEST_BIN)/$(OUTBIN)
 #install_doc:
@@ -209,7 +211,7 @@ install: doc/html # $(OUT_DIR)/$(OUTLIB)
 uninstall:
 	rm -f $(DEST_LIB)/$(OUTLIB)*
 #	find include -type f -exec rm '$(ROOTFS)/usr/{}' ';'
-	rm -rf $(ROOTFS)/usr/include/secutils
+	rm -rf $(DEST_INC)
 	rm -f $(DEST_BIN)/$(OUTBIN)
 	rm -rf $(DEST_DOC)
 
