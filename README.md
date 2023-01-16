@@ -42,14 +42,26 @@ Clone the git repository, e.g., with
 
 ### Prerequisites 
 
-To build the library, the following libraries must be present on the system, including their headers:
+This software should work with any flavor of Linux, including [Cygwin](https://www.cygwin.com/),
+also on a virtual machine or the Windows Subsystem for Linux ([WSL](https://docs.microsoft.com/windows/wsl/about)).
 
+The following network and development tools are needed or recommended.
+* Git (for getting the software, tested with versions 2.7.2, 2.11.0, 2.20, 2.30.2)
+* GNU make (tested with versions 4.1, 4.2.1, 4.3)
+* GNU C compiler (gcc, tested with versions 5.4.0, 7.3.0, 8.3.0, 10.0.1, 10.2.1)
+
+The following OSS components are used.
 * OpenSSL development edition, at least version 1.0.2. Tested, among others,
   with 1.0.2u, 1.1.0f, 1.1.0g, 1.1.1d, 1.1.1i, 1.1.1l, and 3.0.0.<br>
   **Warning:** OpenSSL 1.1.1 (on Mint 19) contains a bug where used cipher suite (level 3) is empty (1.1.1d on Buster works correctly)
 
 * optionally: [siemens/libuta](https://github.com/siemens/libuta)
 
+For instance, on a Debian system the prerequisites may be installed simply as follows:
+```
+sudo apt install libssl-dev libc-dev linux-libc-dev
+```
+while `apt install git make gcc` usually is not needed as far as these tools are pre-installed.
 
 ### Configuring and building
 
@@ -79,7 +91,8 @@ This repository can build the following Debian packages.
 * `libsecutils-bins` - helper binaries from `util/` - so far, there is only `icvutil`
 
 To build the Debian packages, the following dependencies need to be installed:
-* `debhelper`
+* `debhelper` (needed for `dh`)
+* `devscripts` (needed for `debuild`)
 * `libssl-dev`
 * `libuta-dev` (from [github.com/siemens/libuta](https://github.com/siemens/libuta))
    if `SECUTILS_USE_UTA` is defined
