@@ -2,7 +2,7 @@ Source: libsecutils
 Section: libs
 Priority: optional
 Maintainer: David von Oheimb <David.von.Oheimb@siemens.com>
-Build-Depends: libssl-dev, debhelper (>= 9)
+Build-Depends: libssl-dev, debhelper (>= 9), devscripts
 #, pkg-config, libuta-dev
 Homepage: https://github.com/siemens/libsecutils
 Standards-Version: 4.5.1
