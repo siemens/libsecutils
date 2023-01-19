@@ -195,7 +195,7 @@ clean_deb:
 
 # installation target - append ROOTFS=<path> to install into virtual root
 # filesystem
-install: doc/html $(OUT_DIR)/$(OUTLIB)
+install: doc/html $(OUT_DIR)/$(OUTLIB) $(OUT_DIR)/util/$(OUTBIN)
 	install -D $(OUT_DIR)/$(OUTLIB).$(VERSION) $(DEST_LIB)/$(OUTLIB).$(VERSION)
 	ln -sfr $(DEST_LIB)/$(OUTLIB){.$(VERSION),}
 #install_headers:
@@ -221,7 +221,9 @@ clean_uta:
           $(OUT_DIR)/$(OUTLIB)* $(OUT_DIR)/util/$(OUTBIN) $(OUT_DIR)/util/icvutil.o
 
 clean:
-	rm -rf $(OUT_DIR)/$(OUTLIB)* $(OUT_DIR)/util/$(OUTBIN) $(BUILDDIR)
+	rm -f $(OUT_DIR)/$(OUTLIB)*
+	rm -f $(OUT_DIR)/util/$(OUTBIN)
+	rm -fr $(BUILDDIR) doc
 
 clean_all: clean clean_deb
 	$(MAKE) -C util clean
