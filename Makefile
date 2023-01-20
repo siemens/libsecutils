@@ -195,7 +195,7 @@ clean_deb:
 
 # installation target - append ROOTFS=<path> to install into virtual root
 # filesystem
-install: doc/html $(OUT_DIR)/$(OUTLIB) $(OUT_DIR)/util/$(OUTBIN)
+install: # doc/html $(OUT_DIR)/$(OUTLIB) util/$(OUTBIN)
 	install -D $(OUT_DIR)/$(OUTLIB).$(VERSION) $(DEST_LIB)/$(OUTLIB).$(VERSION)
 	ln -sfr $(DEST_LIB)/$(OUTLIB){.$(VERSION),}
 #install_headers:
@@ -203,7 +203,7 @@ install: doc/html $(OUT_DIR)/$(OUTLIB) $(OUT_DIR)/util/$(OUTBIN)
 	cd include/secutils && find . -type d -exec install -d '$(DEST_INC)/{}' ';'
 	cd include/secutils && find . -type f -exec install -Dm 0644 '{}' '$(DEST_INC)/{}' ';'
 #install_bins:
-	install -D $(OUT_DIR)/util/$(OUTBIN) $(DEST_BIN)/$(OUTBIN)
+	install -D util/$(OUTBIN) $(DEST_BIN)/$(OUTBIN)
 #install_doc:
 	cd doc/html && find . -type d -exec install -d '$(DEST_DOC)/{}' ';'
 	cd doc/html && find . -type f -exec install -Dm 0644 '{}' '$(DEST_DOC)/{}' ';'
