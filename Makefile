@@ -153,7 +153,7 @@ endif
 
 util:
 	$(MAKE) -C util SECUTILS_USE_UTA="$(SECUTILS_USE_UTA)" \
-	   CFLAGS="$(CFLAGS) $(LOCAL_CFLAGS)" LDFLAGS="$(LDFLAGS)"
+	   CFLAGS="$(CFLAGS) $(LOCAL_CFLAGS)" LDFLAGS="$(LDFLAGS)" OUT_DIR="$(OUT_DIR)"
 
 build_all: build util
 
