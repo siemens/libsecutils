@@ -440,17 +440,23 @@ bool FILES_load_credentials(OPTIONAL const char* certs, OPTIONAL OPTIONAL const 
                             OPTIONAL const char* source, OPTIONAL const char* engine, OPTIONAL const char* desc,
                             OPTIONAL EVP_PKEY** pkey, OPTIONAL X509** cert, OPTIONAL STACK_OF(X509) * *chain)
 {
+    bool res = false;
     if(engine is_eq 0 and certs not_eq 0 and key not_eq 0 and strcmp(certs, key) is_eq 0)
     {
         char* pass = FILES_get_pass(source, desc);
-        bool res = FILES_load_pkcs12(certs, pass, desc, pkey, cert, chain);
-        UTIL_cleanse_free(pass);
-        if(not res)
+        ERR_set_mark();
+        res = FILES_load_pkcs12(certs, pass, 0 /* desc */, pkey, cert, chain);
+        if(res)
         {
-            goto err;
+            ERR_clear_last_mark();
         }
+        else
+        {
+            ERR_pop_to_mark();
+        }
+        UTIL_cleanse_free(pass);
     }
-    else
+    if(not res)
     {
         if(key not_eq 0 and pkey not_eq 0
            and (*pkey = FILES_load_key_autofmt(key, file_format, false, source, engine, desc)) is_eq 0)

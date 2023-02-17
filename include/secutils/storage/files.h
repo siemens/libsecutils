@@ -185,8 +185,8 @@ bool FILES_load_pkcs12(const char* file, OPTIONAL const char* pass, OPTIONAL con
  * @param certs name of file holding certificate and optional chain, or null
  * @param key file (path) name of the input file, or engine key ID, or null
  * @param file_format the format to try first for file contents
- *        If the 'certs' and the 'key' arguments are equal and the 'engine' argument is null
- *        the credentials are jointly read from the same file, which is expected in PKCS#12 format.
+ *        If the 'certs' and the 'key' arguments refer to equal names and the 'engine' argument is null
+ *        the credentials are first tried to be read jointly in PKCS#12 format.
  * @param source the password source to use for decryption, or null
  * @param engine name of crypto engine to use for loading the private key, else null
  * @param desc (optional) is used if present for forming more descriptive error messages
