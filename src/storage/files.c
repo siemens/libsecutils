@@ -1128,6 +1128,7 @@ EVP_PKEY *FILES_load_pubkey_autofmt(const char *file, file_format_t format,
     LOG(FL_TRACE, "loading %s from file '%s'", desc != NULL ? desc : "public key", file != NULL ? file : "<NULL>");
 
     char *pass = FILES_get_pass(source, desc);
+    ERR_set_mark();
     do
     {
         pkey = FILES_load_pubkey(file, format, pass, NULL /* desc */);
@@ -1135,15 +1136,22 @@ EVP_PKEY *FILES_load_pubkey_autofmt(const char *file, file_format_t format,
             format = next_format(format, UTIL_file_ext(file));
             if((++retries < 2) and (format not_eq FORMAT_UNDEF))
             {
-                ERR_clear_error();
                 continue;
             }
-            (void)ERR_print_errors(bio_err);
-            LOG(FL_ERR, "unable to load %s from file '%s'", desc != NULL ? desc : "public key",
-                file != NULL ? file : "<NULL>");
         }
         break;
     } while (1);
+    if(pkey is_eq 0)
+    {
+        ERR_clear_last_mark();
+        (void)ERR_print_errors(bio_err);
+        LOG(FL_ERR, "unable to load %s from file '%s'", desc != NULL ? desc : "public key",
+            file != NULL ? file : "<NULL>");
+    }
+    else
+    {
+        ERR_pop_to_mark();
+    }
     UTIL_cleanse_free(pass);
     return pkey;
 }
