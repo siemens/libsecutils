@@ -163,8 +163,8 @@ void CREDENTIALS_free(OPTIONAL CREDENTIALS* creds);
  *  crypto engine and the key parameter is used as a key identifier within the engine.
  * @param desc (optional) is used if present for forming more descriptive error messages
  * @return pointer to a new CREDENTIALS structure, or null on error
- * @note The 'certs' and the 'key' argument may not both be null. If they are equal the credentials are jointly read
- *from the same file, which is expected in PKCS#12 format, else for each file the format tried first is PEM (while
+ * @note The 'certs' and the 'key' argument may not both be null. If they refer to equal names the credentials are first
+ * tried to read jointly from the same file in PKCS#12 format. Otherwise, for each file the format tried first is PEM (while
  *depending on the file name extension also PKCS#12 or ASN.1 can be tried).
  *******************************************************************************/
 /* this function is part of the genCMPClient API */

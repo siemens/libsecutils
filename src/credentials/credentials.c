@@ -268,7 +268,7 @@ CREDENTIALS* CREDENTIALS_load(OPTIONAL const char* certs, OPTIONAL const char* k
         source = 0;
     }
 
-    if(not FILES_load_credentials(certs, key, FORMAT_PEM /* overridden by PKCS12 if certs=key */, source, engine, desc,
+    if(not FILES_load_credentials(certs, key, FORMAT_PEM /* will try first PKCS12 if certs=key */, source, engine, desc,
                                   &pkey, &cert, &chain))
     {
         return 0;
