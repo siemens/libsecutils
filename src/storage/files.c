@@ -1218,6 +1218,7 @@ X509_REQ* FILES_load_csr_autofmt(const char* file, file_format_t format, OPTIONA
 
     LOG(FL_TRACE, "loading %s from file '%s'", desc not_eq 0 ? desc : "CSR", file != NULL ? file : "<NULL>");
 
+    ERR_set_mark();
     do
     {
         csr = FILES_load_csr(file, format, 0 /* desc */);
@@ -1227,15 +1228,22 @@ X509_REQ* FILES_load_csr_autofmt(const char* file, file_format_t format, OPTIONA
             format = next_format(format, UTIL_file_ext(file));
             if((++retries < 2) and (format not_eq FORMAT_UNDEF))
             {
-                ERR_clear_error();
                 continue;
             }
-            (void)ERR_print_errors(bio_err);
-            LOG(FL_ERR, "unable to load %s from file '%s'", desc not_eq 0 ? desc : "CSR",
-                file != NULL ? file : "<NULL>");
         }
         break;
     } while(1);
+    if(csr is_eq 0)
+    {
+        ERR_clear_last_mark();
+        (void)ERR_print_errors(bio_err);
+        LOG(FL_ERR, "unable to load %s from file '%s'", desc not_eq 0 ? desc : "CSR",
+            file != NULL ? file : "<NULL>");
+    }
+    else
+    {
+        ERR_pop_to_mark();
+    }
     return csr;
 }
 
