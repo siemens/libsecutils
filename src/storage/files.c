@@ -759,6 +759,7 @@ STACK_OF(X509)
 
     int retries = 0;
 
+    ERR_set_mark();
     do
     {
         certs = FILES_load_certs(file, format, source, 0 /* desc */);
@@ -768,14 +769,21 @@ STACK_OF(X509)
             format = next_format(format, UTIL_file_ext(file));
             if((++retries < MAX_FORMAT_RETRIES) and (format not_eq FORMAT_UNDEF))
             {
-                ERR_clear_error();
                 continue;
             }
-            (void)ERR_print_errors(bio_err);
-            LOG(FL_ERR, "unable to load %s from file '%s'", desc not_eq 0 ? desc : "certs", file);
         }
         break;
     } while(1);
+    if(certs is_eq 0)
+    {
+        ERR_clear_last_mark();
+        (void)ERR_print_errors(bio_err);
+        LOG(FL_ERR, "unable to load %s from file '%s'", desc not_eq 0 ? desc : "certs", file);
+    }
+    else
+    {
+        ERR_pop_to_mark();
+    }
     return certs;
 }
 
