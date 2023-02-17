@@ -1055,6 +1055,7 @@ EVP_PKEY* FILES_load_key_autofmt(OPTIONAL const char* file, file_format_t file_f
 
     int retries = 0;
 
+    ERR_set_mark();
     do
     {
         pkey = FILES_load_key(file, file_format, maybe_stdin, pass, engine, 0 /* desc */);
@@ -1064,7 +1065,6 @@ EVP_PKEY* FILES_load_key_autofmt(OPTIONAL const char* file, file_format_t file_f
             file_format = next_format(file_format, UTIL_file_ext(file));
             if((++retries < MAX_FORMAT_RETRIES) and (file_format not_eq FORMAT_UNDEF))
             {
-                ERR_clear_error();
                 continue;
             }
         }
@@ -1072,9 +1072,14 @@ EVP_PKEY* FILES_load_key_autofmt(OPTIONAL const char* file, file_format_t file_f
     } while(1);
     if(pkey is_eq 0)
     {
+        ERR_clear_last_mark();
         (void)ERR_print_errors(bio_err);
         LOG(FL_ERR, "unable to load %s from %s", desc not_eq 0 ? desc : "credentials",
             file_format is_eq FORMAT_ENGINE ? "engine" : file);
+    }
+    else
+    {
+        ERR_pop_to_mark();
     }
     UTIL_cleanse_free(pass);
     return pkey;
