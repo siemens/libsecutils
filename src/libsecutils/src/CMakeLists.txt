@@ -1,0 +1,7 @@
+add_subdirectory(certstatus)
+add_subdirectory(config)
+add_subdirectory(connections)
+add_subdirectory(credentials)
+add_subdirectory(crypto)
+add_subdirectory(storage)
+add_subdirectory(util)
