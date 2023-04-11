@@ -11,6 +11,10 @@
 *.gcov
 *.diff
 mk
+CMakeCache.txt
+Makefile
+*.cmake
+CMakeFiles/
 tmp/
 bak/
 attic/

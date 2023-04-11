@@ -47,39 +47,60 @@ also on a virtual machine or the Windows Subsystem for Linux ([WSL](https://docs
 
 The following network and development tools are needed or recommended.
 * Git (for getting the software, tested with versions 2.7.2, 2.11.0, 2.20, 2.30.2)
+* CMake (for using [`CMakeLists.txt`](CMakeLists.txt), tested with version 3.18.4)
 * GNU make (tested with versions 4.1, 4.2.1, 4.3)
 * GNU C compiler (gcc, tested with versions 5.4.0, 7.3.0, 8.3.0, 10.0.1, 10.2.1)
 
 The following OSS components are used.
-* OpenSSL development edition, at least version 1.0.2. Tested, among others,
+* OpenSSL development edition, at least version 1.1.1. Tested, among others,
   with 1.0.2u, 1.1.0f, 1.1.0g, 1.1.1d, 1.1.1i, 1.1.1l, and 3.0.0.<br>
   **Warning:** OpenSSL 1.1.1 (on Mint 19) contains a bug where used cipher suite (level 3) is empty (1.1.1d on Buster works correctly)
 
-* optionally: [siemens/libuta](https://github.com/siemens/libuta)
+* optionally: [github.com/siemens/libuta](https://github.com/siemens/libuta)
 
 For instance, on a Debian system the prerequisites may be installed simply as follows:
 ```
-sudo apt install libssl-dev libc-dev linux-libc-dev
+sudo apt install cmake libssl-dev libc-dev linux-libc-dev
 ```
 while `apt install git make gcc` usually is not needed as far as these tools are pre-installed.
 
 ### Configuring and building
 
+By default the library makes use of any OpenSSL installation available on the system.
+The optional environment variable `OPENSSL_DIR` may be set to define the
+absolute (or relative to `../`) path of the OpenSSL installation to use, e.g.:
+```
+export OPENSSL_DIR=/usr/local
+```
+
+It is recommended to use CMake to produce the `Makefile`, as follows:
+```
+cmake .
+```
+
+For backward compatibility it is also possible to use instead of CMake the
+pre-defined [`Makefile_v1`](Makefile_v1); to this end symlink it to `Makefile`:
+```
+ln -s Makefile_v1 Makefile
+```
+
 Build the library with `make`.
 
-The optional environment variable `OPENSSL_DIR` defines absolute or relative
-(to `../`) path to of the OpenSSL installation to use.
+Use of the UTA library can be enabled
+by setting the environment variable `SECUTILS_USE_UTA`.
 
-Use of the UTA library can be enabled by `make SECUTILS_USE_UTA=1`.
 When `SECUTILS_CONFIG_USE_ICV` is defined, configuration files are expected
 to be integrity protected with an Integrity Check Value (ICV),
 which may be produced using `util/icvutil`.
 
 The TLS-related functions may be disabled by defining `SECUTILS_NO_TLS`.
 
+When using CMake, `cmake` must be (re-)run
+after setting or unsetting these environment variables.
+
 ### Installing
 
-The library will be installed (with `make install`)
+The library will be installed (with `make -f Makefile_v1 install`)
 to `/usr/local`, unless specified otherwise by `ROOTFS`.
 
 ### Building Debian packages
@@ -97,7 +118,12 @@ To build the Debian packages, the following dependencies need to be installed:
 * `libuta-dev` (from [github.com/siemens/libuta](https://github.com/siemens/libuta))
    if `SECUTILS_USE_UTA` is defined
 
-Then the packages can be built by
+Currently [`CMakeLists.txt`](CMakeLists.txt) does not support Debian packaging.
+Yet [`Makefile_v1`](Makefile_v1) may be used after symlinking it to `Makefile`:
+```
+ln -s Makefile_v1 Makefile
+```
+Then the packages can be built and installed by
 ```
 make deb
 ```
@@ -113,7 +139,7 @@ To build the documentation, the following dependencies need to be installed:
 
 The documentation is built by
 ```
-make doc
+make -f Makefile_v1 doc
 ```
 
 ### Using the library
