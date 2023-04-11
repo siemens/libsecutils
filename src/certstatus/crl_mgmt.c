@@ -34,14 +34,14 @@ int ASN1_TIME_set_string_X509(ASN1_TIME *s, const char *str)
 #define NID_crl_next_publish    nidCrlNextPublish
 #define OBJ_crl_next_publish    OBJ_id_ce,20L
 
-typedef struct crlmgmt_data_st {
+struct crlmgmt_data_st {
     const char      *proxy_url;
     unsigned long   max_download_size;
     const char      *crl_cache_dir;
     bool            use_url;
     bool            use_issuer;
     const char      *note;
-} CRLMGMT_DATA;
+} /* CRLMGMT_DATA */;
 
 static const char url_param_url[]       = "?url=";
 static const char url_param_issuer[]    = "?issuer=";
