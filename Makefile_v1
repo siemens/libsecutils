@@ -223,7 +223,7 @@ clean_uta:
           $(OUT_DIR)/$(OUTLIB)* $(OUT_DIR)/util/$(OUTBIN) $(OUT_DIR)/util/icvutil.o
 
 clean:
-	rm -fr CMakeCache.txt *.cmake CMakeFiles/
+	rm -fr CMakeCache.txt *.cmake install_manifest.txt CMakeFiles/
 	rm -f $(OUT_DIR)/$(OUTLIB)*
 	rm -f $(OUT_DIR)/util/$(OUTBIN)
 	rm -fr $(BUILDDIR) doc
