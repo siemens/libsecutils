@@ -10,18 +10,19 @@ jobs:
   build-make:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: build-make
         run: |
           # would need access to azure.archive.ubuntu.com:
           # sudo apt-get update
           # sudo apt-get install -y >/dev/null libssl-dev build-essential # not needed
+          ln -s Makefile_v1 Makefile
           make build_all
 
   build-cmake:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: build-cmake
         run: |
           sudo apt-get update
@@ -34,7 +35,7 @@ jobs:
   build-with-uta:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: build-with-uta
         run: |
           sudo apt-get update
@@ -51,16 +52,18 @@ jobs:
           sudo dpkg -i libuta-dev_1.*
           cd ..
           export SECUTILS_USE_UTA=1
+          ln -s Makefile_v1 Makefile
           make build_all
 
   build-debian:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: build-debian
         run: |
           sudo apt-get update
           sudo apt-get install -y >/dev/null debhelper devscripts # rsync libssl-dev git pkg-config
+          ln -s Makefile_v1 Makefile
           mkdir -p debian-packaging
           rsync -av --exclude='debian-packaging' . debian-packaging/
           cd debian-packaging
@@ -70,20 +73,22 @@ jobs:
   doc:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: doc
         run: |
           sudo apt-get update
           sudo apt-get install -y >/dev/null doxygen graphviz # build-essential
+          ln -s Makefile_v1 Makefile
           make doc
   
   coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: coverage
         run: |
           # sudo apt-get update
           # sudo apt-get install -y >/dev/null # libssl-dev build-essential doxygen graphviz
+          ln -s Makefile_v1 Makefile
           make coverage
   

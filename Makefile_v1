@@ -1,3 +1,5 @@
+#!/usr/bin/make
+
 # Makefile for libsecutils
 #
 # Copyright (c) Siemens Mobility GmbH, 2021
@@ -149,7 +151,7 @@ build:
 ifeq ($(COV_ENABLED), 1)
 	COMPILE_TYPE=code_coverage
 endif
-	$(MAKE) COMPILE_TYPE=$(COMPILE_TYPE) build_only
+	$(MAKE) -f Makefile_v1 COMPILE_TYPE=$(COMPILE_TYPE) build_only
 
 util:
 	$(MAKE) -C util SECUTILS_USE_UTA="$(SECUTILS_USE_UTA)" \
@@ -221,6 +223,7 @@ clean_uta:
           $(OUT_DIR)/$(OUTLIB)* $(OUT_DIR)/util/$(OUTBIN) $(OUT_DIR)/util/icvutil.o
 
 clean:
+	rm -fr CMakeCache.txt *.cmake CMakeFiles/
 	rm -f $(OUT_DIR)/$(OUTLIB)*
 	rm -f $(OUT_DIR)/util/$(OUTBIN)
 	rm -fr $(BUILDDIR) doc
@@ -237,7 +240,7 @@ doc/html: Doxyfile $(wildcard include/*/*.h include/*/*/*.h)
 refman.pdf: doc/html
 	mkdir -p doc/latex
 	# for producing doc/latex/*, comment out in Doxyfile: GENERATE_LATEX = NO
-	# $(MAKE) -C doc/latex && cp -a doc/latex/refman.pdf . # requires latex
+	# $(MAKE) -C -f Makefile_v1 doc/latex && cp -a doc/latex/refman.pdf . # requires latex
 
 coverage: clean
-	$(MAKE) COMPILE_TYPE=code_coverage
+	$(MAKE) -f Makefile_v1 COMPILE_TYPE=code_coverage
