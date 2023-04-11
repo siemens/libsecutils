@@ -1,3 +1,9 @@
+libsecutils (2.0) stable; urgency=medium
+
+  * Improved build system; various small fixes
+
+ -- David von Oheimb <David.von.Oheimb@siemens.com>  Tue Apr 11 14:45:32 2023 +0200
+
 libsecutils (1.0) stable; urgency=medium
 
   * Various small improvements and extensions
