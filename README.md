@@ -73,7 +73,8 @@ absolute (or relative to `../`) path of the OpenSSL installation to use, e.g.:
 export OPENSSL_DIR=/usr/local
 ```
 
-It is recommended to use CMake to produce the `Makefile`, as follows:
+Since version 2, it is recommended to use CMake to produce the `Makefile`,
+for instance as follows:
 ```
 cmake .
 ```

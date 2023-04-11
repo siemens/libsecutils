@@ -3,8 +3,8 @@ cmake_minimum_required(VERSION 3.7)
 project(secutils)
 
 if(NOT DEFINED SECUTILS_VERSION)
-  set(SECUTILS_VERSION_MAJOR 1)
-  set(SECUTILS_VERSION ${SECUTILS_VERSION_MAJOR}.0.0)
+  set(SECUTILS_VERSION_MAJOR 2)
+  set(SECUTILS_VERSION ${SECUTILS_VERSION_MAJOR}.0)
 endif()
 
 message(STATUS "SecurityUtilities version " ${SECUTILS_VERSION})
