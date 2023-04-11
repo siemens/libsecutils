@@ -366,4 +366,6 @@ void TLS_drop(OPTIONAL SSL* tls)
     SSL_free(tls);
 }
 
+#else
+typedef int make_iso_compilers_happy;
 #endif /* !defined(SECUTILS_NO_TLS) */
