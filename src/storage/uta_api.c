@@ -180,4 +180,6 @@ bool uta_get_random(uta_ctx* ctx, uint8_t* dst, size_t cnt)
     return true;
 }
 
+#else
+typedef int make_iso_compilers_happy;
 #endif /* defined SECUTILS_USE_UTA  */
