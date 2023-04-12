@@ -110,7 +110,10 @@ static const char* prev_item(const char* opt, const char* end)
     {
         len = SECTION_NAME_MAX;
     }
-    strncpy(opt_item, beg, len);
+    if(len not_eq 0)
+    {
+        strncpy(opt_item, beg, len);
+    }
     opt_item[len] = '\0';
     if(end - beg > SECTION_NAME_MAX)
     {
