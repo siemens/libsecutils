@@ -87,14 +87,15 @@ set(INC_PUBLIC_HDRS
 
 include_directories(${INC_DIR}/.. ${INC_DIR})
 
-if(DEFINED ENV{NDEBUG})
-  add_definitions(-DNDEBUG=1 -O2)
-else()
+if((CMAKE_BUILD_TYPE MATCHES Debug) AND (NOT DEFINED ENV{NDEBUG}))
   add_definitions(-g -O0)
   set(DEBUG_FLAGS -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all)
   add_definitions(${DEBUG_FLAGS})
   link_libraries(${DEBUG_FLAGS})
+else()
+  add_definitions(-DNDEBUG=1 -O2)
 endif()
+
 add_definitions(
   -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes
   -Wformat -Wtype-limits -Wundef -Wconversion -Wno-shadow -Wno-conversion
@@ -118,12 +119,17 @@ endif()
 
 target_link_libraries(secutils ${OPENSSL_LIBRARIES})
 
-#set_property(TARGET secutils PROPERTY C_STANDARD 90)
+# set_property(TARGET secutils PROPERTY C_STANDARD 90)
 
 set_target_properties(secutils PROPERTIES
   VERSION ${SECUTILS_VERSION} SOVERSION ${SECUTILS_VERSION_MAJOR}
   PUBLIC_HEADER "${INC_PUBLIC_HDRS}"
 )
+
+# implied when used with genCMPClient:
+# ADD_CUSTOM_TARGET(build # just an alias
+#   COMMAND make all
+# )
 
 install(TARGETS secutils
   LIBRARY
