@@ -31,6 +31,8 @@ jobs:
           cd build
           cmake ..
           cmake --build .
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          make clean build
 
   build-with-uta:
     runs-on: ubuntu-latest
