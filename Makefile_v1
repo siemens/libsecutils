@@ -20,8 +20,8 @@ ROOTFS ?= $(DESTDIR)$(prefix)
 
 OUT_DIR ?= .
 
-VERSION=1.0
-# must be kept in sync with latest version in debian/changelog
+VERSION=2.0
+# must be kept in sync with debian/changelog and CMakeLists.txt
 # PACKAGENAME=libsecutils
 # DIRNAME=$(PACKAGENAME)-$(VERSION)
 
@@ -45,11 +45,11 @@ endif
 ifeq ($(shell echo $(OPENSSL_DIR) | grep "^/"),)
 # $(OPENSSL_DIR) is relative path, assumed relative to ../
     OPENSSL=../$(OPENSSL_DIR)
-    OPENSSL_LIB=../$(OPENSSL_DIR)
+    OPENSSL_LIB ?= ../$(OPENSSL_DIR)
 else
 # $(OPENSSL_DIR) is absolute path
     OPENSSL=$(OPENSSL_DIR)
-    OPENSSL_LIB=$(OPENSSL_DIR)/$(LIB)
+    OPENSSL_LIB ?= $(OPENSSL_DIR)/$(LIB)
 endif
 
 ################################################################################
@@ -223,7 +223,7 @@ clean_uta:
           $(OUT_DIR)/$(OUTLIB)* $(OUT_DIR)/util/$(OUTBIN) $(OUT_DIR)/util/icvutil.o
 
 clean:
-	rm -fr CMakeCache.txt *.cmake install_manifest.txt CMakeFiles/
+	@# rm -fr CMakeCache.txt *.cmake install_manifest.txt CMakeFiles/
 	rm -f $(OUT_DIR)/$(OUTLIB)*
 	rm -f $(OUT_DIR)/util/$(OUTBIN)
 	rm -fr $(BUILDDIR) doc
@@ -239,8 +239,8 @@ doc/html: Doxyfile $(wildcard include/*/*.h include/*/*/*.h)
 
 refman.pdf: doc/html
 	mkdir -p doc/latex
-	# for producing doc/latex/*, comment out in Doxyfile: GENERATE_LATEX = NO
-	# $(MAKE) -C -f Makefile_v1 doc/latex && cp -a doc/latex/refman.pdf . # requires latex
+	@# for producing doc/latex/*, comment out in Doxyfile: GENERATE_LATEX = NO
+	@# $(MAKE) -C -f Makefile_v1 doc/latex && cp -a doc/latex/refman.pdf . # requires latex
 
 coverage: clean
 	$(MAKE) -f Makefile_v1 COMPILE_TYPE=code_coverage

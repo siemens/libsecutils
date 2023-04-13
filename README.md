@@ -64,13 +64,22 @@ sudo apt install cmake libssl-dev libc-dev linux-libc-dev
 ```
 while `apt install git make gcc` usually is not needed as far as these tools are pre-installed.
 
+
 ### Configuring and building
 
-By default the library makes use of any OpenSSL installation available on the system.
-The optional environment variable `OPENSSL_DIR` may be set to define the
+The library assumes that OpenSSL is already installed,
+including the C header files needed for development
+(as provided by, e.g., the Debian/Ubuntu package `libssl-dev`).
+
+By default any OpenSSL installation available on the system is used.
+Set the optional environment variable `OPENSSL_DIR` to specify the
 absolute (or relative to `../`) path of the OpenSSL installation to use, e.g.:
 ```
 export OPENSSL_DIR=/usr/local
+```
+In case its libraries are in a different location, set also `OPENSSL_LIB`, e.g.:
+```
+export OPENSSL_LIB=$OPENSSL_DIR/lib
 ```
 
 Since version 2, it is recommended to use CMake to produce the `Makefile`,
@@ -85,7 +94,12 @@ pre-defined [`Makefile_v1`](Makefile_v1); to this end symlink it to `Makefile`:
 ln -s Makefile_v1 Makefile
 ```
 
-Build the library with `make`.
+Build the software with `make`.
+
+By default, builds are done in Debug mode.
+For Release mode use `-DCMAKE_BUILD_TYPE=Release` or `NDEBUG=1`.
+
+The result is in, for instance, `./libsecutils.so.2.0`.
 
 Use of the UTA library can be enabled
 by setting the environment variable `SECUTILS_USE_UTA`.
@@ -97,12 +111,20 @@ which may be produced using `util/icvutil`.
 The TLS-related functions may be disabled by defining `SECUTILS_NO_TLS`.
 
 When using CMake, `cmake` must be (re-)run
-after setting or unsetting these environment variables.
+after setting or unsetting environment variables.
 
-### Installing
+### Installing and uninstalling
 
-The library will be installed (with `make -f Makefile_v1 install`)
-to `/usr/local`, unless specified otherwise by `ROOTFS`.
+The software can be installed with
+```
+make install
+```
+and uninstalled with
+```
+make uninstall
+```
+
+The destination is `/usr/local`, unless specified otherwise by `ROOTFS`.
 
 ### Building Debian packages
 
