@@ -25,7 +25,7 @@ build: icvutil
 # CFLAGS may include -DSECUTILS_USE_UTA, LDFLAGS may include -luta
 
 icvutil: icvutil.o
-	$(CC) $(CFLAGS) icvutil$(OBJ) -o icvutil$(EXE) -L$(OUT_REVERSE_DIR) -lsecutils
+	$(CC) $(LDFLAGS) icvutil$(OBJ) -o icvutil$(EXE) -L$(OUT_REVERSE_DIR) -lsecutils
 
 icvutil.o: icvutil.c
 	$(CC) $(CFLAGS) -I../include -c icvutil.c
