@@ -184,7 +184,8 @@ $(BUILDDIR):
 $(OBJS): | $(BUILDDIR)
 
 deb:
-	debuild --preserve-envvar SECUTILS_CONFIG_USE_ICV \
+	debuild --preserve-envvar OPENSSL_DIR \
+	  --preserve-envvar SECUTILS_CONFIG_USE_ICV \
 	  --preserve-envvar SECUTILS_USE_UTA -uc -us \
 	  --lintian-opts --profile debian # --fail-on none
 # alternative:

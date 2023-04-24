@@ -8,7 +8,7 @@ Homepage: https://github.com/siemens/libsecutils
 Standards-Version: 4.5.1
 
 Package: libsecutils
-Depends: libssl1.1, ${shlibs:Depends}, ${misc:Depends}
+Depends: libssl3, ${shlibs:Depends}, ${misc:Depends}
 Architecture: any
 Suggests: libuta
 Description: OpenSSL wrapper library

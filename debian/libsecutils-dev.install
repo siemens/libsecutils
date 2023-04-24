@@ -1,4 +1,9 @@
-usr/lib/lib*.so
-usr/include/secutils/*.h
-usr/include/secutils/*/*.h
-usr/share/doc/libsecutils
+include/secutils/*.h             /usr/include/secutils
+include/secutils/certstatus/*.h  /usr/include/secutils/certstatus
+include/secutils/config/*.h      /usr/include/secutils/config
+include/secutils/connections/*.h /usr/include/secutils/connections
+include/secutils/credentials/*.h /usr/include/secutils/credentials
+include/secutils/crypto/*.h      /usr/include/secutils/crypto
+include/secutils/storage/*.h     /usr/include/secutils/storage
+include/secutils/util/*.h        /usr/include/secutils/util
+doc/html                         /usr/share/doc/libsecutils-dev

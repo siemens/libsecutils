@@ -142,13 +142,9 @@ To build the Debian packages, the following dependencies need to be installed:
    if `SECUTILS_USE_UTA` is defined
 
 Currently [`CMakeLists.txt`](CMakeLists.txt) does not support Debian packaging.
-Yet [`Makefile_v1`](Makefile_v1) may be used after symlinking it to `Makefile`:
+Yet [`Makefile_v1`](Makefile_v1) may be used like this:
 ```
-ln -s Makefile_v1 Makefile
-```
-Then the packages can be built and installed by
-```
-make deb
+make -f Makefile_v1 deb
 ```
 where `SECUTILS_USE_UTA=1` and `SECUTILS_CONFIG_USE_ICV=1` may be added.
 

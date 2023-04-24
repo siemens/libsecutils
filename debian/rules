@@ -19,15 +19,22 @@ AR=$(DEB_HOST_GNU_TYPE)-ar
 %:
 	dh $@
 
-# make sure that clean_all is used
-override_dh_auto_clean:
-	make clean_all
+## make sure that clean_all is used
+#override_dh_auto_clean:
+#	make -f Makefile_v1 clean_all
 
 # adding compile flags as, defaults are commonly debug flags
 override_dh_auto_build:
-#	CFLAGS="-O2 -DNDEBUG" CXXFLAGS="-O2 -DNDEBUG" DEBUG_FLAGS="" LDFLAGS=""  # can be used to avoid dependency on libasan and libubsan
+#	CFLAGS="-O2 -DNDEBUG" CXXFLAGS="-O2 -DNDEBUG" DEBUG_FLAGS="" LDFLAGS=""
+#  NDEBUG=1 can be used to avoid dependency on libasan and libubsan
 	OPENSSL_DIR=/usr CC=$(CC) CXX=$(CXX) AR=$(AR) \
-	dh_auto_build -- -j1 build_all doc
+	dh_auto_build -- -f Makefile_v1 OPENSSL_DIR="$(OPENSSL_DIR)" -j1 # build_all doc
+
+override_dh_auto_install:
+	dh_auto_install --destdir debian/tmp -- -f Makefile_v1
+
+override_dh_shlibdeps:
+	dh_shlibdeps --dpkg-shlibdeps-params="--ignore-missing-info"
 
 override_dh_auto_test:
 # do not run any tests
