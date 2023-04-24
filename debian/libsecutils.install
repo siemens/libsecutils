@@ -1,1 +1,1 @@
-usr/lib/lib*.so.*
+libsecutils.so* /usr/lib
