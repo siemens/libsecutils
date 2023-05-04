@@ -240,7 +240,11 @@ bool STORE_load_more_check(X509_STORE** pstore, const char* file,
         CHECK_AND_SKIP_PREFIX(store_desc, "trusted certificates for ");
     }
 
-    if(ctx is_eq 0 or FILES_check_icv(ctx, file))
+    if(ctx is_eq 0
+#ifdef SECUTILS_USE_ICV
+       or FILES_check_icv(ctx, file)
+#endif
+       )
     {
         STACK_OF(X509)* certs = FILES_load_certs_autofmt(file, format, 0 /* source */, desc);
         if(sk_X509_num(certs) <= 0)
@@ -414,6 +418,7 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
         {
             if(f_stat.st_mode bitand S_IFREG)
             {
+#ifdef SECUTILS_USE_ICV
                 if (FILES_check_icv(ctx, full_path))
                 {
                     STACK_OF(X509_CRL)* crls = FILES_load_crls_autofmt(full_path, FORMAT_PEM, 0 /* timeout not relevant for files */, desc);
@@ -432,6 +437,7 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
                 {
                     LOG(FL_ERR, "ICV check failed for CRL %s", p_dirent->d_name);
                 }
+#endif /* SECUTILS_USE_ICV */
             }
             else if(recursive and (f_stat.st_mode bitand S_IFDIR) and (0 not_eq strncmp(p_dirent->d_name, ".", 1)))
             {
