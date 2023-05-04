@@ -218,7 +218,7 @@ bool FILES_protect_icv_config_trusted(const char* file, OPTIONAL uta_ctx* ctx)
     int str_len = strlen(file);
     const char* name_tail = file + str_len - (str_len >= ext_len ? ext_len : 0);
     if(0 is_eq strcmp(name_tail, ".pem") or 0 is_eq strcmp(name_tail, ".crt")
-#ifdef SECUTILS_CONFIG_USE_ICV
+#ifdef SECUTILS_USE_ICV
        or 0 is_eq strcmp(name_tail, ".cnf") /* OpenSSL-style config file */
 #endif
     )

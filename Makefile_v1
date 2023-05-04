@@ -90,8 +90,8 @@ override CFLAGS += -Iinclude/secutils
 ifdef SECUTILS_USE_UTA
     override CFLAGS += -DSECUTILS_USE_UTA=1
 endif
-ifdef SECUTILS_CONFIG_USE_ICV
-    override CFLAGS += -DSECUTILS_CONFIG_USE_ICV=1
+ifdef SECUTILS_USE_ICV
+    override CFLAGS += -DSECUTILS_USE_ICV=1
 endif
 
 override LDFLAGS += $(DEBUG_FLAGS) # needed for -fsanitize=...
@@ -185,7 +185,7 @@ $(OBJS): | $(BUILDDIR)
 
 deb:
 	debuild --preserve-envvar OPENSSL_DIR \
-	  --preserve-envvar SECUTILS_CONFIG_USE_ICV \
+	  --preserve-envvar SECUTILS_USE_ICV \
 	  --preserve-envvar SECUTILS_USE_UTA -uc -us \
 	  --lintian-opts --profile debian # --fail-on none
 # alternative:

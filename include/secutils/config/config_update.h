@@ -34,7 +34,7 @@ typedef struct
 
 static const int UPDATE_CONFIG_EXCLUDE_NONE = -1; /* must be out of range of valid key indices */
 
-/* update config file, checking and updating its ICV if SECUTILS_CONFIG_USE_ICV is defined */
+/* update config file, checking and updating its ICV if SECUTILS_USE_ICV is defined */
 /* used by FILES_store_credentials_dv() (via store_dv()) if USE_DVFILE is enabled */
 int CONF_update_config(OPTIONAL uta_ctx* ctx, const char* const filename_p,
                        const key_val_section* const key_val_section, int exclude);
