@@ -105,7 +105,7 @@ The result is in, for instance, `./libsecutils.so.2.0`.
 Use of the UTA library can be enabled
 by setting the environment variable `SECUTILS_USE_UTA`.
 
-When `SECUTILS_CONFIG_USE_ICV` is defined, configuration files are expected
+When `SECUTILS_USE_ICV` is defined, configuration files are expected
 to be integrity protected with an Integrity Check Value (ICV),
 which may be produced using `util/icvutil`.
 
@@ -147,7 +147,8 @@ Yet [`Makefile_v1`](Makefile_v1) may be used like this:
 ```
 make -f Makefile_v1 deb
 ```
-where `SECUTILS_USE_UTA=1` and `SECUTILS_CONFIG_USE_ICV=1` may be added.
+where `SECUTILS_USE_UTA=1`, `SECUTILS_USE_ICV=1`, and/or `SECUTILS_NO_TLS=1`
+may be added.
 
 On success, they are placed in the parent directory (`../`).
 

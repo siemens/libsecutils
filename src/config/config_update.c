@@ -315,7 +315,7 @@ int CONF_update_config(OPTIONAL uta_ctx* ctx, const char* file_name, const key_v
     const char* section_name = key_val_section->name;
     LOG(FL_TRACE, "Handling configuration section '%s' in file '%s'", section_name, file_name);
     /*! @todo must be made thread safe by using some mutex on file */
-#ifdef SECUTILS_CONFIG_USE_ICV
+#ifdef SECUTILS_USE_ICV
     if(0 is_eq FILES_check_icv(ctx, file_name))
     {
         return 0;
@@ -381,7 +381,7 @@ int CONF_update_config(OPTIONAL uta_ctx* ctx, const char* file_name, const key_v
         }
         OPENSSL_free(found);
         fclose(file_p);
-#ifdef SECUTILS_CONFIG_USE_ICV
+#ifdef SECUTILS_USE_ICV
         if(not FILES_protect_icv(ctx, file_name))
         {
             return 0;

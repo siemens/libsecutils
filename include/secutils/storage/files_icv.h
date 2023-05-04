@@ -45,7 +45,7 @@ bool FILES_protect_icv_at(OPTIONAL uta_ctx* ctx, const char* file, const char* l
 
 
 /*!
- * @brief (re-)protect integrity of file, if it has suffix .pem, .crt, or .cnf (unless SECUTILS_CONFIG_NO_ICV), with ICV
+ * @brief (re-)protect integrity of file, if it has suffix .pem, .crt, or .cnf (unless SECUTILS_NO_ICV), with ICV
  * derived via UTA
  *
  * @param file (path) name of the file to be protected

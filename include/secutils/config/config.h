@@ -24,7 +24,7 @@
 #include <openssl/x509_vfy.h>
 
 /*!
- * @brief load configuration file, checking its ICV if SECUTILS_CONFIG_USE_ICV is defined
+ * @brief load configuration file, checking its ICV if SECUTILS_USE_ICV is defined
  * @param ctx pointer to UTA context, which typically is part of the libsecutils context, or null
  * @param file config file to be loaded
  * @return configuration structure containing options on success, else false
@@ -51,7 +51,7 @@ bool CONF_read_options(CONF* conf, const char* sections, opt_t* opts);
 bool CONF_update_vpm(CONF* conf, const char* sections, X509_VERIFY_PARAM* vpm);
 
 /*!
- * @brief read options from section(s) of configuration file, checking its ICV if SECUTILS_CONFIG_USE_ICV is defined
+ * @brief read options from section(s) of configuration file, checking its ICV if SECUTILS_USE_ICV is defined
  * @param ctx pointer to UTA context, which typically is part of the libsecutils context, or null
  * @param file config file to be loaded
  * @param sections comma-separated list of names of the section(s) to read
@@ -62,7 +62,7 @@ CONF* CONF_load_options(OPTIONAL uta_ctx* ctx, const char* file,
                         const char* sections, OPTIONAL opt_t* opts);
 
 /*!
- * @brief read string value from section(s) of configuration file, checking its ICV if SECUTILS_CONFIG_USE_ICV is defined
+ * @brief read string value from section(s) of configuration file, checking its ICV if SECUTILS_USE_ICV is defined
  * @param ctx pointer to UTA context, which typically is part of the libsecutils context, or null
  * @param file config file to be loaded
  * @param sections comma-separated list of names of the section(s) to read
