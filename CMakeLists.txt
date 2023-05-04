@@ -91,6 +91,7 @@ set(INC_PUBLIC_HDRS
   ${INC_DIR}/util/log.h
   ${INC_DIR}/operators.h
   ${INC_DIR}/basic.h
+  ${INC_DIR}/static_config.h
 )
 
 include_directories(${INC_DIR}/.. ${INC_DIR})
@@ -116,16 +117,18 @@ add_definitions(
 add_definitions(-pedantic -DPEDANTIC -Werror)
 
 if(DEFINED ENV{SECUTILS_USE_UTA})
-  add_definitions(-DSECUTILS_USE_UTA=1)
+  set(SECUTILS_USE_UTA 1)
 endif()
 
 if(DEFINED ENV{SECUTILS_USE_ICV})
-  add_definitions(-DSECUTILS_USE_ICV=1)
+  set(SECUTILS_USE_ICV 1)
 endif()
 
 if(DEFINED ENV{SECUTILS_NO_TLS})
-  add_definitions(-DSECUTILS_NO_TLS=1)
+  set(SECUTILS_NO_TLS 1)
 endif()
+
+configure_file(${INC_DIR}/static_config.h.in ${INC_DIR}/static_config.h)
 
 target_link_libraries(secutils ${OPENSSL_LIBRARIES})
 

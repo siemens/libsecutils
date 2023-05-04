@@ -16,6 +16,8 @@
 #ifndef SECUTILS_BASIC_H_
 #define SECUTILS_BASIC_H_
 
+#include "static_config.h"
+
 /* this type is part of the genCMPClient API */
 #ifndef __cplusplus
 typedef enum
