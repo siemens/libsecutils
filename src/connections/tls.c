@@ -13,9 +13,9 @@
 * SPDX-License-Identifier: Apache-2.0
 */
 
-#ifndef SECUTILS_NO_TLS
+#include <util/util.h> /* needed for config and version compatibility decls */
 
-#include <util/util.h> /* needed here for version compatibility declarations */
+#ifndef SECUTILS_NO_TLS
 
 #include <openssl/x509v3.h>
 
