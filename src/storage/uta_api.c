@@ -181,5 +181,5 @@ bool uta_get_random(uta_ctx* ctx, uint8_t* dst, size_t cnt)
 }
 
 #else
-typedef int make_iso_compilers_happy;
+typedef int make_iso_compilers_happy_on_empty_translation_unit;
 #endif /* defined SECUTILS_USE_UTA  */

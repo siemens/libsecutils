@@ -17,6 +17,8 @@
 #define SECUTILS_FILES_ICV_H_
 
 #include "../basic.h"
+#ifdef SECUTILS_USE_ICV
+
 #include "../storage/uta_api.h"
 
 #include <openssl/ossl_typ.h>
@@ -126,5 +128,6 @@ bool FILES_store_cert_pem(OPTIONAL uta_ctx* ctx, const X509* cert, const char* f
  */
 bool FILES_store_crl_pem_icv(OPTIONAL uta_ctx* ctx, const X509_CRL* crl, const char* file, OPTIONAL const char* desc);
 
+#endif /* defined SECUTILS_USE_ICV */
 
 #endif /* SECUTILS_FILES_ICV_H_ */

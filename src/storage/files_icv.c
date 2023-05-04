@@ -13,6 +13,9 @@
 * SPDX-License-Identifier: Apache-2.0
 */
 
+#include <secutils/static_config.h>
+#ifdef SECUTILS_USE_ICV
+
 #include <openssl/hmac.h>
 
 #include <storage/files.h>
@@ -289,3 +292,7 @@ bool FILES_store_crl_pem_icv(OPTIONAL uta_ctx* ctx, const X509_CRL* crl, const c
     }
     return true;
 }
+
+#else
+typedef int make_iso_compilers_happy_on_empty_translation_unit;
+#endif /* defined SECUTILS_USE_ICV */
