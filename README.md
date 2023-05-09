@@ -93,6 +93,7 @@ pre-defined [`Makefile_v1`](Makefile_v1); to this end symlink it to `Makefile`:
 ```
 ln -s Makefile_v1 Makefile
 ```
+or use for instance `make -f Makefile_v1`.
 
 Build the software with `make`.
 
