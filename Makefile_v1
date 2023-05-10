@@ -18,7 +18,9 @@
 
 ROOTFS ?= $(DESTDIR)$(prefix)
 
-OUT_DIR ?= .
+ifeq ($(OUT_DIR),)
+     override OUT_DIR = .
+endif
 
 VERSION=2.0
 # must be kept in sync with debian/changelog and CMakeLists.txt
