@@ -106,11 +106,11 @@ The result is in, for instance, `./libsecutils.so.2.0`.
 Use of the UTA library can be enabled
 by setting the environment variable `SECUTILS_USE_UTA`.
 
-When `SECUTILS_USE_ICV` is defined, configuration files are expected
+When `SECUTILS_USE_ICV` is set, configuration files are expected
 to be integrity protected with an Integrity Check Value (ICV),
 which may be produced using `util/icvutil`.
 
-The TLS-related functions may be disabled by defining `SECUTILS_NO_TLS`.
+The TLS-related functions may be disabled by setting `SECUTILS_NO_TLS`.
 
 When using CMake, `cmake` must be (re-)run
 after setting or unsetting environment variables.
@@ -141,7 +141,7 @@ To build the Debian packages, the following dependencies need to be installed:
 * `devscripts` (needed for `debuild`)
 * `libssl-dev`
 * `libuta-dev` (from [github.com/siemens/libuta](https://github.com/siemens/libuta))
-   if `SECUTILS_USE_UTA` is defined
+   if `SECUTILS_USE_UTA` is set
 
 Currently [`CMakeLists.txt`](CMakeLists.txt) does not support Debian packaging.
 Yet [`Makefile_v1`](Makefile_v1) may be used like this:
@@ -168,7 +168,7 @@ make -f Makefile_v1 doc
 
 Most functions of the library can be used directly without specific context.
 A few functions that make use of the UTA library require a `uta_ctx` pointer,
-which may be non-`NULL` only if `SECUTILS_USE_UTA` is defined.
+which may be non-`NULL` only if `SECUTILS_USE_UTA` is set.
 You may have a look at `util/icvutil.c` for a simple example.
 
 ## Library structure
