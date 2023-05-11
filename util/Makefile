@@ -38,16 +38,18 @@ endif
 
 .PHONY: build run clean
 
-build: icvutil$(EXE)
+OUT_DIR_BIN=$(OUT_REVERSE_DIR)/icvutil$(EXE)
 
-icvutil$(EXE): icvutil.o
-	$(CC) $(LDFLAGS) icvutil$(OBJ) -o icvutil$(EXE) -L$(OUT_REVERSE_DIR) -lsecutils -lssl -lcrypto
+build: $(OUT_DIR_BIN)
 
-icvutil.o: icvutil.c
+$(OUT_DIR_BIN): icvutil$(OBJ)
+	$(CC) $(LDFLAGS) icvutil$(OBJ) -o $(OUT_DIR_BIN) -L$(OUT_REVERSE_DIR) -lsecutils -lssl -lcrypto
+
+icvutil$(OBJ): icvutil.c
 	$(CC) $(CFLAGS) -I../include -c icvutil.c
 
 run: build
-	LD_LIBRARY_PATH=../ ./icvutil$(EXE) || true
+	LD_LIBRARY_PATH=../ $(OUT_DIR_BIN) || true
 
 clean:
-	rm -f icvutil$(OBJ) icvutil$(EXE)
+	rm -f icvutil$(OBJ) $(OUT_DIR_BIN)
