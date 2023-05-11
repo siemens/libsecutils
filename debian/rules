@@ -19,6 +19,10 @@ AR=$(DEB_HOST_GNU_TYPE)-ar
 %:
 	dh $@
 
+# prevent dh_build from trying to use "cmake"
+override_dh_auto_configure:
+	ln -s Makefile_v1 Makefile
+
 ## make sure that clean_all is used
 #override_dh_auto_clean:
 #	make -f Makefile_v1 clean_all

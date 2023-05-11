@@ -68,7 +68,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y >/dev/null debhelper devscripts # rsync libssl-dev git pkg-config
-          ln -s Makefile_v1 Makefile # workaround for dh_auto_build issue with subdirectory obj-x86_64-linux-gnu
           echo "copying everything to subdirectory 'debian-packaging'"
           mkdir -p debian-packaging
           rsync -av --exclude='debian-packaging' . debian-packaging/
