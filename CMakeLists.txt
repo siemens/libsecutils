@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.7)
 
 project(secutils)
+include(GNUInstallDirs)
 
 if(NOT DEFINED SECUTILS_VERSION)
   set(SECUTILS_VERSION_MAJOR 2)
@@ -154,6 +155,14 @@ if(DEFINED ENV{ROOTFS})
   set(CMAKE_INSTALL_PREFIX $ENV{ROOTFS} CACHE PATH "comment" FORCE)
 endif()
 
+install(FILES libsecutils.svg
+  DESTINATION ${CMAKE_INSTALL_FULL_DOCDIR}
+  )
+install(DIRECTORY doc/html/.
+  OPTIONAL  # TODO add build for doc/
+  DESTINATION ${CMAKE_INSTALL_FULL_DOCDIR}
+  )
+
 install(TARGETS secutils
   LIBRARY
     DESTINATION lib
@@ -171,5 +180,5 @@ if(DEFINED ENV{SECUTILS_USE_ICV})
 endif()
 
 if(NOT TARGET uninstall)
-  add_custom_target(uninstall COMMAND xargs rm -vf <install_manifest.txt)
+  add_custom_target(uninstall COMMAND xargs -I{} rm -vf $ENV{DESTDIR}{} <install_manifest.txt)
 endif()

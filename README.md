@@ -117,16 +117,16 @@ after setting or unsetting environment variables.
 
 ### Installing and uninstalling
 
-The software can be installed with
+The software can be installed with, e.g.,
 ```
-make install
+sudo make install
 ```
 and uninstalled with
 ```
-make uninstall
+sudo make uninstall
 ```
 
-The destination is `/usr/local`, unless specified otherwise by `ROOTFS`.
+The destination is `/usr`, unless specified otherwise by `DESTDIR` or `ROOTFS`.
 
 ### Building Debian packages
 

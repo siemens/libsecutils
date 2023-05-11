@@ -7,7 +7,7 @@ name: CI
 on: push
 
 jobs:
-  build-make:
+  make:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -17,8 +17,11 @@ jobs:
           # sudo apt-get update
           # sudo apt-get install -y >/dev/null libssl-dev build-essential # not needed
           make -f Makefile_v1 build_all
+          mkdir -p doc/html # workaround for not using doxygen here
+          DESTDIR=tmp make -f Makefile_v1 install
+          DESTDIR=tmp make -f Makefile_v1 uninstall
 
-  build-cmake:
+  cmake:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -28,12 +31,14 @@ jobs:
           sudo apt-get install -y >/dev/null cmake # build-essential git libssl-dev
           mkdir build
           cd build
-          cmake ..
+          SECUTILS_NO_TLS=1 cmake -S .. -B .
           cmake --build .
-          cmake -DCMAKE_BUILD_TYPE=Release ..
+          SECUTILS_USE_ICV=1 cmake -DCMAKE_BUILD_TYPE=Release -S .. -B .
           make clean build
+          DESTDIR=tmp make install
+          DESTDIR=tmp make uninstall
 
-  build-with-uta:
+  make-with-uta:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -55,7 +60,7 @@ jobs:
           export SECUTILS_USE_UTA=1
           make -f Makefile_v1 build_all
 
-  build-debian:
+  deb:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
