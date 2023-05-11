@@ -61,7 +61,6 @@ add_library(secutils SHARED
   ${SECUTIL_LIB_SRC}
 )
 
-
 set(INC_DIR ${PROJECT_SOURCE_DIR}/include/secutils)
 set(INC_PUBLIC_HDRS
   ${INC_DIR}/credentials/store.h
@@ -128,9 +127,17 @@ if(DEFINED ENV{SECUTILS_NO_TLS})
   set(SECUTILS_NO_TLS 1)
 endif()
 
-configure_file(${INC_DIR}/static_config.h.in ${INC_DIR}/static_config.h)
+if(DEFINED ENV{SECUTILS_USE_ICV})
+  add_executable(icvutil
+    util/icvutil.c
+    )
+  target_link_libraries(icvutil
+    ${PROJECT_NAME}
+    ${OPENSSL_LIBRARIES}
+    )
+endif()
 
-target_link_libraries(secutils ${OPENSSL_LIBRARIES})
+configure_file(${INC_DIR}/static_config.h.in ${INC_DIR}/static_config.h)
 
 # set_property(TARGET secutils PROPERTY C_STANDARD 90)
 
@@ -155,6 +162,13 @@ install(TARGETS secutils
     DESTINATION include/secutils
     COMPONENT Development
 )
+
+if(DEFINED ENV{SECUTILS_USE_ICV})
+  install(TARGETS icvutil
+    RUNTIME
+    DESTINATION bin
+    )
+endif()
 
 if(NOT TARGET uninstall)
   add_custom_target(uninstall COMMAND xargs rm -vf <install_manifest.txt)

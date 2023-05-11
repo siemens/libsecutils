@@ -69,6 +69,7 @@ jobs:
           rsync -av --exclude='debian-packaging' . debian-packaging/
           cd debian-packaging
           unset SECUTILS_USE_UTA
+          export SECUTILS_USE_ICV=1
           dpkg-buildpackage -uc -us
 
   doc:
