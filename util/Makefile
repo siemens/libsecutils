@@ -1,3 +1,21 @@
+#!/usr/bin/make
+
+# Makefile for libsecutils/util
+#
+# Copyright (c) Siemens Mobility GmbH, 2021
+#
+# Authors:
+#  David von Oheimb <David.von.Oheimb@siemens.com>
+#
+# This work is licensed under the terms of the Apache Software License 2.0.
+# See the COPYING file in the top-level directory.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Optional OUT_DIR defines absolute or relative (to ../) path where to place the binary.
+# Optional CFLAGS are used, may include -DSECUTILS_USE_UTA
+# Optional LDFLAGS are used, may include -luta
+
 ifeq ($(OS),Windows_NT)
     EXE=.exe
     DLL=.dll
@@ -20,12 +38,10 @@ endif
 
 .PHONY: build run clean
 
-build: icvutil
+build: icvutil$(EXE)
 
-# CFLAGS may include -DSECUTILS_USE_UTA, LDFLAGS may include -luta
-
-icvutil: icvutil.o
-	$(CC) $(LDFLAGS) icvutil$(OBJ) -o icvutil$(EXE) -L$(OUT_REVERSE_DIR) -lsecutils
+icvutil$(EXE): icvutil.o
+	$(CC) $(LDFLAGS) icvutil$(OBJ) -o icvutil$(EXE) -L$(OUT_REVERSE_DIR) -lsecutils -lssl -lcrypto
 
 icvutil.o: icvutil.c
 	$(CC) $(CFLAGS) -I../include -c icvutil.c

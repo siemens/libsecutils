@@ -13,8 +13,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # Optional OPENSSL_DIR defines absolute or relative (to ../) path to OpenSSL installation.
-# Optional OUT_DIR defines absolute or relative (to ./) path where library be produced.
+# Optional CFLAGS and LDFLAGS are appended by local settings.
 # Optional DEBUG_FLAGS may set to prepend to local CFLAGS and LDFLAGS (default see below).
+# Builds are done in release mode if optional NDEBUG is defined.
+# Optional OUT_DIR defines absolute or relative (to ./) path where to place the library.
+# Optional DESTDIR defines a prefix for the installation target directories.
 
 ROOTFS ?= $(DESTDIR)$(prefix)
 
@@ -89,10 +92,10 @@ override CFLAGS += -D_FORTIFY_SOURCE=2
 override CFLAGS += -isystem $(OPENSSL)/include# # # use of -isystem is critical for selecting wanted OpenSSL version
 override CFLAGS += -Iinclude
 override CFLAGS += -Iinclude/secutils
-ifdef SECUTILS_USE_UTA
+ifneq ($(SECUTILS_USE_UTA),)
     override CFLAGS += -DSECUTILS_USE_UTA=1
 endif
-ifdef SECUTILS_USE_ICV
+ifneq ($(SECUTILS_USE_ICV),)
     override CFLAGS += -DSECUTILS_USE_ICV=1
 endif
 
@@ -101,15 +104,15 @@ override LDFLAGS += -L$(OPENSSL_LIB) -L$(OPENSSL)
 ifeq ($(DEB_TARGET_ARCH),) # not during Debian packaging
     override LDFLAGS += -Wl,-rpath=$(OPENSSL_LIB) -Wl,-rpath=$(OPENSSL) # needed for genCMPClient
 endif
-ifdef SECUTILS_USE_UTA
+ifneq ($(SECUTILS_USE_UTA),)
     override LDFLAGS += -luta
 endif
-ifdef SECUTILS_NO_TLS
+ifneq ($(SECUTILS_NO_TLS),)
     override CFLAGS += -DSECUTILS_NO_TLS=1
 else
     override LDFLAGS += -lssl
 endif
-override LDFLAGS += -shared -lcrypto
+override LDFLAGS += -lcrypto
 
 ifeq ($(COMPILE_TYPE), code_coverage)
     override CFLAGS += --coverage
@@ -156,14 +159,15 @@ endif
 	$(MAKE) -f Makefile_v1 COMPILE_TYPE=$(COMPILE_TYPE) build_only
 
 util:
-	$(MAKE) -C util SECUTILS_USE_UTA="$(SECUTILS_USE_UTA)" \
-	   CFLAGS="$(CFLAGS) $(LOCAL_CFLAGS)" LDFLAGS="$(LDFLAGS)" OUT_DIR="$(OUT_DIR)"
+ifneq ($(SECUTILS_USE_ICV),)
+	$(MAKE) -C util CFLAGS="$(CFLAGS) $(LOCAL_CFLAGS)" LDFLAGS="$(LDFLAGS)" OUT_DIR="$(OUT_DIR)"
+endif
 
 build_all: build util
 
 # Binary output target
 $(OUT_DIR)/$(OUTLIB).$(VERSION): $(OBJS)
-	$(CC) $(OBJS) $(LDFLAGS) -o $@ -Wl,-soname,$(OUTLIB).$(VERSION)
+	$(CC) $(OBJS) $(LDFLAGS) -shared -o $@ -Wl,-soname,$(OUTLIB).$(VERSION)
 
 $(OUT_DIR)/$(OUTLIB): $(OUT_DIR)/$(OUTLIB).$(VERSION)
 	ln -sfr $(OUT_DIR)/$(OUTLIB){.$(VERSION),}
@@ -187,6 +191,7 @@ $(OBJS): | $(BUILDDIR)
 
 deb:
 	debuild --preserve-envvar OPENSSL_DIR \
+	  --preserve-envvar SECUTILS_NO_TLS \
 	  --preserve-envvar SECUTILS_USE_ICV \
 	  --preserve-envvar SECUTILS_USE_UTA -uc -us \
 	  --lintian-opts --profile debian # --fail-on none
@@ -207,8 +212,10 @@ install: # doc/html $(OUT_DIR)/$(OUTLIB) util/$(OUTBIN)
 	mkdir -p $(DEST_INC)
 	cd include/secutils && find . -type d -exec install -d '$(DEST_INC)/{}' ';'
 	cd include/secutils && find . -type f -exec install -Dm 0644 '{}' '$(DEST_INC)/{}' ';'
+ifneq ($(SECUTILS_USE_ICV),)
 #install_bins:
 	install -D util/$(OUTBIN) $(DEST_BIN)/$(OUTBIN)
+endif
 #install_doc:
 	cd doc/html && find . -type d -exec install -d '$(DEST_DOC)/{}' ';'
 	cd doc/html && find . -type f -exec install -Dm 0644 '{}' '$(DEST_DOC)/{}' ';'
