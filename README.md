@@ -126,7 +126,7 @@ and uninstalled with
 sudo make uninstall
 ```
 
-The destination is `/usr`, unless specified otherwise by `DESTDIR` or `ROOTFS`.
+The destination is `/usr/`, unless specified otherwise by `DESTDIR` or `ROOTFS`.
 
 ### Building Debian packages
 
