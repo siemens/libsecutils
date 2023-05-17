@@ -12,6 +12,9 @@ message(STATUS "SecurityUtilities version " ${SECUTILS_VERSION})
 
 # set(CMAKE_VERBOSE_MAKEFILE on)
 
+set(CMAKE_INSTALL_PREFIX "/usr") # must be set before include(GNUInstallDirs)
+include(GNUInstallDirs)
+
 if(NOT("$ENV{OPENSSL_DIR}" STREQUAL ""))
   message(STATUS "using OpenSSL from " $ENV{OPENSSL_DIR})
   if(DEFINED ENV{OPENSSL_LIB})
