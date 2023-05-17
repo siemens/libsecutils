@@ -1,14 +1,15 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.18)
 
-project(secutils)
-include(GNUInstallDirs)
+project(libsecutils)
+set (LIBSECUTILS_NAME secutils)
 
-if(NOT DEFINED SECUTILS_VERSION)
-  set(SECUTILS_VERSION_MAJOR 2)
-  set(SECUTILS_VERSION ${SECUTILS_VERSION_MAJOR}.0)
+if(NOT DEFINED LIBSECUTILS_VERSION)
+  set(LIBSECUTILS_VERSION_MAJOR 2)
+  set(LIBSECUTILS_VERSION_MINOR 0)
+  set(LIBSECUTILS_VERSION ${LIBSECUTILS_VERSION_MAJOR}.${LIBSECUTILS_VERSION_MINOR})
 endif()
 
-message(STATUS "SecurityUtilities version " ${SECUTILS_VERSION})
+message(STATUS "SecurityUtilities version " ${LIBSECUTILS_VERSION})
 
 # set(CMAKE_VERBOSE_MAKEFILE on)
 
@@ -32,7 +33,8 @@ else()
 endif()
 
 set(SRC_DIR ${PROJECT_SOURCE_DIR}/src)
-set(SECUTIL_LIB_SRC
+set(LIBSECUTILS_LIB_SRC
+  "${PROJECT_SOURCE_DIR}/.github/workflows/build.yml"
   ${SRC_DIR}/certstatus/certstatus.c
   ${SRC_DIR}/certstatus/cdp_util.c
   ${SRC_DIR}/certstatus/certstatus.c
@@ -62,10 +64,10 @@ set(SECUTIL_LIB_SRC
 )
 
 add_library(secutils SHARED
-  ${SECUTIL_LIB_SRC}
+  ${LIBSECUTILS_LIB_SRC}
 )
 
-set(INC_DIR ${PROJECT_SOURCE_DIR}/include/secutils)
+set(INC_DIR "${PROJECT_SOURCE_DIR}/include/${LIBSECUTILS_NAME}")
 set(INC_PUBLIC_HDRS
   ${INC_DIR}/credentials/store.h
   ${INC_DIR}/credentials/cert.h
@@ -99,7 +101,7 @@ set(INC_PUBLIC_HDRS
 
 include_directories(${INC_DIR}/.. ${INC_DIR})
 
-if((CMAKE_BUILD_TYPE MATCHES Release) OR (DEFINED ENV{NDEBUG}))
+if(CMAKE_BUILD_TYPE MATCHES Release OR DEFINED ENV{NDEBUG})
   message(STATUS "build mode: Release")
   add_definitions(-DNDEBUG=1 -O2)
 else()
@@ -131,12 +133,21 @@ if(DEFINED ENV{SECUTILS_NO_TLS})
   set(SECUTILS_NO_TLS 1)
 endif()
 
+# help CPackDeb please dpkg-shlibdeps
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.20.0")
+  set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS_PRIVATE_DIRS
+    "../lib/${CMAKE_INSTALL_FULL_LIBDIR}")
+else()
+  set(CMAKE_INSTALL_RPATH # must be done before add_executable()
+    "../lib/${CMAKE_INSTALL_FULL_LIBDIR}")
+endif()
+
 if(DEFINED ENV{SECUTILS_USE_ICV})
   add_executable(icvutil
     util/icvutil.c
     )
   target_link_libraries(icvutil
-    ${PROJECT_NAME}
+    ${LIBSECUTILS_NAME}
     ${OPENSSL_LIBRARIES}
     )
 endif()
@@ -144,45 +155,184 @@ endif()
 configure_file(${INC_DIR}/secutils_static_config.h.in
                ${INC_DIR}/secutils_static_config.h)
 
-# set_property(TARGET secutils PROPERTY C_STANDARD 90)
+# set_property(TARGET ${LIBSECUTILS_NAME} PROPERTY C_STANDARD 90)
 
-set_target_properties(secutils PROPERTIES
-  VERSION ${SECUTILS_VERSION} SOVERSION ${SECUTILS_VERSION_MAJOR}
-  PUBLIC_HEADER "${INC_PUBLIC_HDRS}"
+set_target_properties(${LIBSECUTILS_NAME} PROPERTIES
+  VERSION ${LIBSECUTILS_VERSION} SOVERSION ${LIBSECUTILS_VERSION_MAJOR}
+  # not used as directory structure would not be preserved on installation:
+  # PUBLIC_HEADER "${INC_PUBLIC_HDRS}"
 )
 
 if(NOT TARGET build)
   add_custom_target(build COMMAND make all)
 endif()
 
+
+# installation and uninstall
+
 if(DEFINED ENV{ROOTFS})
   set(CMAKE_INSTALL_PREFIX $ENV{ROOTFS} CACHE PATH "comment" FORCE)
 endif()
 
-install(FILES libsecutils.svg
-  DESTINATION ${CMAKE_INSTALL_FULL_DOCDIR}
-  )
-install(DIRECTORY doc/html/.
-  OPTIONAL  # TODO add build for doc/
-  DESTINATION ${CMAKE_INSTALL_FULL_DOCDIR}
+# see also https://gitlab.kitware.com/cmake/cmake/-/issues/24929 and
+# https://stackoverflow.com/questions/46490448/how-i-can-add-a-changelog-in-deb-with-cmake
+add_custom_command(
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/debian/changelog"
+    COMMAND gzip -cn9 "${CMAKE_CURRENT_SOURCE_DIR}/debian/changelog"
+    > "${CMAKE_CURRENT_BINARY_DIR}/changelog.gz"
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/changelog.gz"
+)
+if(NOT TARGET changelog)
+  add_custom_target(changelog ALL DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/changelog.gz")
+endif()
+
+install(TARGETS ${LIBSECUTILS_NAME}
+  LIBRARY
+  DESTINATION "${CMAKE_INSTALL_FULL_LIBDIR}"
+  COMPONENT lib
   )
 
-install(TARGETS secutils
-  LIBRARY
-    DESTINATION lib
-    COMPONENT Library
-  PUBLIC_HEADER
-    DESTINATION include/secutils
-    COMPONENT Development
-)
+find_program(DOXYGEN doxygen)
+if(NOT TARGET doc AND DOXYGEN)
+  add_custom_command(
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/include/secutils/basic.h"
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+    COMMAND doxygen Doxyfile # required packages: doxygen graphviz
+    OUTPUT "${CMAKE_CURRENT_SOURCE_DIR}/doc/html" # BINARY_DIR woud be better
+    )
+  add_custom_target(doc ALL DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/doc/html")
+endif()
+
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/doc/html/."
+  OPTIONAL # as doxygen may not be available
+  DESTINATION "${CMAKE_INSTALL_FULL_DOCDIR}-dev/html"
+  COMPONENT dev
+  )
+
+install(DIRECTORY include/.
+  DESTINATION "${CMAKE_INSTALL_FULL_INCLUDEDIR}"
+  COMPONENT dev
+  )
 
 if(DEFINED ENV{SECUTILS_USE_ICV})
   install(TARGETS icvutil
     RUNTIME
-    DESTINATION bin
+    DESTINATION "${CMAKE_INSTALL_FULL_BINDIR}"
+    COMPONENT bin
     )
 endif()
 
 if(NOT TARGET uninstall)
   add_custom_target(uninstall COMMAND xargs -I{} rm -vf $ENV{DESTDIR}{} <install_manifest.txt)
 endif()
+
+
+if(NOT DEFINED CPACK_PACKAGE_NAME)
+# generate Debian packages using CPack, relying on installation defined above
+
+SET(CPACK_PACKAGE_NAME ${PROJECT_NAME})
+SET(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/siemens/libsecutils")
+SET(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/libsecutils.svg")
+SET(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/README.md")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/LICENSE.txt")
+SET(CPACK_PACKAGE_VENDOR "Siemens")
+set(CPACK_PACKAGE_CONTACT "David von Oheimb <David.von.Oheimb@siemens.com>")
+set(CPACK_PACKAGE_VERSION       ${LIBSECUTILS_VERSION})
+set(CPACK_PACKAGE_VERSION_MAJOR ${LIBSECUTILS_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${LIBSECUTILS_VERSION_MINOR})
+set(CPACK_STRIP_FILES ON)
+
+set(CPACK_COMPONENT_LIB_DESCRIPTION "OpenSSL enhancement wrapper library
+OpenSSL wrapper library simplifying use of commonly needed functionality
+With extended support for certficate status checking using CRLs and/or OCSP")
+set(CPACK_COMPONENT_DEV_DESCRIPTION "libsecutils C headers and documentation
+Development support for libsecutils")
+set(CPACK_COMPONENT_BIN_DESCRIPTION "libsecutils helper binaries
+Stand-alone helper CLI applications using libsecutils")
+
+set(CPACK_GENERATOR "DEB")
+set(CPACK_DEB_COMPONENT_INSTALL ON)
+set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
+set(CPACK_DEBIAN_LIB_PACKAGE_NAME "${PROJECT_NAME}")
+set(CPACK_DEBIAN_DEV_PACKAGE_ARCHITECTURE "all")
+set(CPACK_DEBIAN_LIB_PACKAGE_SECTION "libs")
+set(CPACK_DEBIAN_DEV_PACKAGE_SECTION "devel")
+set(CPACK_DEBIAN_BIN_PACKAGE_SECTION "utils")
+set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
+set(CPACK_DEBIAN_ENABLE_COMPONENT_DEPENDS ON)
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS_PRIVATE_DIRS "${CMAKE_CURRENT_BINARY_DIR}")
+set(CPACK_DEBIAN_DEV_PACKAGE_DEPENDS "libsecutils (>= ${CPACK_PACKAGE_VERSION})")
+set(CPACK_DEBIAN_DEV_PACKAGE_SUGGESTS "libssl-dev, libuta-dev")
+# see also https://gitlab.kitware.com/cmake/cmake/-/issues/21834
+# CPack Deb does not create postinst when installing to /usr/lib/x86_64-linux-gnu
+set(CPACK_DEBIAN_LIB_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/triggers")
+set(CPACK_DEBIAN_LIB_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
+
+set(CPACK_SOURCE_GENERATOR "TGZ")
+#set(CPACK_SET_DESTDIR TRUE) # prevents package creation error when using cpack
+set(CPACK_VERBATIM_VARIABLES YES)
+set(CPACK_SOURCE_IGNORE_FILES
+  ${CPACK_IGNORE_FILES}
+  ~$
+  \./\.git/
+  \\.git$
+  \\.deb$
+  \\.gz$
+  \\.o$
+  \\.so
+  \./attic/
+  \./tmp/
+  CMakeFiles/
+  _CPack_Packages/
+  \\.cmake$
+  /CMakeCache.txt$
+  /compile_commands.json$
+  /install_manifest.*\.txt$
+  /changelog.gz$
+  \./debian/tmp/
+  \\.substvars$
+  \\.log$
+  /debian/\\.debhelper/
+  /debian/files$
+  /debian/debhelper-build-stamp$
+  \./debian/${PROJECT_NAME}/
+  \./debian/${PROJECT_NAME}-dev/
+  \./debian/${PROJECT_NAME}-bin/
+  \./doc/
+  \./icvutil$
+  )
+
+include(CPack)
+
+# see also https://gitlab.kitware.com/cmake/cmake/-/issues/21832
+# CPack Deb lacks a way to configure copyright files by component
+foreach(component IN LISTS CPACK_COMPONENTS_ALL)
+  if(${component} STREQUAL "lib")
+    set(suffix "")
+  else()
+    set(suffix "-${component}")
+  endif()
+  install(FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/debian/copyright"
+    "${CMAKE_CURRENT_BINARY_DIR}/changelog.gz"
+    "${CMAKE_SOURCE_DIR}/libsecutils.svg"
+    DESTINATION "${CMAKE_INSTALL_FULL_DOCDIR}${suffix}"
+    COMPONENT ${component}
+    )
+endforeach()
+
+if(NOT TARGET deb)
+  set (deb_pack_full_name
+    "${CMAKE_CURRENT_BINARY_DIR}/${CPACK_PACKAGE_NAME}-dev_${CPACK_PACKAGE_VERSION}_all.deb")
+  add_custom_command(
+    OUTPUT "${deb_pack_full_name}"
+    DEPENDS build
+    COMMENT "Building packages possibly including doxygen run"
+    COMMAND cpack # --config CPackConfig.cmake
+    COMMAND cpack --config CPackSourceConfig.cmake
+    )
+  add_custom_target(deb DEPENDS ${deb_pack_full_name})
+endif()
+
+endif(NOT DEFINED CPACK_PACKAGE_NAME)
