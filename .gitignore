@@ -34,3 +34,9 @@ debian/libsecutils
 debian/libsecutils-dev
 debian/libsecutils-bins
 debian/*.substvars
+debian-packaging/
+*.deb
+*.dsc
+*.tar.gz
+*.buildinfo
+*.changes

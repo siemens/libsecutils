@@ -222,6 +222,8 @@ clean_deb:
 	rm -rf debian/{.debhelper,tmp,libsecutils{,-dev,-bin}} debian-packaging
 	rm -f debian/{files,debhelper-build-stamp} debian/*.{log,substvars}
 	rm -f ../libsecutils{_,-}*
+	rm -rf debian-packaging/
+	rm -f *.deb *.dsc *.buildinfo *.changes libsecutils_*.tar.gz
 
 # installation target - append ROOTFS=<path> to install into virtual root
 # filesystem
