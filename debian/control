@@ -8,21 +8,26 @@ Homepage: https://github.com/siemens/libsecutils
 Standards-Version: 4.5.1
 
 Package: libsecutils
-Depends: libssl3, ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Section: libs
 Architecture: any
 Suggests: libuta
-Description: OpenSSL wrapper library
- OpenSSL wrapper library for easy reuse of commonly needed functionality
+Description: OpenSSL enhancement wrapper library
+ OpenSSL wrapper library simplifying use of commonly needed functionality
+ With extended support for certficate status checking using CRLs and/or OCSP
 
 Package: libsecutils-dev
-Depends: libsecutils, libssl-dev, ${misc:Depends}
+Depends: libsecutils (>= 2.0), ${misc:Depends}
+Suggests: libssl-dev, libuta-dev
+Section: devel
 Architecture: all
 Multi-Arch: foreign
-Description: libsecutils C headers
- Only needed for development
+Description: libsecutils C headers and documentation
+ Development support for libsecutils
 
-Package: libsecutils-bins
-Depends: libsecutils${binary:Version}, ${shlibs:Depends}, ${misc:Depends}
+Package: libsecutils-bin
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Section: utils
 Architecture: any
 Description: libsecutils helper binaries
  Stand-alone helper CLI applications using libsecutils

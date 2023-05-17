@@ -27,16 +27,16 @@ jobs:
       - uses: actions/checkout@v3
       - name: build-cmake
         run: |
-          sudo apt-get update
-          sudo apt-get install -y >/dev/null cmake # build-essential git libssl-dev
+          #sudo apt-get update
+          #sudo apt-get install -y >/dev/null cmake # build-essential git libssl-dev
           mkdir build
           cd build
           SECUTILS_NO_TLS=1 cmake -S .. -B .
           cmake --build .
           SECUTILS_USE_ICV=1 cmake -DCMAKE_BUILD_TYPE=Release -S .. -B .
           make clean build
-          DESTDIR=tmp make install
-          DESTDIR=tmp make uninstall
+          DESTDIR=tmp make install uninstall
+          make deb
 
   make-with-uta:
     runs-on: ubuntu-latest

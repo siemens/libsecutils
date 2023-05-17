@@ -30,6 +30,7 @@ can be used for enhanced file protection.
   - [Copyright](#copyright)
   - [License](#license)
 
+
 ## Getting started
 
 
@@ -47,7 +48,7 @@ also on a virtual machine or the Windows Subsystem for Linux ([WSL](https://docs
 
 The following network and development tools are needed or recommended.
 * Git (for getting the software, tested with versions 2.7.2, 2.11.0, 2.20, 2.30.2)
-* CMake (for using [`CMakeLists.txt`](CMakeLists.txt), tested with version 3.18.4)
+* CMake (for using [`CMakeLists.txt`](CMakeLists.txt), tested with versions 3.18.4 and 3.26.3)
 * GNU make (tested with versions 4.1, 4.2.1, 4.3)
 * GNU C compiler (gcc, tested with versions 5.4.0, 7.3.0, 8.3.0, 10.0.1, 10.2.1)
 
@@ -115,6 +116,7 @@ The TLS-related functions may be disabled by setting `SECUTILS_NO_TLS`.
 When using CMake, `cmake` must be (re-)run
 after setting or unsetting environment variables.
 
+
 ### Installing and uninstalling
 
 The software can be installed with, e.g.,
@@ -128,30 +130,39 @@ sudo make uninstall
 
 The destination is `/usr/`, unless specified otherwise by `DESTDIR` or `ROOTFS`.
 
+
 ### Building Debian packages
 
-This repository can build the following Debian packages.
+This repository can build the following Debian and source packages.
 
-* `libsecutils` - the shared library
-* `libsecutils-dev` - development headers
-* `libsecutils-bins` - helper binaries from `util/` - so far, there is only `icvutil`
+* `libsecutils` -- the shared library
+* `libsecutils-dev` -- development headers and documentation
+* `libsecutils-bin` -- helper binaries;
+   so far, there is only `icvutil`, in case `SECUTILS_USE_UTA` is set
+* `libsecutils*Source.tar.gz` -- source tarball
 
-To build the Debian packages, the following dependencies need to be installed:
+The recommended way is to use CPack with the files produced by CMake as follows:
+```
+make deb
+```
+
+Alternatively, [`Makefile_v1`](Makefile_v1) may be used like this:
+```
+make -f Makefile_v1 deb
+```
+In this case, the resulting packages are placed in the parent directory (`../`),
+and following dependencies need to be installed:
 * `debhelper` (needed for `dh`)
 * `devscripts` (needed for `debuild`)
 * `libssl-dev`
 * `libuta-dev` (from [github.com/siemens/libuta](https://github.com/siemens/libuta))
    if `SECUTILS_USE_UTA` is set
 
-Currently [`CMakeLists.txt`](CMakeLists.txt) does not support Debian packaging.
-Yet [`Makefile_v1`](Makefile_v1) may be used like this:
+The Debian packages may be installed for instance as follows:
 ```
-make -f Makefile_v1 deb
+sudo dpkg -i libsecutils*deb
 ```
-where `SECUTILS_USE_UTA=1`, `SECUTILS_USE_ICV=1`, and/or `SECUTILS_NO_TLS=1`
-may be added.
 
-On success, they are placed in the parent directory (`../`).
 
 ### Building the documentation
 
@@ -160,6 +171,10 @@ To build the documentation, the following dependencies need to be installed:
 * `latex`, in case LaTeX output is desired; if so, comment out in [`Doxyfile`](Doxyfile): `GENERATE_LATEX = NO`
 
 The documentation is built by
+```
+make doc
+```
+or
 ```
 make -f Makefile_v1 doc
 ```
@@ -170,6 +185,7 @@ Most functions of the library can be used directly without specific context.
 A few functions that make use of the UTA library require a `uta_ctx` pointer,
 which may be non-`NULL` only if `SECUTILS_USE_UTA` is set.
 You may have a look at `util/icvutil.c` for a simple example.
+
 
 ## Library structure
 
@@ -190,9 +206,11 @@ The library functionality is organized by topic:
 - util
   - Utilities used also within in the library, e.g. for logging
 
+
 ## Copyright
 
-Copyright (c) Siemens Mobility GmbH, 2021
+Copyright (c) Siemens Mobility GmbH, 2021-2023
+
 
 ## License
 

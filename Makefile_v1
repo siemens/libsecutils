@@ -85,7 +85,7 @@ OUTLIB=libsecutils$(DLL)
 DEST_PRE=$(ROOTFS)/usr
 DEST_LIB=$(DEST_PRE)/lib
 DEST_INC=$(DEST_PRE)
-DEST_DOC=$(DEST_PRE)/share
+DEST_DOC=$(DEST_PRE)/share/doc/libsecutils-dev
 OUTBIN=icvutil$(EXE)
 DEST_BIN=$(DEST_PRE)/bin
 LOCAL_CFLAGS=-std=gnu90 -fPIC
@@ -200,11 +200,11 @@ deb:
 #	LD_LIBRARY_PATH= dpkg-buildpackage -uc -us # may prepend DH_VERBOSE=1
 
 clean_deb:
-	rm -rf debian/tmp debian/libsecutils{,-dev,-bins}
+	rm -rf debian/{tmp,libsecutils{,-dev,-bin}} debian-packaging
 	rm -f debian/{files,debhelper-build-stamp} debian/*.{log,substvars}
-	rm -f ../libsecutils{_,-}*
-	rm -rf debian-packaging/
-	rm -f *.deb *.dsc *.buildinfo *.changes libsecutils_*.tar.gz
+	rm -f ../libsecutils*.{deb,dsc,build*,changes,tar.gz}
+	rm -fr _CPack_Packages changelog.gz
+	rm -f libsecutils*.{deb,tar.gz}
 
 # installation target - append ROOTFS=<path> to install into virtual root
 # filesystem
@@ -220,16 +220,17 @@ ifneq ($(SECUTILS_USE_ICV),)
 	install -D ./$(OUTBIN) $(DEST_BIN)/$(OUTBIN)
 endif
 #install_doc:
-	ln -sfr doc/html doc/libsecutils
-	find doc/libsecutils/ -type d -exec install -d '$(DEST_DOC)/{}' ';'
-	find doc/libsecutils/ -type f -exec install -Dm 0644 '{}' '$(DEST_DOC)/{}' ';'
+	ln -sf doc/html
+	find html/ -type d -exec install -d '$(DEST_DOC)/{}' ';'
+	find html/ -type f -exec install -Dm 0644 '{}' '$(DEST_DOC)/{}' ';'
+	rm html
 
 uninstall:
 	rm -f $(DEST_LIB)/$(OUTLIB)*
 #	find include -type f -exec rm '$(DEST_PRE)/{}' ';'
 	rm -rf $(DEST_INC)/include/secutils
 	rm -f $(DEST_BIN)/$(OUTBIN)
-	rm -rf $(DEST_DOC)/doc/libsecutils
+	rm -rf $(DEST_DOC)/doc/html
 
 clean_uta:
 	rm -f $(BUILDDIR)/uta_api$(OBJ) $(BUILDDIR)/files_icv$(OBJ) \
@@ -237,14 +238,15 @@ clean_uta:
           $(OUT_DIR)/$(OUTLIB)* ./$(OUTBIN) $(OUT_DIR)/util/icvutil.o
 
 clean:
-	@# rm -fr CMakeCache.txt *.cmake install_manifest.txt CMakeFiles/
 	rm -f $(OUT_DIR)/$(OUTLIB)*
 	rm -f ./$(OUTBIN)
-	rm -fr $(BUILDDIR) doc
+	$(MAKE) -C util clean
+	rm -fr $(BUILDDIR)
 
 clean_all: clean clean_deb
-	$(MAKE) -C util clean
-	rm -rf doc refman.pdf *.gcov reports
+	rm -fr Makefile CMakeCache.txt *.cmake CMakeFiles/
+	rm -f install_manifest*.txt
+	rm -fr doc refman.pdf *.gcov reports
 
 doc: doc/html refman.pdf
 
