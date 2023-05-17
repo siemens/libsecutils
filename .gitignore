@@ -21,9 +21,9 @@ bak/
 attic/
 share/
 doc/
-util/icvutil
 build/
 dependencies/
+icvutil
 
 debian/.debhelper
 debian/debhelper-build-stamp

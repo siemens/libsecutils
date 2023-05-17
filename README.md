@@ -108,7 +108,7 @@ by setting the environment variable `SECUTILS_USE_UTA`.
 
 When `SECUTILS_USE_ICV` is set, configuration files are expected
 to be integrity protected with an Integrity Check Value (ICV),
-which may be produced using `util/icvutil`.
+which may be produced using `icvutil`.
 
 The TLS-related functions may be disabled by setting `SECUTILS_NO_TLS`.
 
