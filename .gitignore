@@ -14,7 +14,8 @@ mk
 CMakeCache.txt
 Makefile
 *.cmake
-install_manifest.txt
+install_manifest*.txt
+changelog.gz
 CMakeFiles/
 tmp/
 bak/
@@ -32,7 +33,7 @@ debian/substvars
 debian/tmp
 debian/libsecutils
 debian/libsecutils-dev
-debian/libsecutils-bins
+debian/libsecutils-bin
 debian/*.substvars
 debian-packaging/
 *.deb
@@ -40,3 +41,4 @@ debian-packaging/
 *.tar.gz
 *.buildinfo
 *.changes
+_CPack_Packages/
