@@ -83,11 +83,12 @@ override CFLAGS += -Wformat -Wformat-security -Wno-declaration-after-statement -
 
 CC ?= gcc
 OUTLIB=libsecutils$(DLL)
-DEST_LIB=$(ROOTFS)/usr/lib
-DEST_INC=$(ROOTFS)/usr
-DEST_DOC=$(ROOTFS)/usr/share
+DEST_PRE=$(ROOTFS)/usr
+DEST_LIB=$(DEST_PRE)/lib
+DEST_INC=$(DEST_PRE)
+DEST_DOC=$(DEST_PRE)/share
 OUTBIN=icvutil$(EXE)
-DEST_BIN=$(ROOTFS)/usr/bin
+DEST_BIN=$(DEST_PRE)/bin
 LOCAL_CFLAGS=-std=gnu90 -fPIC
 override CFLAGS += -D_FORTIFY_SOURCE=2
 override CFLAGS += -isystem $(OPENSSL)/include# # # use of -isystem is critical for selecting wanted OpenSSL version
@@ -237,6 +238,8 @@ install: # doc/html $(OUT_DIR)/$(OUTLIB) $(OUT_DIR)/$(OUTBIN)
 #install_bins:
 ifeq ($(SECUTILS_USE_ICV),)
 	touch $(OUT_DIR)/$(OUTBIN) # workaround for Debian packaging
+else
+	install -D ./$(OUTBIN) $(DEST_BIN)/$(OUTBIN)
 endif
 	install -D $(OUT_DIR)/$(OUTBIN) $(DEST_BIN)/$(OUTBIN)
 #install_doc:
@@ -246,7 +249,7 @@ endif
 
 uninstall:
 	rm -f $(DEST_LIB)/$(OUTLIB)*
-#	find include -type f -exec rm '$(ROOTFS)/usr/{}' ';'
+#	find include -type f -exec rm '$(DEST_PRE)/{}' ';'
 	rm -rf $(DEST_INC)/include/secutils
 	rm -f $(DEST_BIN)/$(OUTBIN)
 	rm -rf $(DEST_DOC)/doc/libsecutils
