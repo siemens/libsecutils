@@ -23,9 +23,9 @@ AR=$(DEB_HOST_GNU_TYPE)-ar
 override_dh_auto_configure:
 	ln -sf Makefile_v1 Makefile
 
-## make sure that clean_all is used
-#override_dh_auto_clean:
-#	make -f Makefile_v1 clean_all
+## make sure that clean_deb is used and CMake is not used
+override_dh_auto_clean:
+	make -f Makefile_v1 clean clean_deb
 
 # adding compile flags as, defaults are commonly debug flags
 override_dh_auto_build:

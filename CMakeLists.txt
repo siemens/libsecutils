@@ -133,6 +133,15 @@ if(DEFINED ENV{SECUTILS_NO_TLS})
   set(SECUTILS_NO_TLS 1)
 endif()
 
+# help CPackDeb please dpkg-shlibdeps
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.20.0")
+  set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS_PRIVATE_DIRS
+    "../lib/${CMAKE_INSTALL_FULL_LIBDIR}")
+else()
+  set(CMAKE_INSTALL_RPATH # must be done before add_executable()
+    "../lib/${CMAKE_INSTALL_FULL_LIBDIR}")
+endif()
+
 if(DEFINED ENV{SECUTILS_USE_ICV})
   add_executable(icvutil
     util/icvutil.c
@@ -264,29 +273,33 @@ set(CPACK_SOURCE_GENERATOR "TGZ")
 set(CPACK_VERBATIM_VARIABLES YES)
 set(CPACK_SOURCE_IGNORE_FILES
   ${CPACK_IGNORE_FILES}
-  \\.git/
+  ~$
+  \./\.git/
   \\.git$
   \\.deb$
   \\.gz$
+  \\.o$
   \\.so
-  ~$
-  attic/
-  tmp/
-  Makefile
+  \./attic/
+  \./tmp/
   CMakeFiles/
   _CPack_Packages/
   \\.cmake$
-  CMakeCache.txt
-  compile_commands.json
-  install_manifest.*\\.txt
-  changelog.gz
-  debian/tmp/
-  debian/substvars
-  debian/.debhelper
-  debian/${PROJECT_NAME}/
-  debian/${PROJECT_NAME}-dev/
-  debian/${PROJECT_NAME}-bin/
-  icvutil$
+  /CMakeCache.txt$
+  /compile_commands.json$
+  /install_manifest.*\.txt$
+  /changelog.gz$
+  \./debian/tmp/
+  \\.substvars$
+  \\.log$
+  /debian/\\.debhelper/
+  /debian/files$
+  /debian/debhelper-build-stamp$
+  \./debian/${PROJECT_NAME}/
+  \./debian/${PROJECT_NAME}-dev/
+  \./debian/${PROJECT_NAME}-bin/
+  \./doc/
+  \./icvutil$
   )
 
 include(CPack)
