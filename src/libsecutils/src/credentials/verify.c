@@ -270,3 +270,4 @@ err: ;
     OPENSSL_free(name);
     return result;
 }
+#endif

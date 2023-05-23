@@ -16,6 +16,8 @@
 #ifndef SECUTILS_FILES_ICV_H_
 #define SECUTILS_FILES_ICV_H_
 
+#include "static_config.h"
+
 #include "../basic.h"
 #ifdef SECUTILS_USE_ICV
 

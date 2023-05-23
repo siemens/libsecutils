@@ -29,4 +29,7 @@ if(SIEMENS_LIBSECUTILS_NO_TLS)
 endif()
 
 configure_file(static_config.h.in static_config.h)
-target_include_directories(siemens_libsecutils PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
+
+target_include_directories(siemens_libsecutils PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+)
