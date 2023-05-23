@@ -16,6 +16,8 @@
 #ifndef SECUTILS_CRLS_H_
 #define SECUTILS_CRLS_H_
 
+#include "basic.h"
+
 #include <openssl/x509.h>
 
 /*!*****************************************************************************

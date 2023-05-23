@@ -29,14 +29,16 @@ target_link_options(siemens_libsecutils PUBLIC
     $<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all>
 )
 
-if(SIEMENS_LIBSECUTILS_USE_UTA)
-    target_link_libraries(siemens_libsecutils PUBLIC -luta)
-endif()
-
 add_subdirectory(include)
 add_subdirectory(src)
 
-target_link_libraries(siemens_libsecutils PRIVATE OpenSSL::SSL)
+target_link_libraries(siemens_libsecutils
+    PUBLIC
+    $<$<BOOL:${SIEMENS_LIBSECUTILS_USE_UTA}>:-luta>
+
+    PRIVATE
+    OpenSSL::SSL
+)
 
 # =============================
 # Installing

@@ -15,7 +15,7 @@
 
 #include <stdlib.h> /* for EXIT_SUCCESS */
 
-#include "../include/secutils/util/log.h"
+#include "log.h"
 #include "../include/secutils/storage/files_icv.h"
 #include "../include/secutils/storage/uta_api.h"
 
@@ -25,22 +25,21 @@
 
 int main(int argc, char *argv[]) {
     int ret = EXIT_FAILURE;
-    uta_ctx *uta_ctx = NULL;
 
 #ifdef SECUTILS_USE_UTA
+    uta_ctx *uta_ctx = NULL;
+
     if ((uta_ctx = uta_open()) == NULL) {
         LOG(FL_EMERG, "failure getting UTA ctx");
         return ret;
     }
-#else
-    LOG(FL_WARN, "Not using UTA lib because SECUTILS_USE_UTA was not defined");
-#endif
 
     const char *prog = argv[0];
     const char *option = (argc > ARG_OPTION) ? argv[ARG_OPTION] : "";
     const char *file   = (argc > ARG_FILE  ) ? argv[ARG_FILE  ] : NULL;
     const char *file_loc = (argc > ARG_FILE_LOC) ? argv[ARG_FILE_LOC] : NULL;
 
+#ifdef SECUTILS_USE_ICV
     if (strcmp(option, "-protect_icv") == 0 && file) {
         if (FILES_protect_icv_at(uta_ctx, file, file_loc)) {
             ret = EXIT_SUCCESS;
@@ -65,9 +64,13 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "       %s -check_icv <file> [<file_location>]\n", prog);
         fprintf(stderr, "       %s -help\n", prog);
     }
+#else
+    LOG(FL_WARN, "Not using ICV protection because SECUTILS_USE_ICV was not defined");
+#endif
 
-#ifdef SECUTILS_USE_UTA
     uta_close(uta_ctx);
+#else
+    LOG(FL_WARN, "Not using UTA lib because SECUTILS_USE_UTA was not defined");
 #endif
     return ret;
 }
