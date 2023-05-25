@@ -22,7 +22,7 @@ Description: libsecutils C headers
  Only needed for development
 
 Package: libsecutils-bins
-Depends: libsecutils${binary:Version}, ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Architecture: any
 Description: libsecutils helper binaries
  Stand-alone helper CLI applications using libsecutils
