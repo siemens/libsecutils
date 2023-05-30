@@ -150,7 +150,7 @@ OBJS := $(patsubst %.c,$(BUILDDIR)/%$(OBJ),$(notdir $(wildcard src/*/*.c)))
 # Default target
 all: build_all doc
 
-build_only: $(OUT_DIR)/$(OUTLIB)
+build_only: include/secutils/static_config.h $(OUT_DIR)/$(OUTLIB)
 
 build:
 ifeq ($(COV_ENABLED), 1)
@@ -164,6 +164,24 @@ ifneq ($(SECUTILS_USE_ICV),)
 endif
 
 build_all: build util
+
+%.h: %.h.in # limitation: this is not triggered when any of the env. vars changes
+	cp $< $@
+ifdef SECUTILS_USE_UTA
+	@sed -i -e 's|#cmakedefine SECUTILS_USE_UTA|#define SECUTILS_USE_UTA|' $@
+else
+	@sed -i -e 's|#cmakedefine SECUTILS_USE_UTA|/* #undef SECUTILS_USE_UTA */|' $@
+endif
+ifdef SECUTILS_USE_ICV
+	@sed -i -e 's|#cmakedefine SECUTILS_USE_ICV|#define SECUTILS_USE_ICV|' $@
+else
+	@sed -i -e 's|#cmakedefine SECUTILS_USE_ICV|/* #undef SECUTILS_USE_ICV */|' $@
+endif
+ifdef SECUTILS_NO_TLS
+	@sed -i -e 's|#cmakedefine SECUTILS_NO_TLS|#define SECUTILS_NO_TLS|' $@
+else
+	@sed -i -e 's|#cmakedefine SECUTILS_NO_TLS|/* #undef SECUTILS_NO_TLS */|' $@
+endif
 
 # Binary output target
 $(OUT_DIR)/$(OUTLIB).$(VERSION): $(OBJS)
