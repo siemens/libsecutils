@@ -234,9 +234,10 @@ install: # doc/html $(OUT_DIR)/$(OUTLIB) ./$(OUTBIN)
 	find include/secutils -type d -exec install -d '$(DEST_INC)/{}' ';'
 	find include/secutils -type f -exec install -Dm 0644 '{}' '$(DEST_INC)/{}' ';'
 #install_bins:
-ifneq ($(SECUTILS_USE_ICV),)
-	install -D ./$(OUTBIN) $(DEST_BIN)/$(OUTBIN)
+ifeq ($(SECUTILS_USE_ICV),)
+	touch ./$(OUTBIN) # workaround for Debian packaging
 endif
+	install -D ./$(OUTBIN) $(DEST_BIN)/$(OUTBIN)
 #install_doc:
 	ln -sf doc/html
 	find html/ -type d -exec install -d '$(DEST_DOC)/{}' ';'
