@@ -24,7 +24,6 @@
 #define X509_V_ERR_STORE_LOOKUP 70 /* from x509_vfy.h */
 #endif
 
-#include "../storage/uta_api.h"
 #include "../util/log.h"
 
 #define X509_V_FLAG_ALLOW_EXPIRED_NONROOT_CERTS 0x400000
@@ -72,7 +71,6 @@ int CREDENTIALS_print_cert_verify_cb(int ok, X509_STORE_CTX* ctx_x509);
 /* TODO DvO remove this function when the ones using it are merged upstream */
 bool verify_cb_cert(X509_STORE_CTX* store_ctx, X509* cert, int err);
 
-#ifdef SECUTILS_USE_UTA
 /*!*****************************************************************************
  * @brief attempt to verify certificate
  *
@@ -86,6 +84,5 @@ bool verify_cb_cert(X509_STORE_CTX* store_ctx, X509* cert, int err);
  *******************************************************************************/
 int CREDENTIALS_verify_cert(OPTIONAL uta_ctx* ctx, X509* cert,
                             OPTIONAL const STACK_OF(X509) * untrusted, X509_STORE* trust_store);
-#endif
 
 #endif /* SECUTILS_VERIFY_H_ */
