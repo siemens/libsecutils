@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: libsecutils
-Upstream-Contact: David von Oheimb <David.von.Oheimb@siemens.com>
+Upstream-Contact: David von Oheimb <David.von.Oheimb@siemens.com>, Benjamin Schilling <Schilling.Benjamin@siemens.com>
 
 Files: *
 Copyright: 2021 Siemens Mobility AG
