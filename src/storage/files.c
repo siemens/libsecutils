@@ -866,12 +866,12 @@ static ENGINE* try_load_engine(const char* engine)
 #endif
 
 
+#ifndef OPENSSL_NO_ENGINE
 /* adapted from OpenSSL:apps/lib/apps.c just for visibility reasons */
 static ENGINE* setup_engine_no_default(const char* engine, int debug)
 {
     ENGINE* e = 0;
 
-#ifndef OPENSSL_NO_ENGINE
     if(engine not_eq 0)
     {
         if(strcmp(engine, "auto") is_eq 0)
@@ -909,32 +909,29 @@ static ENGINE* setup_engine_no_default(const char* engine, int debug)
 
         LOG(FL_ERR, "engine \"%s\" set.", ENGINE_get_id(e));
     }
-#endif
     return e;
 }
 
-
 static void release_engine(ENGINE* e)
 {
-#ifndef OPENSSL_NO_ENGINE
     if(e not_eq 0)
     {
         /* Free our "structural" reference. */
         ENGINE_free(e);
     }
-#endif
 }
+#endif
 
 
 static EVP_PKEY* load_key_engine(const char* keyid, const char* pass, const char* engine, const char* desc)
 {
     EVP_PKEY* pkey = 0;
+#ifndef OPENSSL_NO_ENGINE
     PW_CB_DATA cb_data;
 
     cb_data.password = pass;
     cb_data.prompt_info = keyid;
 
-#ifndef OPENSSL_NO_ENGINE
     if(engine is_eq 0)
     {
         LOG(FL_ERR, "no engine specified");
