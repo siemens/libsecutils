@@ -13,13 +13,6 @@ set_target_properties(siemens_libsecutils PROPERTIES
 
 target_compile_features(siemens_libsecutils PRIVATE c_std_90)
 set_target_properties(siemens_libsecutils PROPERTIES C_EXTENSIONS OFF)
-target_compile_options(siemens_libsecutils PRIVATE
-    -Woverflow -Wswitch -Wmissing-prototypes -Wstrict-prototypes
-    -Wtype-limits -Wundef -Wconversion -Wno-shadow -Wno-conversion
-    -Wno-sign-conversion -Wno-unused-parameter -Wno-sign-compare # TODO enable -Wsign-conversion -Wsign-compare -Wunused-parameter
-    -Wformat -Wformat-security -Wno-declaration-after-statement -Wno-vla # -Wpointer-arith -pedantic -DPEDANTIC # -Werror
-    -pedantic -Werror
-)
 
 # must be public, targets linking libsecutils need those too
 target_compile_options(siemens_libsecutils PRIVATE
@@ -38,6 +31,7 @@ target_link_libraries(siemens_libsecutils
 
     PRIVATE
     OpenSSL::SSL
+    secutils_compilation_options
 )
 
 # =============================
