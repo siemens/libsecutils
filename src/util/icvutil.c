@@ -39,7 +39,6 @@ int main(int argc, char *argv[]) {
     const char *file   = (argc > ARG_FILE  ) ? argv[ARG_FILE  ] : NULL;
     const char *file_loc = (argc > ARG_FILE_LOC) ? argv[ARG_FILE_LOC] : NULL;
 
-#ifdef SECUTILS_USE_ICV
     if (strcmp(option, "-protect_icv") == 0 && file) {
         if (FILES_protect_icv_at(uta_ctx, file, file_loc)) {
             ret = EXIT_SUCCESS;
@@ -64,9 +63,6 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "       %s -check_icv <file> [<file_location>]\n", prog);
         fprintf(stderr, "       %s -help\n", prog);
     }
-#else
-    LOG(FL_WARN, "Not using ICV protection because SECUTILS_USE_ICV was not defined");
-#endif
 
     uta_close(uta_ctx);
 #else
