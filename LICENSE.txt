@@ -3,7 +3,8 @@ libsecutils
 Copyright (c) Siemens Mobility GmbH, 2021
 
 Authors:
- David von Oheimb <david.von.oheimb@siemens.com>
+ David von Oheimb <David.von.oheimb@siemens.com>
+ Martin Bárta <Martin.Barta@siemens.com>
 
 This work is licensed under the terms of the Apache Software License 2.0.
 
