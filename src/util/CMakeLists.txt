@@ -11,15 +11,8 @@ set_target_properties(siemens_icvutil PROPERTIES
 
 target_compile_features(siemens_icvutil PRIVATE c_std_90)
 set_target_properties(siemens_icvutil PROPERTIES C_EXTENSIONS OFF)
-target_compile_options(siemens_icvutil PRIVATE
-    -Woverflow -Wswitch -Wmissing-prototypes -Wstrict-prototypes
-    -Wtype-limits -Wundef -Wconversion -Wno-shadow -Wno-conversion
-    -Wno-sign-conversion -Wno-unused-parameter -Wno-sign-compare # TODO enable -Wsign-conversion -Wsign-compare -Wunused-parameter
-    -Wformat -Wformat-security -Wno-declaration-after-statement -Wno-vla # -Wpointer-arith -pedantic -DPEDANTIC # -Werror
-    -pedantic -Werror
-)
 
-target_link_libraries(siemens_icvutil PRIVATE siemens::libsecutils)
+target_link_libraries(siemens_icvutil PRIVATE siemens::libsecutils secutils_compilation_options)
 
 # =============================
 # Installing
