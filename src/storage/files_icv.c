@@ -13,7 +13,7 @@
 * SPDX-License-Identifier: Apache-2.0
 */
 
-#include <secutils/static_config.h>
+#include <secutils/basic.h>
 #ifdef SECUTILS_USE_ICV
 
 #include <openssl/hmac.h>
