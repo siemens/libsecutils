@@ -45,7 +45,7 @@ install(TARGETS siemens_libsecutils
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     COMPONENT siemens_libsecutils_Runtime
     NAMELINK_COMPONENT siemens_libsecutils_Development
-    INCLUDES DESTINATION include
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
 install(EXPORT siemens_libsecutilsTargets
@@ -69,7 +69,7 @@ install(FILES
 )
 
 install(DIRECTORY include/
-    DESTINATION include
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     COMPONENT siemens_libsecutils_Development
     PATTERN CMakeLists.txt EXCLUDE
 )
