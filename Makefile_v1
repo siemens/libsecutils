@@ -12,7 +12,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-# Optional OPENSSL_DIR and OPENSSL_LIB define absolute or relative (to ../) path to OpenSSL installation
+# Optional OPENSSL_DIR defines absolute or relative (to ../) path to OpenSSL installation
+# Optional OPENSSL_LIB defines where to find the OpenSSL library installation (default: OPENSSL_DIR/lib).
 # Optional CFLAGS and LDFLAGS are appended by local settings.
 # Optional DEBUG_FLAGS may set to prepend to local CFLAGS and LDFLAGS (default see below).
 # Builds are done in release mode if optional NDEBUG is defined.
@@ -209,7 +210,7 @@ $(BUILDDIR):
 $(OBJS): | $(BUILDDIR)
 
 deb:
-	debuild -e OPENSSL_DIR=$(OPENSSL_DIR) -e OPENSSL_LIB=$(OPENSSL_LIB) \
+	debuild -e OPENSSL_DIR="$(OPENSSL_DIR)" -e OPENSSL_LIB="$(OPENSSL_LIB)" \
 	  --preserve-envvar SECUTILS_NO_TLS \
 	  --preserve-envvar SECUTILS_USE_ICV \
 	  --preserve-envvar SECUTILS_USE_UTA -uc -us \
