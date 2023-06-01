@@ -223,7 +223,7 @@ clean_deb:
 
 # installation target - append ROOTFS=<path> to install into virtual root
 # filesystem
-install: # doc/html $(OUT_DIR)/$(OUTLIB) ./$(OUTBIN)
+install: # doc/html $(OUT_DIR)/$(OUTLIB) $(OUT_DIR)/$(OUTBIN)
 	install -D $(OUT_DIR)/$(OUTLIB).$(VERSION) $(DEST_LIB)/$(OUTLIB).$(VERSION)
 	ln -sfr $(DEST_LIB)/$(OUTLIB){.$(VERSION),}
 #install_headers:
@@ -232,9 +232,9 @@ install: # doc/html $(OUT_DIR)/$(OUTLIB) ./$(OUTBIN)
 	find include/secutils -type f -exec install -Dm 0644 '{}' '$(DEST_INC)/{}' ';'
 #install_bins:
 ifeq ($(SECUTILS_USE_ICV),)
-	touch ./$(OUTBIN) # workaround for Debian packaging
+	touch $(OUT_DIR)/$(OUTBIN) # workaround for Debian packaging
 endif
-	install -D ./$(OUTBIN) $(DEST_BIN)/$(OUTBIN)
+	install -D $(OUT_DIR)/$(OUTBIN) $(DEST_BIN)/$(OUTBIN)
 #install_doc:
 	ln -sfr doc/html doc/libsecutils
 	find doc/libsecutils/ -type d -exec install -d '$(DEST_DOC)/{}' ';'
@@ -250,12 +250,13 @@ uninstall:
 clean_uta:
 	rm -f $(BUILDDIR)/uta_api$(OBJ) $(BUILDDIR)/files_icv$(OBJ) \
           $(BUILDDIR)/files_dv$(OBJ) \
-          $(OUT_DIR)/$(OUTLIB)* ./$(OUTBIN) $(OUT_DIR)/util/icvutil.o
+          $(OUT_DIR)/$(OUTLIB)* $(OUT_DIR)/$(OUTBIN) $(OUT_DIR)/util/icvutil.o
 
 clean:
 	@# rm -fr CMakeCache.txt *.cmake install_manifest.txt CMakeFiles/
 	rm -f $(OUT_DIR)/$(OUTLIB)*
-	rm -f ./$(OUTBIN)
+	rm -f $(OUT_DIR)/$(OUTBIN)
+	$(MAKE) -C util clean OUT_DIR="$(OUT_DIR)"
 	rm -fr $(BUILDDIR) doc
 
 clean_all: clean clean_deb
