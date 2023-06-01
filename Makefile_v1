@@ -95,10 +95,10 @@ override CFLAGS += -isystem $(OPENSSL)/include# # # use of -isystem is critical 
 override CFLAGS += -Iinclude
 override CFLAGS += -Iinclude/secutils
 ifneq ($(SECUTILS_USE_UTA),)
-    # override CFLAGS += -DSECUTILS_USE_UTA=1
+    override CFLAGS += -DSECUTILS_USE_UTA=1
 endif
 ifneq ($(SECUTILS_USE_ICV),)
-    # override CFLAGS += -DSECUTILS_USE_ICV=1
+    override CFLAGS += -DSECUTILS_USE_ICV=1
 endif
 
 override LDFLAGS += $(DEBUG_FLAGS) # needed for -fsanitize=...
@@ -110,7 +110,7 @@ ifneq ($(SECUTILS_USE_UTA),)
     override LDFLAGS += -luta
 endif
 ifneq ($(SECUTILS_NO_TLS),)
-    # override CFLAGS += -DSECUTILS_NO_TLS=1
+    override CFLAGS += -DSECUTILS_NO_TLS=1
 else
     override LDFLAGS += -lssl
 endif
