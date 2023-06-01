@@ -1,7 +1,7 @@
 /** 
-* @file static_config.h
+* @file secutils_static_config.h
 * 
-* @brief Static configuration of the library itself
+* @brief Static configuration of the Security Utilities
 *
 * @copyright Copyright (c) Siemens Mobility GmbH, 2023
 *

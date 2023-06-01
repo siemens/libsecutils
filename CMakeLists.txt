@@ -91,7 +91,7 @@ set(INC_PUBLIC_HDRS
   ${INC_DIR}/util/log.h
   ${INC_DIR}/operators.h
   ${INC_DIR}/basic.h
-  ${INC_DIR}/static_config.h
+  ${INC_DIR}/secutils_static_config.h
 )
 
 include_directories(${INC_DIR}/.. ${INC_DIR})
@@ -138,7 +138,8 @@ if(DEFINED ENV{SECUTILS_USE_ICV})
     )
 endif()
 
-configure_file(${INC_DIR}/static_config.h.in ${INC_DIR}/static_config.h)
+configure_file(${INC_DIR}/secutils_static_config.h.in
+               ${INC_DIR}/secutils_static_config.h)
 
 # set_property(TARGET secutils PROPERTY C_STANDARD 90)
 

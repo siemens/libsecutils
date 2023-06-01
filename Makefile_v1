@@ -150,7 +150,7 @@ OBJS := $(patsubst %.c,$(BUILDDIR)/%$(OBJ),$(notdir $(wildcard src/*/*.c)))
 # Default target
 all: build_all doc
 
-build_only: include/secutils/static_config.h $(OUT_DIR)/$(OUTLIB)
+build_only: $(OUT_DIR)/$(OUTLIB)
 
 build:
 ifeq ($(COV_ENABLED), 1)
@@ -191,7 +191,7 @@ $(OUT_DIR)/$(OUTLIB): $(OUT_DIR)/$(OUTLIB).$(VERSION)
 	ln -sfr $(OUT_DIR)/$(OUTLIB){.$(VERSION),}
 
 # Individual object targets; also provide dependencies on header files of the project (not on system headers)
-$(BUILDDIR)/%$(OBJ): %.c
+$(BUILDDIR)/%$(OBJ): %.c include/secutils/secutils_static_config.h
 	 $(CC) $(CFLAGS) $(LOCAL_CFLAGS) -c $< -o $@
 	@$(CC) $(CFLAGS) $(LOCAL_CFLAGS) -MM $< -MT $@ -MF $(BUILDDIR)/$*.d
 DEPS = $(OBJS:$(OBJ)=.d)
@@ -259,6 +259,7 @@ clean:
 	rm -fr $(BUILDDIR) doc
 
 clean_all: clean clean_deb
+	rm -f include/secutils/secutils_static_config.h
 	$(MAKE) -C util clean
 	rm -rf doc refman.pdf *.gcov reports
 
