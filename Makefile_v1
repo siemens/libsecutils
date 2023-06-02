@@ -147,7 +147,7 @@ OBJS := $(patsubst %.c,$(BUILDDIR)/%$(OBJ),$(notdir $(wildcard src/*/*.c)))
 ################################################################################
 
 # Phony (non-file) targets
-.PHONY: all doc util build build_only build_all clean clean_all clean_uta install uninstall deb clean_deb coverage
+.PHONY: all doc util build build_only build_all clean clean_config clean_all clean_uta install uninstall deb clean_deb coverage
 
 # Default target
 all: build_all doc
@@ -160,14 +160,15 @@ ifeq ($(COV_ENABLED), 1)
 endif
 	$(MAKE) -f Makefile_v1 COMPILE_TYPE=$(COMPILE_TYPE) build_only
 
-util: include/secutils/secutils_static_config.h
+SECUTILS_CONFIG=include/secutils/secutils_static_config.h
+util: $(SECUTILS_CONFIG)
 ifneq ($(SECUTILS_USE_ICV),)
 	$(MAKE) -C util CFLAGS="$(CFLAGS) $(LOCAL_CFLAGS)" LDFLAGS="$(LDFLAGS)" OUT_DIR="$(OUT_DIR)"
 endif
 
 build_all: build util
 
-%.h: %.h.in # limitation: this is not triggered when any of the env. vars changes
+$(SECUTILS_CONFIG): $(SECUTILS_CONFIG).in # limitation: this is not triggered when any of the env. vars changes
 	cp $< $@
 ifdef SECUTILS_USE_UTA
 	@sed -i -e 's|#cmakedefine SECUTILS_USE_UTA|#define SECUTILS_USE_UTA|' $@
@@ -193,7 +194,7 @@ $(OUT_DIR)/$(OUTLIB): $(OUT_DIR)/$(OUTLIB).$(VERSION)
 	ln -sfr $(OUT_DIR)/$(OUTLIB){.$(VERSION),}
 
 # Individual object targets; also provide dependencies on header files of the project (not on system headers)
-$(BUILDDIR)/%$(OBJ): %.c include/secutils/secutils_static_config.h
+$(BUILDDIR)/%$(OBJ): %.c $(SECUTILS_CONFIG)
 	 $(CC) $(CFLAGS) $(LOCAL_CFLAGS) -c $< -o $@
 	@$(CC) $(CFLAGS) $(LOCAL_CFLAGS) -MM $< -MT $@ -MF $(BUILDDIR)/$*.d
 DEPS = $(OBJS:$(OBJ)=.d)
@@ -263,8 +264,10 @@ clean:
 	$(MAKE) -C util clean OUT_DIR="$(OUT_DIR)"
 	rm -fr $(BUILDDIR)
 
-clean_all: clean clean_deb
-	rm -f include/secutils/secutils_static_config.h
+clean_config:
+	rm -f $(SECUTILS_CONFIG)
+
+clean_all: clean clean_config clean_deb
 	rm -fr Makefile CMakeCache.txt *.cmake CMakeFiles/
 	rm -f install_manifest*.txt
 	rm -fr doc refman.pdf *.gcov reports
