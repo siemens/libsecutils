@@ -178,7 +178,9 @@ SSL_CTX* TLS_CTX_new(OPTIONAL SSL_CTX* ssl_ctx,
                 /* disable any cert status/revocation checking etc. */
                 X509_VERIFY_PARAM_clear_flags(vpm,
                                               compl(X509_V_FLAG_USE_CHECK_TIME
-                                                bitor X509_V_FLAG_NO_CHECK_TIME));
+                                                bitor X509_V_FLAG_NO_CHECK_TIME
+                                                bitor X509_V_FLAG_PARTIAL_CHAIN
+                                                bitor X509_V_FLAG_POLICY_CHECK));
                 X509_VERIFY_PARAM_set_flags(vpm, X509_V_FLAG_NONFINAL_CHECK);
             }
             int ret = SSL_CTX_build_cert_chain(ctx,
