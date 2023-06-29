@@ -25,7 +25,7 @@ doc/
 build/
 dependencies/
 icvutil
-
+secutils_static_config.h
 debian/.debhelper
 debian/debhelper-build-stamp
 debian/files
