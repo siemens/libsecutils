@@ -19,7 +19,26 @@ elseif(NOT CMAKE_BUILD_TYPE)
     CACHE STRING "Choose the type of build." FORCE)
 endif()
 
-find_package(OpenSSL MODULE REQUIRED COMPONENTS SSL)
+if(NOT("$ENV{OPENSSL_DIR}" STREQUAL ""))
+  message(STATUS "Using OpenSSL from " $ENV{OPENSSL_DIR})
+  set(OPENSSL_ROOT_DIR "$ENV{OPENSSL_DIR}")
+endif()
+
+find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
+
+if(NOT("$ENV{OPENSSL_LIB}" STREQUAL ""))
+  if(TARGET OpenSSL::SSL)
+    set_target_properties(OpenSSL::SSL PROPERTIES
+      IMPORTED_LOCATION $ENV{OPENSSL_LIB}/libssl.so
+    )
+  endif()
+
+  if(TARGET OpenSSL::Crypto)
+    set_target_properties(OpenSSL::Crypto PROPERTIES
+      IMPORTED_LOCATION $ENV{OPENSSL_LIB}/libcrypto.so
+    )
+  endif()
+endif()
 
 option(SIEMENS_LIBSECUTILS_USE_UTA "Use UTA API" OFF)
 option(SIEMENS_LIBSECUTILS_USE_ICV "Use configuration ICV" OFF)

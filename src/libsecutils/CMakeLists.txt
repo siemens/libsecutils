@@ -31,6 +31,7 @@ target_link_libraries(siemens_libsecutils
 
     PRIVATE
     OpenSSL::SSL
+    OpenSSL::Crypto
     secutils_compilation_options
 )
 
