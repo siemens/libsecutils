@@ -5,6 +5,8 @@ project(
   VERSION 2.0.0 # always 3 components for correct versioning
   LANGUAGES C)
 
+message(STATUS "SecurityUtilities version " ${siemens_secutils_VERSION})
+
 if(DEFINED ENV{NDEBUG})
   message(STATUS "Setting build type to 'Release' because NDEBUG was set.")
   set(CMAKE_BUILD_TYPE
