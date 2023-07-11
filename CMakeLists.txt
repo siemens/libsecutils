@@ -25,15 +25,6 @@ option(SIEMENS_LIBSECUTILS_USE_UTA "Use UTA API" OFF)
 option(SIEMENS_LIBSECUTILS_USE_ICV "Use configuration ICV" OFF)
 option(SIEMENS_LIBSECUTILS_NO_TLS "Do not use TLS" OFF)
 
-add_library(secutils_compilation_options INTERFACE)
-target_compile_options(secutils_compilation_options INTERFACE
-  -Woverflow -Wswitch -Wmissing-prototypes -Wstrict-prototypes
-  -Wtype-limits -Wundef -Wconversion -Wno-shadow -Wno-conversion
-  -Wno-sign-conversion -Wno-unused-parameter -Wno-sign-compare # TODO enable -Wsign-conversion -Wsign-compare -Wunused-parameter
-  -Wformat -Wformat-security -Wno-declaration-after-statement -Wno-vla # -Wpointer-arith
-  -pedantic -Werror
-)
-
 add_subdirectory(src)
 
 # =============================
