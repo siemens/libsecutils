@@ -242,14 +242,15 @@ static char* component_creds_id2file(component_creds_id cid)
         path = CREDS_DIR_DEFAULT;
     }
 
-    res = malloc(strlen(path) + strlen("/") + strlen(cid) + strlen(".p12") + 1);
+    size_t len = strlen(path) + strlen("/") + strlen(cid) + strlen(".p12") + 1;
+    res = malloc(len);
     if(res is_eq 0)
     {
         LOG_err("out of memory");
         return 0;
     }
 
-    sprintf(res, "%s/%s.p12", path, cid);
+    snprintf(res, len, "%s/%s.p12", path, cid);
     return res;
 }
 

@@ -13,8 +13,12 @@ message(STATUS "SecurityUtilities version " ${LIBSECUTILS_VERSION})
 
 # set(CMAKE_VERBOSE_MAKEFILE on)
 
-set(CMAKE_INSTALL_PREFIX "/usr") # must be set before include(GNUInstallDirs)
-include(GNUInstallDirs)
+if(APPLE)
+  set(CMAKE_INSTALL_PREFIX "tmp")
+else()
+  set(CMAKE_INSTALL_PREFIX "/usr")
+endif()
+include(GNUInstallDirs) # CMAKE_INSTALL_PREFIX must be set before
 
 if(NOT("$ENV{OPENSSL_DIR}" STREQUAL ""))
   message(STATUS "using OpenSSL from " $ENV{OPENSSL_DIR})
@@ -24,12 +28,13 @@ if(NOT("$ENV{OPENSSL_DIR}" STREQUAL ""))
     set(OPENSSL_LIB $ENV{OPENSSL_DIR})
   endif()
   set(OpenSSL_INCLUDE_DIRS $ENV{OPENSSL_DIR}/include)
-  set(OPENSSL_LIBRARIES ${OPENSSL_LIB}/libssl.so ${OPENSSL_LIB}/libcrypto.so)
+  set(OPENSSL_LIBRARIES ${OPENSSL_LIB}/libssl${CMAKE_SHARED_LIBRARY_SUFFIX}
+                        ${OPENSSL_LIB}/libcrypto${CMAKE_SHARED_LIBRARY_SUFFIX})
   add_definitions(-isystem ${OpenSSL_INCLUDE_DIRS})
 else()
   find_package(OpenSSL REQUIRED)
-  message(STATUS "using OpenSSL version " ${OPENSSL_VERSION})
-  add_definitions(-isystem /usr/include)
+  message(STATUS "using OpenSSL package, with version " ${OPENSSL_VERSION})
+  add_definitions(-isystem ${OPENSSL_INCLUDE_DIR})
 endif()
 
 set(SRC_DIR ${PROJECT_SOURCE_DIR}/src)
@@ -107,9 +112,11 @@ if(CMAKE_BUILD_TYPE MATCHES Release OR DEFINED ENV{NDEBUG})
 else()
   message(STATUS "build mode: Debug")
   add_definitions(-g -O0)
-  set(DEBUG_FLAGS -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all)
+
+  set(DEBUG_FLAGS "-fsanitize=address,undefined -fno-sanitize-recover=all") # must use quotes on MacOSX
   add_definitions(${DEBUG_FLAGS})
   link_libraries(${DEBUG_FLAGS})
+  set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS} ${DEBUG_FLAGS}) # workarund for link_libraries() ignored on MacOSX
 endif()
 
 add_definitions(
@@ -156,6 +163,8 @@ configure_file(${INC_DIR}/secutils_static_config.h.in
                ${INC_DIR}/secutils_static_config.h)
 
 # set_property(TARGET ${LIBSECUTILS_NAME} PROPERTY C_STANDARD 90)
+
+target_link_libraries(${LIBSECUTILS_NAME} ${OPENSSL_LIBRARIES}) # needed for clang/MacOSX
 
 set_target_properties(${LIBSECUTILS_NAME} PROPERTIES
   VERSION ${LIBSECUTILS_VERSION} SOVERSION ${LIBSECUTILS_VERSION_MAJOR}
@@ -250,6 +259,10 @@ Development support for libsecutils")
 set(CPACK_COMPONENT_BIN_DESCRIPTION "libsecutils helper binaries
 Stand-alone helper CLI applications using libsecutils")
 
+if(APPLE)
+  set(CPACK_GENERATOR "Bundle")
+  set(CPACK_BUNDLE_NAME "${PROJECT_NAME}")
+else()
 set(CPACK_GENERATOR "DEB")
 set(CPACK_DEB_COMPONENT_INSTALL ON)
 set(CPACK_DEBIAN_FILE_NAME DEB-DEFAULT)
@@ -268,6 +281,7 @@ set(CPACK_DEBIAN_DEV_PACKAGE_SUGGESTS "libssl-dev, libuta-dev")
 # CPack Deb does not create postinst when installing to /usr/lib/x86_64-linux-gnu
 set(CPACK_DEBIAN_LIB_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/triggers")
 set(CPACK_DEBIAN_LIB_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
+endif() # Apple
 
 set(CPACK_SOURCE_GENERATOR "TGZ")
 #set(CPACK_SET_DESTDIR TRUE) # prevents package creation error when using cpack
@@ -281,6 +295,7 @@ set(CPACK_SOURCE_IGNORE_FILES
   \\.gz$
   \\.o$
   \\.so
+  \\.dylib$
   \./attic/
   \./tmp/
   CMakeFiles/
@@ -323,8 +338,10 @@ foreach(component IN LISTS CPACK_COMPONENTS_ALL)
 endforeach()
 
 if(NOT TARGET deb)
-  set (deb_pack_full_name
-    "${CMAKE_CURRENT_BINARY_DIR}/${CPACK_PACKAGE_NAME}-dev_${CPACK_PACKAGE_VERSION}_all.deb")
+  if(NOT APPLE)
+    set (deb_pack_full_name
+      "${CMAKE_CURRENT_BINARY_DIR}/${CPACK_PACKAGE_NAME}-dev_${CPACK_PACKAGE_VERSION}_all.deb")
+  endif()
   add_custom_command(
     OUTPUT "${deb_pack_full_name}"
     DEPENDS build
