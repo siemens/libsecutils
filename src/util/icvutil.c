@@ -25,14 +25,16 @@
 
 int main(int argc, char *argv[]) {
     int ret = EXIT_FAILURE;
-
-#ifdef SECUTILS_USE_UTA
     uta_ctx *uta_ctx = NULL;
 
+#ifdef SECUTILS_USE_UTA
     if ((uta_ctx = uta_open()) == NULL) {
         LOG(FL_EMERG, "failure getting UTA ctx");
         return ret;
     }
+#else
+    LOG(FL_WARN, "Not using UTA lib because SECUTILS_USE_UTA was not defined");
+#endif
 
     const char *prog = argv[0];
     const char *option = (argc > ARG_OPTION) ? argv[ARG_OPTION] : "";
@@ -64,9 +66,8 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "       %s -help\n", prog);
     }
 
+#ifdef SECUTILS_USE_UTA
     uta_close(uta_ctx);
-#else
-    LOG(FL_WARN, "Not using UTA lib because SECUTILS_USE_UTA was not defined");
 #endif
     return ret;
 }
