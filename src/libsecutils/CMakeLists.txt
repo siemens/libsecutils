@@ -45,7 +45,7 @@ install(TARGETS security-utilities_library
 )
 
 install(EXPORT security-utilities_libraryTargets
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/siemens
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/security-utilities
     NAMESPACE security-utilities::
     FILE security-utilities_libraryTargets.cmake
     COMPONENT security-utilities_library_Development
@@ -60,7 +60,7 @@ write_basic_package_version_file(
 install(FILES
     security-utilities_libraryConfig.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/security-utilities_libraryConfigVersion.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/siemens
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/security-utilities
     COMPONENT security-utilities_library_Development
 )
 

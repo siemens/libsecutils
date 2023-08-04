@@ -27,7 +27,7 @@ install(TARGETS security-utilities_icvutil
 )
 
 install(EXPORT security-utilities_icvutilTargets
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/siemens
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/security-utilities
     NAMESPACE security-utilities::
     FILE security-utilities_icvutilTargets.cmake
     COMPONENT security-utilities_icvutil_Development
@@ -42,6 +42,6 @@ write_basic_package_version_file(
 install(FILES
     security-utilities_icvutilConfig.cmake
     ${CMAKE_CURRENT_BINARY_DIR}/security-utilities_icvutilConfigVersion.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/siemens
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/security-utilities
     COMPONENT security-utilities_icvutil_Development
 )
