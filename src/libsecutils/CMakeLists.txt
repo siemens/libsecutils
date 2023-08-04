@@ -14,14 +14,6 @@ set_target_properties(security-utilities_library PROPERTIES
 target_compile_features(security-utilities_library PRIVATE c_std_90)
 set_target_properties(security-utilities_library PROPERTIES C_EXTENSIONS ON)
 
-# must be public, targets linking libsecutils need those too
-target_compile_options(security-utilities_library PRIVATE
-    $<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all>
-)
-target_link_options(security-utilities_library PUBLIC
-    $<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all>
-)
-
 add_subdirectory(include)
 add_subdirectory(src)
 

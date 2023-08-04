@@ -9,6 +9,11 @@ target_compile_options(secutils_compilation_options INTERFACE
     # -Werror
 )
 
+add_library(security-utlities_sanitizer_options INTERFACE)
+set(SANITIZER_FLAGS -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all)
+target_compile_options(security-utlities_sanitizer_options INTERFACE ${SANITIZER_FLAGS})
+target_link_options(security-utlities_sanitizer_options INTERFACE ${SANITIZER_FLAGS})
+
 add_subdirectory(libsecutils)
 
 if(SIEMENS_LIBSECUTILS_USE_ICV OR DEFINED ENV{SECUTILS_USE_ICV})
