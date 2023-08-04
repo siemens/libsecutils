@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.13)
 
 project(
-  siemens_secutils
+  security-utilities
   VERSION 2.0.0 # always 3 components for correct versioning
   LANGUAGES C)
 
-message(STATUS "SecurityUtilities version " ${siemens_secutils_VERSION})
+message(STATUS "SecurityUtilities version " ${security-utilities_VERSION})
 
 if(DEFINED ENV{NDEBUG})
   message(STATUS "Setting build type to 'Release' because NDEBUG was set.")
