@@ -19,7 +19,7 @@ add_subdirectory(src)
 
 target_link_libraries(security-utilities_library
     PUBLIC
-    $<$<BOOL:${SIEMENS_LIBSECUTILS_USE_UTA}>:-luta>
+    $<$<BOOL:${SECURITY_UTILITIES_USE_UTA}>:-luta>
 
     # must be public, targets linking the library need those too
     $<$<CONFIG:Debug>:security-utlities_sanitizer_options>

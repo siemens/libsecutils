@@ -16,6 +16,6 @@ target_link_options(security-utlities_sanitizer_options INTERFACE ${SANITIZER_FL
 
 add_subdirectory(libsecutils)
 
-if(SIEMENS_LIBSECUTILS_USE_ICV OR DEFINED ENV{SECUTILS_USE_ICV})
+if(SECURITY_UTILITIES_USE_ICV OR DEFINED ENV{SECUTILS_USE_ICV})
     add_subdirectory(util)
 endif()

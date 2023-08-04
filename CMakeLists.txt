@@ -40,9 +40,9 @@ if(NOT("$ENV{OPENSSL_LIB}" STREQUAL ""))
   endif()
 endif()
 
-option(SIEMENS_LIBSECUTILS_USE_UTA "Use UTA API" OFF)
-option(SIEMENS_LIBSECUTILS_USE_ICV "Use configuration ICV" OFF)
-option(SIEMENS_LIBSECUTILS_NO_TLS "Do not use TLS" OFF)
+option(SECURITY_UTILITIES_USE_UTA "Use UTA API" OFF)
+option(SECURITY_UTILITIES_USE_ICV "Use configuration ICV" OFF)
+option(SECURITY_UTILITIES_NO_TLS "Do not use TLS" OFF)
 
 add_subdirectory(src)
 
