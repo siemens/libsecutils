@@ -1,18 +1,18 @@
 # =============================
 # Define targets
 # =============================
-add_executable(siemens_icvutil icvutil.c)
-add_executable(siemens::icvutil ALIAS siemens_icvutil)
+add_executable(security-utilities_icvutil icvutil.c)
+add_executable(security-utilities::icvutil ALIAS security-utilities_icvutil)
 
-set_target_properties(siemens_icvutil PROPERTIES
+set_target_properties(security-utilities_icvutil PROPERTIES
     EXPORT_NAME icvutil
     OUTPUT_NAME icvutil
 )
 
-target_compile_features(siemens_icvutil PRIVATE c_std_90)
-set_target_properties(siemens_icvutil PROPERTIES C_EXTENSIONS OFF)
+target_compile_features(security-utilities_icvutil PRIVATE c_std_90)
+set_target_properties(security-utilities_icvutil PROPERTIES C_EXTENSIONS OFF)
 
-target_link_libraries(siemens_icvutil PRIVATE siemens::libsecutils secutils_compilation_options)
+target_link_libraries(security-utilities_icvutil PRIVATE security-utilities::library secutils_compilation_options)
 
 # =============================
 # Installing
@@ -20,28 +20,28 @@ target_link_libraries(siemens_icvutil PRIVATE siemens::libsecutils secutils_comp
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
-install(TARGETS siemens_icvutil
-    EXPORT siemens_icvutilTargets
+install(TARGETS security-utilities_icvutil
+    EXPORT security-utilities_icvutilTargets
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT siemens_icvutil_Runtime
+    COMPONENT security-utilities_icvutil_Runtime
 )
 
-install(EXPORT siemens_icvutilTargets
+install(EXPORT security-utilities_icvutilTargets
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/siemens
-    NAMESPACE siemens::
-    FILE siemens_icvutilTargets.cmake
-    COMPONENT siemens_icvutil_Development
+    NAMESPACE security-utilities::
+    FILE security-utilities_icvutilTargets.cmake
+    COMPONENT security-utilities_icvutil_Development
 )
 
 write_basic_package_version_file(
-    siemens_icvutilConfigVersion.cmake
-    VERSION ${siemens_icvutil_VERSION}
+    security-utilities_icvutilConfigVersion.cmake
+    VERSION ${security-utilities_icvutil_VERSION}
     COMPATIBILITY SameMajorVersion # semantic versioning
 )
 
 install(FILES
-    siemens_icvutilConfig.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/siemens_icvutilConfigVersion.cmake
+    security-utilities_icvutilConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/security-utilities_icvutilConfigVersion.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/siemens
-    COMPONENT siemens_icvutil_Development
+    COMPONENT security-utilities_icvutil_Development
 )
