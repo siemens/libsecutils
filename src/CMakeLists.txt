@@ -14,6 +14,10 @@ set(SANITIZER_FLAGS -fsanitize=address -fsanitize=undefined -fno-sanitize-recove
 target_compile_options(security-utlities_sanitizer_options INTERFACE ${SANITIZER_FLAGS})
 target_link_options(security-utlities_sanitizer_options INTERFACE ${SANITIZER_FLAGS})
 
+add_library(security-utlities_uta-api INTERFACE)
+target_include_directories(security-utlities_uta-api INTERFACE /usr/local/include)
+target_link_directories(security-utlities_uta-api INTERFACE /usr/local/lib)
+
 add_subdirectory(libsecutils)
 
 if(SECURITY_UTILITIES_USE_ICV OR DEFINED ENV{SECUTILS_USE_ICV})
