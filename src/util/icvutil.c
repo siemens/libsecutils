@@ -15,9 +15,9 @@
 
 #include <stdlib.h> /* for EXIT_SUCCESS */
 
-#include "log.h"
-#include "../include/secutils/storage/files_icv.h"
-#include "../include/secutils/storage/uta_api.h"
+#include "../libsecutils/include/secutils/util/log.h"
+#include "../libsecutils/include/secutils/storage/files_icv.h"
+#include "../libsecutils/include/secutils/storage/uta_api.h"
 
 #define ARG_OPTION    1
 #define ARG_FILE      2
