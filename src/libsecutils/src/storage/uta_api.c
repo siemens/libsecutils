@@ -13,13 +13,14 @@
 * SPDX-License-Identifier: Apache-2.0
 */
 
-#include <storage/uta_api.h>
+#include <secutils/basic.h>
 
 #ifdef SECUTILS_USE_UTA 
 
 #include <openssl/sha.h>
 #include <uta.h>
 
+#include <storage/uta_api.h>
 #include <util/log.h>
 
 #include <operators.h>

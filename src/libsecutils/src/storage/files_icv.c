@@ -19,6 +19,7 @@
 #include <openssl/hmac.h>
 
 #include <storage/files.h>
+#include <storage/files_icv.h>
 #include <storage/uta_api.h>
 #include <util/log.h>
 #include <credentials/verify.h>
