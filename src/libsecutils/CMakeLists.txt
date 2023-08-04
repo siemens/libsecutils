@@ -27,6 +27,7 @@ target_link_libraries(security-utilities_library
     PRIVATE
     OpenSSL::SSL
     OpenSSL::Crypto
+    security-utlities_uta-api
     secutils_compilation_options
 )
 
