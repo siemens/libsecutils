@@ -7,8 +7,8 @@ add_library(siemens::libsecutils ALIAS siemens_libsecutils)
 set_target_properties(siemens_libsecutils PROPERTIES
     EXPORT_NAME libsecutils
     OUTPUT_NAME secutils
-    SOVERSION ${siemens_secutils_VERSION_MAJOR}
-    VERSION ${siemens_secutils_VERSION_MAJOR}.${siemens_secutils_VERSION_MINOR}.${siemens_secutils_VERSION_PATCH}
+    SOVERSION ${security-utilities_VERSION_MAJOR}
+    VERSION ${security-utilities_VERSION_MAJOR}.${security-utilities_VERSION_MINOR}.${security-utilities_VERSION_PATCH}
 )
 
 target_compile_features(siemens_libsecutils PRIVATE c_std_90)
