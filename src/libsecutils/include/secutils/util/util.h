@@ -32,7 +32,7 @@
 # include <limits.h>  /* for INT_MIN */
 # include <unistd.h>
 
-# include "basic.h"
+# include "../basic.h"
 # include "../operators.h"
 
 # include <openssl/err.h>

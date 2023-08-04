@@ -16,8 +16,6 @@
 #ifndef SECUTILS_UTA_API_H_
 #define SECUTILS_UTA_API_H_
 
-#include "static_config.h"
-
 #define DVLEN 8 /* = UTA_LEN_DV_V1 */
 #define TA_OUTLEN 32
 
