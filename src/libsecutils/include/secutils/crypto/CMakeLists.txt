@@ -1,3 +1,3 @@
-target_sources(siemens_libsecutils PRIVATE
+target_sources(security-utilities_library PRIVATE
     crypto.h
 )

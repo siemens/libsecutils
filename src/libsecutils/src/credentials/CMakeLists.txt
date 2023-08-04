@@ -1,4 +1,4 @@
-target_sources(siemens_libsecutils PRIVATE
+target_sources(security-utilities_library PRIVATE
     cert.c
     credentials.c
     key.c

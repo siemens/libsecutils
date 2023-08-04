@@ -1,4 +1,4 @@
-target_sources(siemens_libsecutils PRIVATE
+target_sources(security-utilities_library PRIVATE
     config.h
     config_update.h
     opt.h

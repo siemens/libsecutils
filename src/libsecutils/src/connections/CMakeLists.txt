@@ -1,4 +1,4 @@
-target_sources(siemens_libsecutils PRIVATE
+target_sources(security-utilities_library PRIVATE
     conn.c
     http.c
     tls.c

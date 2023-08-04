@@ -1,33 +1,36 @@
 # =============================
 # Define targets
 # =============================
-add_library(siemens_libsecutils SHARED)
-add_library(siemens::libsecutils ALIAS siemens_libsecutils)
+add_library(security-utilities_library SHARED)
+add_library(security-utilities::library ALIAS security-utilities_library)
 
-set_target_properties(siemens_libsecutils PROPERTIES
-    EXPORT_NAME libsecutils
+set_target_properties(security-utilities_library PROPERTIES
+    EXPORT_NAME library
     OUTPUT_NAME secutils
     SOVERSION ${security-utilities_VERSION_MAJOR}
     VERSION ${security-utilities_VERSION_MAJOR}.${security-utilities_VERSION_MINOR}.${security-utilities_VERSION_PATCH}
 )
 
-target_compile_features(siemens_libsecutils PRIVATE c_std_90)
-set_target_properties(siemens_libsecutils PROPERTIES C_EXTENSIONS OFF)
+target_compile_features(security-utilities_library PRIVATE c_std_90)
+set_target_properties(security-utilities_library PROPERTIES C_EXTENSIONS OFF)
 
 # must be public, targets linking libsecutils need those too
-target_compile_options(siemens_libsecutils PRIVATE
+target_compile_options(security-utilities_library PRIVATE
     $<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all>
 )
-target_link_options(siemens_libsecutils PUBLIC
+target_link_options(security-utilities_library PUBLIC
     $<$<CONFIG:Debug>:-fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all>
 )
 
 add_subdirectory(include)
 add_subdirectory(src)
 
-target_link_libraries(siemens_libsecutils
+target_link_libraries(security-utilities_library
     PUBLIC
     $<$<BOOL:${SIEMENS_LIBSECUTILS_USE_UTA}>:-luta>
+
+    # must be public, targets linking the library need those too
+    $<$<CONFIG:Debug>:security-utlities_sanitizer_options>
 
     PRIVATE
     OpenSSL::SSL
@@ -41,36 +44,36 @@ target_link_libraries(siemens_libsecutils
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
-install(TARGETS siemens_libsecutils
-    EXPORT siemens_libsecutilsTargets
+install(TARGETS security-utilities_library
+    EXPORT security-utilities_libraryTargets
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    COMPONENT siemens_libsecutils_Runtime
-    NAMELINK_COMPONENT siemens_libsecutils_Development
+    COMPONENT security-utilities_library_Runtime
+    NAMELINK_COMPONENT security-utilities_library_Development
     INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
-install(EXPORT siemens_libsecutilsTargets
+install(EXPORT security-utilities_libraryTargets
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/siemens
-    NAMESPACE siemens::
-    FILE siemens_libsecutilsTargets.cmake
-    COMPONENT siemens_libsecutils_Development
+    NAMESPACE security-utilities::
+    FILE security-utilities_libraryTargets.cmake
+    COMPONENT security-utilities_library_Development
 )
 
 write_basic_package_version_file(
-    siemens_libsecutilsConfigVersion.cmake
-    VERSION ${siemens_libsecutils_VERSION}
+    security-utilities_libraryConfigVersion.cmake
+    VERSION ${security-utilities_library_VERSION}
     COMPATIBILITY SameMajorVersion # semantic versioning
 )
 
 install(FILES
-    siemens_libsecutilsConfig.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/siemens_libsecutilsConfigVersion.cmake
+    security-utilities_libraryConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/security-utilities_libraryConfigVersion.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/siemens
-    COMPONENT siemens_libsecutils_Development
+    COMPONENT security-utilities_library_Development
 )
 
 install(DIRECTORY include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-    COMPONENT siemens_libsecutils_Development
+    COMPONENT security-utilities_library_Development
     PATTERN CMakeLists.txt EXCLUDE
 )

@@ -1,4 +1,4 @@
-target_sources(siemens_libsecutils PRIVATE
+target_sources(security-utilities_library PRIVATE
     cdp_util.h
     certstatus.h
     crl_mgmt.h
