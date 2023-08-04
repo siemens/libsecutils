@@ -12,7 +12,7 @@ set_target_properties(security-utilities_library PROPERTIES
 )
 
 target_compile_features(security-utilities_library PRIVATE c_std_90)
-set_target_properties(security-utilities_library PROPERTIES C_EXTENSIONS OFF)
+set_target_properties(security-utilities_library PROPERTIES C_EXTENSIONS ON)
 
 # must be public, targets linking libsecutils need those too
 target_compile_options(security-utilities_library PRIVATE
