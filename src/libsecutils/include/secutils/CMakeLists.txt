@@ -6,12 +6,12 @@ add_subdirectory(crypto)
 add_subdirectory(storage)
 add_subdirectory(util)
 
-target_sources(siemens_libsecutils PRIVATE
+target_sources(security-utilities_library PRIVATE
     operators.h
     basic.h
 )
 
-target_include_directories(siemens_libsecutils PUBLIC
+target_include_directories(security-utilities_library PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>
     $<INSTALL_INTERFACE:include>
 )
@@ -30,6 +30,6 @@ endif()
 
 configure_file(static_config.h.in static_config.h)
 
-target_include_directories(siemens_libsecutils PUBLIC
+target_include_directories(security-utilities_library PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
