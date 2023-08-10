@@ -44,6 +44,18 @@ option(SECURITY_UTILITIES_USE_UTA "Use UTA API" OFF)
 option(SECURITY_UTILITIES_USE_ICV "Use configuration ICV" OFF)
 option(SECURITY_UTILITIES_NO_TLS "Do not use TLS" OFF)
 
+if(DEFINED ENV{SECUTILS_USE_UTA})
+  set(SECURITY_UTILITIES_USE_UTA ON)
+endif()
+
+if(DEFINED ENV{SECUTILS_USE_ICV})
+  set(SECURITY_UTILITIES_USE_ICV ON)
+endif()
+
+if(DEFINED ENV{SECUTILS_NO_TLS})
+  set(SECURITY_UTILITIES_NO_TLS ON)
+endif()
+
 add_subdirectory(src)
 
 # =============================
