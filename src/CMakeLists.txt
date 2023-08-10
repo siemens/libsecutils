@@ -23,6 +23,6 @@ endif()
 
 add_subdirectory(libsecutils)
 
-if(SECURITY_UTILITIES_USE_ICV OR DEFINED ENV{SECUTILS_USE_ICV})
+if(SECURITY_UTILITIES_USE_ICV)
     add_subdirectory(util)
 endif()
