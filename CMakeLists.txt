@@ -67,6 +67,12 @@ install(FILES libsecutils.svg
   DESTINATION ${CMAKE_INSTALL_DOCDIR}
 )
 
+find_package(Doxygen QUIET)
+if(NOT TARGET doc AND Doxygen_FOUND)
+  set(DOXYGEN_OUTPUT_DIRECTORY doc/html)
+  doxygen_add_docs(doc ${CMAKE_CURRENT_LIST_DIR}/src/libsecutils/include/secutils/basic.h)
+endif()
+
 install(DIRECTORY doc/html/
   OPTIONAL # TODO add build for doc/
   DESTINATION ${CMAKE_INSTALL_DOCDIR}
