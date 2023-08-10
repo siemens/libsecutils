@@ -22,13 +22,11 @@ target_link_libraries(security-utilities_library
     OpenSSL::SSL
     OpenSSL::Crypto
 
-    $<$<BOOL:${SECURITY_UTILITIES_USE_UTA}>:-luta>
-
     # must be public, targets linking the library need those too
     $<$<CONFIG:Debug>:security-utlities_sanitizer_options>
 
     PRIVATE
-    security-utlities_uta-api
+    $<$<BOOL:${SECURITY_UTILITIES_USE_UTA}>:security-utlities_uta-api>
     secutils_compilation_options
 )
 
