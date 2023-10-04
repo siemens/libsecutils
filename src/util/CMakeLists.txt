@@ -16,7 +16,7 @@ target_link_libraries(security-utilities_icvutil
     PRIVATE
     security-utilities::library
     secutils_compilation_options
-    security-utilities_uta-api
+    $<$<BOOL:${SECURITY_UTILITIES_USE_UTA}>:security-utilities_uta-api>
 )
 
 # =============================
