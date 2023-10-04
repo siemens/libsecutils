@@ -26,7 +26,7 @@ target_link_libraries(security-utilities_library
     $<$<CONFIG:Debug>:security-utlities_sanitizer_options>
 
     PRIVATE
-    $<$<BOOL:${SECURITY_UTILITIES_USE_UTA}>:security-utlities_uta-api>
+    $<$<BOOL:${SECURITY_UTILITIES_USE_UTA}>:security-utilities_uta-api>
     secutils_compilation_options
 )
 

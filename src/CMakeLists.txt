@@ -15,10 +15,10 @@ target_compile_options(security-utlities_sanitizer_options INTERFACE ${SANITIZER
 target_link_options(security-utlities_sanitizer_options INTERFACE ${SANITIZER_FLAGS})
 
 if(SECURITY_UTILITIES_USE_UTA)
-    add_library(security-utlities_uta-api INTERFACE)
-    target_include_directories(security-utlities_uta-api INTERFACE /usr/local/include)
-    target_link_directories(security-utlities_uta-api INTERFACE /usr/local/lib)
-    target_link_libraries(security-utlities_uta-api INTERFACE -luta)
+    add_library(security-utilities_uta-api INTERFACE)
+    target_include_directories(security-utilities_uta-api INTERFACE /usr/local/include)
+    target_link_directories(security-utilities_uta-api INTERFACE /usr/local/lib)
+    target_link_libraries(security-utilities_uta-api INTERFACE -luta)
 endif()
 
 add_subdirectory(libsecutils)
