@@ -85,3 +85,67 @@ endif()
 if(NOT TARGET build)
   add_custom_target(build COMMAND make all)
 endif()
+
+# =============================
+# Packaging
+# =============================
+
+if(DEFINED CPACK_PACKAGE_NAME)
+  return()
+endif()
+
+# help CPackDeb please dpkg-shlibdeps
+if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.20.0")
+  set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS_PRIVATE_DIRS
+    "../lib/${CMAKE_INSTALL_FULL_LIBDIR}")
+else()
+  set(CMAKE_INSTALL_RPATH # must be done before add_executable()
+    "../lib/${CMAKE_INSTALL_FULL_LIBDIR}")
+endif()
+
+# see also https://gitlab.kitware.com/cmake/cmake/-/issues/24929 and
+# https://stackoverflow.com/questions/46490448/how-i-can-add-a-changelog-in-deb-with-cmake
+add_custom_command(
+    DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/debian/changelog"
+    COMMAND gzip -cn9 "${CMAKE_CURRENT_SOURCE_DIR}/debian/changelog"
+    > "${CMAKE_CURRENT_BINARY_DIR}/changelog.gz"
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/changelog.gz"
+)
+if(NOT TARGET changelog)
+  add_custom_target(changelog ALL DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/changelog.gz")
+endif()
+
+include(cmake/CPackDebianPackageSettings.cmake)
+include(CPack)
+
+# see also https://gitlab.kitware.com/cmake/cmake/-/issues/21832
+# CPack Deb lacks a way to configure copyright files by component
+foreach(component IN LISTS CPACK_COMPONENTS_ALL)
+  if(${component} STREQUAL "security-utilities_library_Runtime")
+    set(suffix "")
+  else()
+    set(suffix "-${component}")
+  endif()
+  install(FILES
+    "${CMAKE_CURRENT_SOURCE_DIR}/debian/copyright"
+    "${CMAKE_CURRENT_BINARY_DIR}/changelog.gz"
+    "${CMAKE_CURRENT_SOURCE_DIR}/libsecutils.svg"
+    DESTINATION "${CMAKE_INSTALL_FULL_DOCDIR}${suffix}"
+    COMPONENT ${component}
+    )
+endforeach()
+
+if(NOT TARGET deb)
+  if(NOT APPLE)
+    set (deb_pack_full_name
+      "${CMAKE_CURRENT_BINARY_DIR}/${CPACK_PACKAGE_NAME}-dev_${CPACK_PACKAGE_VERSION}_all.deb")
+  endif()
+  add_custom_command(
+    OUTPUT "${deb_pack_full_name}"
+    DEPENDS build
+    COMMENT "Building packages possibly including doxygen run"
+    COMMAND cpack # --config CPackConfig.cmake
+    COMMAND cpack --config CPackSourceConfig.cmake
+    )
+  add_custom_target(deb DEPENDS ${deb_pack_full_name})
+endif()
