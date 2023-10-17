@@ -62,26 +62,36 @@ static bool chkmkdir(const char *dir) {
     return false;
 }
 
-static int get_cache_filename_from_url(const char * cache_dir, const char * url, char *buf, size_t buflen)
+static bool get_cache_filename_from_url(const char * cache_dir, const char * url, char *buf, size_t buflen)
 {
     if (cache_dir == NULL) {
         LOG(FL_DEBUG, "no cache directory is given, caching is disabled");
-        return 0;
+        return false;
     }
 
     if (!chkmkdir(cache_dir)) {
         LOG(FL_ERR, "the cache directory does not exist or could not be created: %s",
             cache_dir);
-        return 0;
+        return false;
     }
 
-    size_t len = UTIL_safe_string_copy(cache_dir, buf, buflen, 0);
+    int res = UTIL_safe_string_copy(cache_dir, buf, buflen, 0);
+    if (res < 0) {
+        LOG(FL_ERR, "internal error calling UTIL_safe_string_copy()");
+        return false;
+    }
+    size_t len = (size_t)res;
 
     // create sha256 from url
     unsigned char hash[SHA256_DIGEST_LENGTH];
     SHA256((unsigned char*)url, strlen(url), hash);
     len += UTIL_bintohex(hash, SHA256_DIGEST_LENGTH, false, 0, 0, buf+len, buflen-len, NULL);
-    len += UTIL_safe_string_copy(crl_suffix, buf+len, buflen-len, 0);
+    res = UTIL_safe_string_copy(crl_suffix, buf+len, buflen-len, 0);
+    if (res < 0) {
+        LOG(FL_ERR, "internal error calling UTIL_safe_string_copy()");
+        return false;
+    }
+    len += (size_t)res;
 
     return len > 0;
 }
@@ -343,8 +353,18 @@ X509_CRL *CRLMGMT_load_crl_by_url(
     }
     else {
         LOG(FL_DEBUG, "cdp proxy given, appending original url to proxy %s", data->proxy_url);
-        size_t copied = UTIL_safe_string_copy(data->proxy_url, cdp_proxy_url, CDP_PROXY_URL_LEN, NULL);
-        copied += UTIL_safe_string_copy(url_param_url, cdp_proxy_url + copied, CDP_PROXY_URL_LEN - (size_t)copied, NULL);
+        int res = UTIL_safe_string_copy(data->proxy_url, cdp_proxy_url, CDP_PROXY_URL_LEN, NULL);
+        if (res < 0) {
+            LOG(FL_ERR, "internal error calling UTIL_safe_string_copy()");
+            return NULL;
+        }
+        size_t copied = (size_t)res;
+        res = UTIL_safe_string_copy(url_param_url, cdp_proxy_url + copied, CDP_PROXY_URL_LEN - (size_t)copied, NULL);
+        if (res < 0) {
+            LOG(FL_ERR, "internal error calling UTIL_safe_string_copy()");
+            return NULL;
+        }
+        copied += (size_t)res;
         copied += UTIL_url_encode(url, cdp_proxy_url + copied, CDP_PROXY_URL_LEN - (size_t)copied, NULL);
         effective_url = cdp_proxy_url;
     }
@@ -374,8 +394,18 @@ X509_CRL *CRLMGMT_load_crl_by_cert(
     const size_t URL_LEN = 4096;
     char url[URL_LEN];
     LOG(FL_DEBUG, "cdp proxy given, appending cert issuer to proxy %s", data->proxy_url);
-    size_t copied = UTIL_safe_string_copy(data->proxy_url, url, URL_LEN, NULL);
-    copied += UTIL_safe_string_copy(url_param_issuer, url + copied, URL_LEN - (size_t)copied, NULL);
+    int res = UTIL_safe_string_copy(data->proxy_url, url, URL_LEN, NULL);
+    if (res < 0) {
+        LOG(FL_ERR, "internal error calling UTIL_safe_string_copy()");
+        return NULL;
+    }
+    size_t copied = (size_t)res;
+    res = UTIL_safe_string_copy(url_param_issuer, url + copied, URL_LEN - (size_t)copied, NULL);
+    if (res < 0) {
+        LOG(FL_ERR, "internal error calling UTIL_safe_string_copy()");
+        return NULL;
+    }
+    copied += (size_t)res;
     copied += UTIL_url_encode(issuer_name, url + copied, URL_LEN - (size_t)copied, NULL);
 
     return get_crl_by_download_or_from_cache(data, url, url, timeout, desc);

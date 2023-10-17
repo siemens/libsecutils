@@ -331,17 +331,16 @@ bool UTIL_get_random(void *buf, size_t len);
  * @param source pointer to the unencoded source string
  * @param destination optional pointer to destination buffer to hold the result
  * @param destination_len size of the destination buffer in bytes
- * @param size_needed optional pointer to the exact size needed for the
- *        converted string. If the size_needed is null the size is not returned
+ * @param size_needed optional pointer to the exact size (including the terminating NUL) that
+ *        is needed for the copied string. If the size_needed is null the size is not returned.
  *
- * @return number of bytes excluding the terminating NUL that have been written
- *             into the destination buffer.
- *         0 also on fatal error, e.g., the source is null
- *         or the destination is not null and the buffer size is 0.
+ * @return number of bytes excluding the terminating NUL that have been copied to destination,
+ *         -1 on error, e.g., the source is null or
+ *            the destination is not null and the buffer size is 0.
  */
-size_t UTIL_safe_string_copy(const char *source, OPTIONAL char *destination,
-                             size_t destination_len,
-                             OPTIONAL size_t *size_needed);
+int UTIL_safe_string_copy(const char *source, OPTIONAL char *destination,
+                          size_t destination_len,
+                          OPTIONAL size_t *size_needed);
 
 /*!
  * @brief The function URL-encodes the source string in the destination buffer.

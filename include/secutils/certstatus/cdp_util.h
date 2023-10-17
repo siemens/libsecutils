@@ -42,7 +42,7 @@ typedef enum CDP_reason_flag {
 typedef int CDP_REASON_FLAGS;
 
 /* Copy a one-line representation of the X509_NAME into the buffer */
-int CDP_get_x509_name(
+bool CDP_get_x509_name(
     X509_NAME       *name,
     char            *name_utf8_buf,
     size_t          name_utf8_buf_len,
@@ -50,7 +50,7 @@ int CDP_get_x509_name(
 );
 
 /* Copy the ASN1 time into a string */
-int CDP_get_x509_time(
+bool CDP_get_x509_time(
     const ASN1_TIME *time,
     char            *name_utf8_buf,
     size_t          name_utf8_buf_len
@@ -85,10 +85,8 @@ const char *CDP_get_crl_distribution_point_from_extension(
 );
 
 /* Get the CDP url from an X509 certificate structure.
- * Return a const char * pointer to the internal data.
- * The pointer is valid only as long as the cert
- * parameter given is not freed.*/
-int CDP_get_crl_distribution_point_from_cert(
+ * Return true if CDP url is present and was copied successfully */
+bool CDP_get_crl_distribution_point_from_cert(
     const X509  *cert,
     int         nid,
     char        *cdp_utf8_buf,
