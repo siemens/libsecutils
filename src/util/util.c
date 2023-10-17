@@ -326,50 +326,43 @@ int ASN1_TIME_compare(const ASN1_TIME *a, const ASN1_TIME *b)
 #endif
 
 /* Copy a NUL-terminated string from the given source
- * into an optional destination buffer, or calculate how large it needs to be.
+ * into an optional destination buffer, and/or calculate how large it needs to be.
  * Copy at most destination_len bytes including the terminating NUL.
+ * Return number of bytes excluding the terminating NUL that have been copied, -1 on error
  */
-size_t UTIL_safe_string_copy(const char *source, OPTIONAL char *destination,
-                             size_t destination_len, OPTIONAL size_t *size_needed)
+int UTIL_safe_string_copy(const char *source, OPTIONAL char *destination,
+                          size_t destination_len, OPTIONAL size_t *size_needed)
 {
     if (source == NULL) {
-        return 0;
+        return -1;
     }
     if (destination != NULL && destination_len == 0) {
         /* buffer size too small, not even the terminating NUL can be written */
-        return 0;
+        return -1;
     }
 
     if (destination == NULL && size_needed == NULL) {
         /* neither buffer nor size output given, nothing to do */
-        return 0;
+        return -1;
     }
 
-    if (destination != NULL) {
-        /* reserve one byte for the terminating NUL, destination_len is assured > 0 above */
-        --destination_len;
-    }
-
-    size_t i, needed;  /* index into target buffer and record the size needed */
-    for (i=0,needed=0; source[needed] != 0; /* inc needed before loop body */) {
-        ++needed;
-        if (destination != NULL && destination_len >= needed) {
-            destination[i] = source[i];
-            ++i;
+    const char *begin = source;
+    size_t needed = 1;  /* record the buffer size that would be needed == strlen(source) */
+    while (*source != 0) {
+        needed++;
+        if (destination != NULL && needed < destination_len) {
+            *destination++ = *source++;
         }
     }
-
-    /* terminating NUL */
-    ++needed;
-    if (destination != NULL) {
-        destination[i] = '\0';
+     if (destination != NULL) {
+        *destination = '\0';
     }
 
     if (size_needed != NULL) {
         *size_needed = needed;
     }
 
-    return i;
+    return source - begin;
 }
 
 /* implementation of the function url_encode */

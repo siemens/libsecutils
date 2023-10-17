@@ -16,7 +16,7 @@
 #include <certstatus/cdp_util.h>
 #include <certstatus/certstatus.h>
 
-int CDP_get_x509_name(
+bool CDP_get_x509_name(
     X509_NAME       *name,
     char            *name_utf8_buf,
     size_t          name_utf8_buf_len,
@@ -30,12 +30,16 @@ int CDP_get_x509_name(
     X509_NAME_print_ex(bio, name, 0, flags);
     /* append terminating NUL */
     BIO_write(bio, "", 1);
-    UTIL_safe_string_copy(bptr->data, name_utf8_buf, name_utf8_buf_len, NULL);
+    int res = UTIL_safe_string_copy(bptr->data, name_utf8_buf, name_utf8_buf_len, NULL);
     BIO_free(bio);
-    return 1;
+    if (res < 0) {
+        LOG(FL_ERR, "internal error calling UTIL_safe_string_copy()");
+        return false;
+    }
+    return true;
 }
 
-int CDP_get_x509_time(
+bool CDP_get_x509_time(
     const ASN1_TIME *time,
     char            *name_utf8_buf,
     size_t          name_utf8_buf_len)
@@ -48,9 +52,13 @@ int CDP_get_x509_time(
     ASN1_TIME_print(bio, time);
     /* append terminating NUL */
     BIO_write(bio, "", 1);
-    UTIL_safe_string_copy(bptr->data, name_utf8_buf, name_utf8_buf_len, NULL);
+    int res = UTIL_safe_string_copy(bptr->data, name_utf8_buf, name_utf8_buf_len, NULL);
     BIO_free(bio);
-    return 1;
+    if (res < 0) {
+        LOG(FL_ERR, "internal error calling UTIL_safe_string_copy()");
+        return false;
+    }
+    return true;
 }
 
 
@@ -198,7 +206,7 @@ const char *CDP_get_crl_distribution_point_from_extension(
     return NULL;
 }
 
-int CDP_get_crl_distribution_point_from_cert(
+bool CDP_get_crl_distribution_point_from_cert(
     const X509  *cert,
     int         nid,
     char        *cdp_utf8_buf,
@@ -208,14 +216,14 @@ int CDP_get_crl_distribution_point_from_cert(
     if (nid != NID_crl_distribution_points &&
         nid != NID_freshest_crl)
     {
-        return 0;
+        return false;
     }
 
     /* retrieve the stack of extensions from the x509 certificate */
     const STACK_OF(X509_EXTENSION) *exts = X509_get0_extensions(cert);
     if (sk_X509_EXTENSION_num(exts) <= 0) {
         /* extension pointer not valid */
-        return 0;
+        return false;
     }
 
     /* Use openssl to get the only extension of type nid. There are two
@@ -228,15 +236,18 @@ int CDP_get_crl_distribution_point_from_cert(
         0 /*no index, make sure it's only one extension*/);
     if (cdp_extension == NULL) {
         /* evaluate critical for error reason, if it matters */
-        return 0;
+        return false;
     }
 
     const char *cdp_url = CDP_get_crl_distribution_point_from_extension(cdp_extension);
-    if (cdp_url) {
-        UTIL_safe_string_copy(cdp_url, cdp_utf8_buf, cdp_utf8_buf_len, NULL);
+    if (cdp_url != NULL) {
+        if (UTIL_safe_string_copy(cdp_url, cdp_utf8_buf, cdp_utf8_buf_len, NULL) < 0) {
+            LOG(FL_ERR, "internal error calling UTIL_safe_string_copy()");
+            cdp_url = NULL;
+        }
     }
     CRL_DIST_POINTS_free(cdp_extension);
-    return cdp_url != 0 ? 1 : 0;
+    return cdp_url != NULL;
 }
 
 
