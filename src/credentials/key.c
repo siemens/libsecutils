@@ -265,7 +265,7 @@ EVP_PKEY* KEY_new(const char* spec)
 #if OPENSSL_VERSION_NUMBER >= OPENSSL_V_3_0_0
         pkey = EVP_EC_gen(OSSL_EC_curve_nid2name(nid));
         if (pkey == NULL) {
-            LOG(FL_ERR, "cannot generate EC key with curve name %.40%s", spec);
+            LOG(FL_ERR, "cannot generate EC key with curve name %.40s", spec);
             goto err;
         }
         return pkey;
