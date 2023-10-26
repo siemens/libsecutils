@@ -45,10 +45,10 @@ else
     ifeq ($(shell uname -s),Darwin)
         OS=MacOS
         DLL=.dylib
-        SONAME=install_name
+        SONAME=install_name,@rpath/
     else # assuming Linux
         DLL=.so
-        SONAME=soname
+        SONAME=soname,
     endif
 endif
 
@@ -117,7 +117,10 @@ endif
 override LDFLAGS += $(DEBUG_FLAGS) # needed for -fsanitize=...
 override LDFLAGS += -L $(OPENSSL_LIB) -L $(OPENSSL)
 ifeq ($(DEB_TARGET_ARCH),) # not during Debian packaging
-    override LDFLAGS += -Wl,-rpath $(OPENSSL_LIB) -Wl,-rpath $(OPENSSL) # needed for genCMPClient
+  override LDFLAGS += -Wl,-rpath,$(OPENSSL_LIB)
+  ifneq ($(OPENSSL_LIB),$(OPENSSL))
+    override LDFLAGS += -Wl,-rpath,$(OPENSSL)
+  endif
 endif
 ifneq ($(SECUTILS_USE_UTA),)
     override LDFLAGS += -luta
@@ -201,7 +204,7 @@ endif
 
 # Binary output target
 $(OUT_DIR)/$(OUTLIBV): $(OBJS)
-	$(CC) $(OBJS) $(LDFLAGS) -shared -o $@ -Wl,-$(SONAME),$(OUTLIBV)
+	$(CC) $(OBJS) $(LDFLAGS) -shared -o $@ -Wl,-$(SONAME)$(OUTLIBV)
 
 $(OUT_DIR)/$(OUTLIB): $(OUT_DIR)/$(OUTLIBV)
 	ln -sf $(OUTLIBV) $(OUT_DIR)/$(OUTLIB)
