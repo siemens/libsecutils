@@ -81,6 +81,10 @@ static bool get_cache_filename_from_url(const char * cache_dir, const char * url
         return false;
     }
     size_t len = (size_t)res;
+    if (buflen > len + 1 && buf[len] != '/' && buf[len] != '\\') {
+        buf[len] = '/'; /* add missing path name separator */
+        buf[++len] = '\0';
+    }
 
     // create sha256 from url
     unsigned char hash[SHA256_DIGEST_LENGTH];
