@@ -68,7 +68,7 @@ sudo apt install cmake libssl-dev libc-dev linux-libc-dev
 while `apt install git make gcc` usually is not needed as far as these tools are pre-installed.
 
 
-### Configuring and building
+### Configuring
 
 The library assumes that OpenSSL is already installed,
 including the C header files needed for development
@@ -85,27 +85,6 @@ In case its libraries are in a different location, set also `OPENSSL_LIB`, e.g.:
 export OPENSSL_LIB=$OPENSSL_DIR/lib
 ```
 
-Since version 2, it is recommended to use CMake to produce the `Makefile`,
-for instance as follows:
-```
-cmake .
-```
-
-For backward compatibility it is also possible to use instead of CMake the
-pre-defined [`Makefile_v1`](Makefile_v1); to this end symlink it to `Makefile`:
-```
-ln -s Makefile_v1 Makefile
-```
-or use for instance `make -f Makefile_v1`.
-
-Build the software with `make`.
-
-By default, builds are done in Debug mode.
-For Release mode use `-DCMAKE_BUILD_TYPE=Release` or `NDEBUG=1`.
-For switching to Debug mode, use `-DCMAKE_BUILD_TYPE=Debug` and unset `NDEBUG`.
-
-The result is in, for instance, `./libsecutils.so.2.0`.
-
 Use of the UTA library can be enabled
 by setting the environment variable `SECUTILS_USE_UTA`.
 
@@ -115,8 +94,49 @@ which may be produced using `icvutil`.
 
 The TLS-related functions may be disabled by setting `SECUTILS_NO_TLS`.
 
+Since version 2, it is recommended to use CMake to produce the `Makefile`,
+for instance as follows:
+```
+cmake .
+```
 When using CMake, `cmake` must be (re-)run
 after setting or unsetting environment variables.
+By default, CMake builds are in Release mode.
+This may also be enforced by defining the environment variable `NDEBUG`.
+For switching to Debug mode, use `cmake` with `-DCMAKE_BUILD_TYPE=Debug`.
+The chosen mode is remembered in `CMakeCache.txt`.
+
+For backward compatibility it is also possible to use instead of CMake the
+pre-defined [`Makefile_v1`](Makefile_v1); to this end symlink it to `Makefile`:
+```
+ln -s Makefile_v1 Makefile
+```
+or use for instance `make -f Makefile_v1`.
+
+By default, builds using `Makefile_v1` are in Debug mode.
+Release mode can be selected by defining the environment variable `NDEBUG`.
+
+By default `Makefile_v1` behaves as if
+```
+OPENSSL_DIR=/usr
+```
+was given, such that the OpenSSL headers will be searched for in `/usr/include`
+and its shared objects in `/usr/lib` (or `/usr/bin` for Cygwin).
+
+When using [`Makefile_v1`](Makefile_v1),
+you may also specify using the environment variable `OUT_DIR`
+where the produced library files (e.g., `libcmp.so.2.0`) shall be placed.
+By default, the current directory (`.`) is used.\
+The environment variable `CC` may be set as needed; it defaults to `gcc`.\
+For further details on optional environment variables,
+see the [`Makefile_v1`](Makefile_v1).
+
+
+### Building
+
+Build the software with `make`.
+
+The result is in, for instance, `./libsecutils.so.2.0`.
 
 
 ### Installing and uninstalling
