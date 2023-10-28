@@ -153,15 +153,15 @@ BUILDDIR=tmp
 
 # Path for automatic lookup of source files by Make
 # Note: sort removes duplicate entries
-VPATH := src
-VPATH += $(sort $(dir $(wildcard src/*/)))
+VPATH := src/libsecutils/src
+VPATH += $(sort $(dir $(wildcard src/libsecutils/src/*/)))
 
 ################################################################################
 # Objects lists
 ################################################################################
 
 # Target object files lookup in src directory (and mapping to build directory)
-OBJS := $(patsubst %.c,$(BUILDDIR)/%$(OBJ),$(notdir $(wildcard src/*/*.c)))
+OBJS := $(patsubst %.c,$(BUILDDIR)/%$(OBJ),$(notdir $(wildcard src/libsecutils/src/*/*.c)))
 
 ################################################################################
 # Targets
@@ -184,7 +184,7 @@ endif
 SECUTILS_CONFIG=src/libsecutils/include/secutils/secutils_static_config.h
 util: $(SECUTILS_CONFIG)
 ifneq ($(SECUTILS_USE_ICV),)
-	$(MAKE) -C util CFLAGS="$(CFLAGS) $(LOCAL_CFLAGS)" LDFLAGS="$(LDFLAGS)" OUT_DIR="$(OUT_DIR)"
+	$(MAKE) -C src/util -f Makefile_v1 CFLAGS="$(CFLAGS) $(LOCAL_CFLAGS)" LDFLAGS="$(LDFLAGS)" OUT_DIR="$(OUT_DIR)"
 endif
 
 build_all: build util
@@ -284,7 +284,7 @@ clean_uta:
 clean: clean_config
 	rm -fr $(OUT_DIR)/$(OUTLIB_)*$(DLL)*
 	rm -f $(OUT_DIR)/$(OUTBIN)
-	$(MAKE) -C src/util clean OUT_DIR="$(OUT_DIR)"
+	$(MAKE) -C src/util -f Makefile_v1 clean OUT_DIR="$(OUT_DIR)"
 	rm -fr $(BUILDDIR)
 
 clean_config:

@@ -30,7 +30,7 @@ endif
 
 ifeq ($(shell echo $(OUT_DIR) | grep "^/"),)
 # $(OUT_DIR) is relative path, assumed relative to ./
-    OUT_REVERSE_DIR=../$(OUT_DIR)
+    OUT_REVERSE_DIR=../../$(OUT_DIR)
 else
 # $(OUT_DIR) is absolute path
     OUT_REVERSE_DIR=$(OUT_DIR)
