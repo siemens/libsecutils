@@ -276,7 +276,7 @@ clean_uta:
           $(BUILDDIR)/files_dv$(OBJ) \
           $(OUT_DIR)/$(OUTLIB_)*$(DLL)* $(OUT_DIR)/$(OUTBIN) $(OUT_DIR)/util/icvutil.o
 
-clean:
+clean: clean_config
 	rm -fr $(OUT_DIR)/$(OUTLIB_)*$(DLL)*
 	rm -f $(OUT_DIR)/$(OUTBIN)
 	$(MAKE) -C util clean OUT_DIR="$(OUT_DIR)"
@@ -285,7 +285,7 @@ clean:
 clean_config:
 	rm -f $(SECUTILS_CONFIG)
 
-clean_all: clean clean_config clean_deb
+clean_all: clean clean_deb
 	rm -fr Makefile CMakeCache.txt *.cmake CMakeFiles/
 	rm -f install_manifest*.txt
 	rm -fr doc refman.pdf *.gcov reports

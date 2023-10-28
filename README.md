@@ -138,6 +138,10 @@ Build the software with `make`.
 
 The result is in, for instance, `./libsecutils.so.2.0`.
 
+When getting the linker error: `Undefined symbols: _uta_init_v1`
+likely `secutils_static_config.h` is outdated.  In such situations,
+`make -f Makfile_v1 clean` helps to reset it to a consistent state.
+
 
 ### Installing and uninstalling
 
