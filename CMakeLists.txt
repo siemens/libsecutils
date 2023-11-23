@@ -125,10 +125,11 @@ message(STATUS "build mode: ${CMAKE_BUILD_TYPE}")
 
 add_compile_options(
   -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes
-  -Wformat -Wtype-limits -Wundef -Wconversion -Wno-shadow -Wno-conversion
-  -Wno-sign-conversion  -Wno-sign-compare -Wpointer-arith
-  -Wformat -Wformat-security -Wno-declaration-after-statement -Wno-vla
-  # TODO enable -Wconversion -Wsign-conversion -Wsign-compare
+  -Wformat -Wformat-security -Wtype-limits -Wundef -Wconversion
+  -Wsign-compare -Wpointer-arith -Wunused-parameter)
+add_compile_options( # TODO clean up code and enable instead:
+  -Wsign-conversion -Wno-shorten-64-to-32 -Wno-c99-extensions
+  -Wno-shadow -Wno-declaration-after-statement -Wno-vla
   )
 add_compile_options(-pedantic -Werror)
 add_compile_definitions(-DPEDANTIC)

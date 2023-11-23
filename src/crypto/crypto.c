@@ -63,7 +63,7 @@ EVP_CIPHER_CTX* AESGCM_init(const uint8_t* key, size_t key_len, const uint8_t* i
     }
 
     int key_len_req = EVP_CIPHER_CTX_key_length(osslctx);
-    if(key_len_req != key_len)
+    if((size_t)key_len_req != key_len)
     {
         LOG(FL_ERR, "Length of provided key doesn't match required by cipher (%d != %d)",
                 key_len, key_len_req);
@@ -93,8 +93,8 @@ ssize_t AESGCM_encrypt(EVP_CIPHER_CTX* osslctx, uint8_t* cipher_buff, size_t cip
         return ret;
     }
 
-    int32_t cipher_len = cipher_buff_len;
-    if((EVP_EncryptUpdate(osslctx, cipher_buff, &cipher_len, plain, plain_len) not_eq 1) or (cipher_len not_eq plain_len))
+    int cipher_len = cipher_buff_len;
+    if((EVP_EncryptUpdate(osslctx, cipher_buff, &cipher_len, plain, plain_len) not_eq 1) or ((size_t)cipher_len not_eq plain_len))
     {/* The second condition - GCM is used, hence length(plain_text) == length(cipher_text) */
         LOG(FL_ERR, "Encryption failed");
         return ret;
@@ -117,9 +117,9 @@ ssize_t AESGCM_decrypt(EVP_CIPHER_CTX* osslctx, uint8_t* plain_buff, size_t plai
         return ret;
     }
 
-    int32_t plain_len = plain_buff_len;
+    int plain_len = plain_buff_len;
     if((EVP_DecryptUpdate(osslctx, plain_buff, &plain_len, cipher, cipher_len) not_eq 1)
-            or (plain_len not_eq cipher_len))
+       or ((size_t)plain_len not_eq cipher_len))
     {/* The second condition - GCM is used hence length(plain_text) == length(cipher_text) */
         LOG(FL_ERR, "Decryption failed");
         return ret;

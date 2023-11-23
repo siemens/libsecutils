@@ -102,7 +102,7 @@ void* UTIL_read_file(const char* filename, int* lenp)
     FILE* fp = 0;
     struct stat st;
     unsigned char* contents = 0;
-    int contents_len = 0;
+    unsigned long contents_len = 0;
 
     if(stat(filename, &st) < 0)
     {
@@ -143,7 +143,7 @@ end:
     }
     if(0 not_eq lenp)
     {
-        *lenp = contents_len;
+        *lenp = (int)contents_len;
     }
     return contents;
 }
@@ -511,7 +511,7 @@ size_t UTIL_bintohex(
 
 bool UTIL_hex_to_bytes(const char** in_p, unsigned char* out, unsigned int num_out)
 {
-    unsigned int v = 0;
+    unsigned char v = 0;
     unsigned int i = 0;
     unsigned char byte = 0;
 
