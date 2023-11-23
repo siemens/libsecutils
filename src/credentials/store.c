@@ -49,8 +49,8 @@ static
 #else
        void
 #endif
-STORE_EX_new(X509_STORE* ts, STORE_EX* ex_data, CRYPTO_EX_DATA* ad,
-                         int idx, long argl, void* argp)
+STORE_EX_new(X509_STORE* ts, STORE_EX* ex_data, ossl_unused CRYPTO_EX_DATA* ad,
+                         int idx, ossl_unused long argl, ossl_unused void* argp)
 {
     int res = 1;
     if((ex_data = OPENSSL_zalloc(sizeof(*ex_data))) is_eq 0)
@@ -73,8 +73,8 @@ STORE_EX_new(X509_STORE* ts, STORE_EX* ex_data, CRYPTO_EX_DATA* ad,
 #endif
 }
 
-static void STORE_EX_free(X509_STORE* ts, STORE_EX* ex_data, CRYPTO_EX_DATA* ad,
-                          int idx, long argl, void* argp)
+static void STORE_EX_free(ossl_unused X509_STORE* ts, STORE_EX* ex_data, ossl_unused CRYPTO_EX_DATA* ad,
+                          ossl_unused int idx, ossl_unused long argl, ossl_unused void* argp)
 {
     if(0 not_eq ex_data)
     {
