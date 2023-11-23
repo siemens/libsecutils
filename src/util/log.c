@@ -259,9 +259,8 @@ bool LOG_system_debug(int errnum)
     errno = 0;
 
     // https://man7.org/linux/man-pages/man3/strerror.3.html : RETURN VALUE
-    const char *message = "";
-    message = strerror_r(errnum, buffer, sizeof(buffer));
-    bool result = 0 is_eq errno;
+    bool result = 0 is_eq strerror_r(errnum, buffer, sizeof(buffer))
+        and 0 is_eq errno;
 
     if (ERANGE is_eq errno)
     {
@@ -269,7 +268,7 @@ bool LOG_system_debug(int errnum)
         (void)memcpy((void *)(buffer + (sizeof(buffer) - sizeof(messageTooLong))), (const void *)messageTooLong, sizeof(messageTooLong));
     }
 
-    result = result and LOG(FL_DEBUG, "system error info: 'errno' = %i, '%s'", errnum, message);
+    result = result and LOG(FL_DEBUG, "system error info: 'errno' = %i, '%s'", errnum, buffer);
 
     // must stay after calling LOG; LOG may change errno
     errno = errnoBak;
