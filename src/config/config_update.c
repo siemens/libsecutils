@@ -298,7 +298,7 @@ static int copy_remaining_config(FILE* file_p, int file_len, char* input_line)
 
 
 /* returns length of new file, or 0 in case of error */
-int CONF_update_config(OPTIONAL uta_ctx* ctx, const char* file_name, const key_val_section* key_val_section,
+int CONF_update_config(OPTIONAL ossl_unused uta_ctx* ctx, const char* file_name, const key_val_section* key_val_section,
                        int exclude)
 {
     FILE* file_p = 0;
@@ -373,7 +373,7 @@ int CONF_update_config(OPTIONAL uta_ctx* ctx, const char* file_name, const key_v
             goto error;
         }
 
-        if(fprintf(file_p, "%s", file_buffer) not_eq file_len)
+        if((size_t)fprintf(file_p, "%s", file_buffer) not_eq file_len)
         {
             file_len = 0;
             LOG(FL_ERR, "Error writing config file '%s'", file_name);

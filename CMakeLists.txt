@@ -125,9 +125,9 @@ message(STATUS "build mode: ${CMAKE_BUILD_TYPE}")
 add_definitions(
   -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes
   -Wformat -Wtype-limits -Wundef -Wconversion -Wno-shadow -Wno-conversion
-  -Wno-sign-conversion -Wno-unused-parameter -Wno-sign-compare -Wpointer-arith
+  -Wno-sign-conversion  -Wno-sign-compare -Wpointer-arith
   -Wformat -Wformat-security -Wno-declaration-after-statement -Wno-vla
-  # TODO enable -Wconversion -Wsign-conversion -Wsign-compare -Wunused-parameter
+  # TODO enable -Wconversion -Wsign-conversion -Wsign-compare
   )
 add_definitions(-pedantic -DPEDANTIC -Werror)
 

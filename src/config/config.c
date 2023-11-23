@@ -53,7 +53,7 @@ static bool parse_long(const char* str, long* result)
     return true;
 }
 
-CONF* CONF_load_config(OPTIONAL uta_ctx* ctx, const char* file)
+CONF* CONF_load_config(OPTIONAL ossl_unused uta_ctx* ctx, const char* file)
 {
     CONF* conf = 0;
 
