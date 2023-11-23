@@ -433,7 +433,7 @@ EVP_PKEY* FILES_load_key_autofmt_dv(const char* key, file_format_t file_format, 
         }
         else
         {
-            return false;
+            return 0;
         }
     }
     pkey = FILES_load_key_autofmt(key, file_format, false /* no stdin */, source, engine, desc);
@@ -458,7 +458,7 @@ STACK_OF(X509)
         }
         else
         {
-            return false;
+            return 0;
         }
     }
     certs = FILES_load_certs_autofmt(file, format, source, desc);
