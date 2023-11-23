@@ -30,11 +30,11 @@ if(NOT("$ENV{OPENSSL_DIR}" STREQUAL ""))
   set(OpenSSL_INCLUDE_DIRS $ENV{OPENSSL_DIR}/include)
   set(OPENSSL_LIBRARIES ${OPENSSL_LIB}/libssl${CMAKE_SHARED_LIBRARY_SUFFIX}
                         ${OPENSSL_LIB}/libcrypto${CMAKE_SHARED_LIBRARY_SUFFIX})
-  add_definitions(-isystem ${OpenSSL_INCLUDE_DIRS})
+  include_directories(SYSTEM ${OpenSSL_INCLUDE_DIRS})
 else()
   find_package(OpenSSL REQUIRED)
   message(STATUS "using OpenSSL package, with version " ${OPENSSL_VERSION})
-  add_definitions(-isystem ${OPENSSL_INCLUDE_DIR})
+  include_directories(SYSTEM ${OPENSSL_INCLUDE_DIR})
 endif()
 
 set(SRC_DIR ${PROJECT_SOURCE_DIR}/src)
@@ -109,27 +109,29 @@ include_directories(${INC_DIR}/.. ${INC_DIR})
 if(DEFINED ENV{NDEBUG} OR NOT CMAKE_BUILD_TYPE MATCHES Debug)
   set(CMAKE_BUILD_TYPE Release
       CACHE STRING "Choose the type of build." FORCE)
-  add_definitions(-DNDEBUG=1 -O2)
+  add_compile_options(-O2)
+  add_compile_definitions(-DNDEBUG=1)
 else()
   set(CMAKE_BUILD_TYPE Debug
       CACHE STRING "Choose the type of build." FORCE)
-  add_definitions(-g -O0)
+  add_compile_options(-g -O0)
 
   set(DEBUG_FLAGS "-fsanitize=address,undefined -fno-sanitize-recover=all") # must use quotes on MacOSX
-  add_definitions(${DEBUG_FLAGS})
+  add_compile_options(${DEBUG_FLAGS})
   link_libraries(${DEBUG_FLAGS})
   set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS} ${DEBUG_FLAGS}) # workarund for link_libraries() ignored on MacOSX
 endif()
 message(STATUS "build mode: ${CMAKE_BUILD_TYPE}")
 
-add_definitions(
+add_compile_options(
   -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes
   -Wformat -Wtype-limits -Wundef -Wconversion -Wno-shadow -Wno-conversion
   -Wno-sign-conversion  -Wno-sign-compare -Wpointer-arith
   -Wformat -Wformat-security -Wno-declaration-after-statement -Wno-vla
   # TODO enable -Wconversion -Wsign-conversion -Wsign-compare
   )
-add_definitions(-pedantic -DPEDANTIC -Werror)
+add_compile_options(-pedantic -Werror)
+add_compile_definitions(-DPEDANTIC)
 
 if(DEFINED ENV{SECUTILS_USE_UTA})
   set(SECUTILS_USE_UTA 1)
