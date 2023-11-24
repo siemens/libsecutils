@@ -11,8 +11,10 @@ set(CPACK_STRIP_FILES ON)
 set(CPACK_COMPONENTS_ALL
   security-utilities_library_Runtime
   security-utilities_library_Development
-  security-utilities_icvutil_Runtime
 )
+if (SECURITY_UTILITIES_USE_ICV)
+  list(APPEND CPACK_COMPONENTS_ALL security-utilities_icvutil_Runtime)
+endif()
 
 set(CPACK_COMPONENT_SECURITY-UTILITIES_LIBRARY_RUNTIME_DESCRIPTION "OpenSSL enhancement wrapper library
 OpenSSL wrapper library simplifying use of commonly needed functionality
