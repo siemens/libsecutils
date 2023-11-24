@@ -144,8 +144,9 @@ if(NOT TARGET deb)
     OUTPUT "${deb_pack_full_name}"
     DEPENDS build
     COMMENT "Building packages possibly including doxygen run"
-    COMMAND cpack # --config CPackConfig.cmake
-    COMMAND cpack --config CPackSourceConfig.cmake
+    COMMAND cpack --config CPackConfig.cmake
+                -G DEB
+                -D CPACK_PACKAGING_INSTALL_PREFIX=/usr
     )
   add_custom_target(deb DEPENDS ${deb_pack_full_name})
 endif()
