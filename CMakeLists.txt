@@ -184,6 +184,7 @@ if(NOT TARGET deb)
     COMMAND cpack --config CPackConfig.cmake
                 -G DEB
                 -D CPACK_PACKAGING_INSTALL_PREFIX=/usr
+    COMMAND cpack --config CPackSourceConfig.cmake
     )
   add_custom_target(deb DEPENDS ${deb_pack_full_name})
 endif()
