@@ -62,34 +62,3 @@ endif() # Apple
 set(CPACK_SOURCE_GENERATOR "TGZ")
 #set(CPACK_SET_DESTDIR TRUE) # prevents package creation error when using cpack
 set(CPACK_VERBATIM_VARIABLES YES)
-set(CPACK_SOURCE_IGNORE_FILES
-  ${CPACK_IGNORE_FILES}
-  ~$
-  \./\.git/
-  \\.git$
-  \\.deb$
-  \\.gz$
-  \\.o$
-  \\.so
-  \\.dylib$
-  \./attic/
-  \./tmp/
-  CMakeFiles/
-  _CPack_Packages/
-  \\.cmake$
-  /CMakeCache.txt$
-  /compile_commands.json$
-  /install_manifest.*\.txt$
-  /changelog.gz$
-  \./debian/tmp/
-  \\.substvars$
-  \\.log$
-  /debian/\\.debhelper/
-  /debian/files$
-  /debian/debhelper-build-stamp$
-  \./debian/${DEB_PACKAGE_NAME}/
-  \./debian/${DEB_PACKAGE_NAME}-dev/
-  \./debian/${DEB_PACKAGE_NAME}-bin/
-  \./doc/
-  \./icvutil$
-)
