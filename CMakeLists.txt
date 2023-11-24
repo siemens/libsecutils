@@ -123,8 +123,12 @@ include(CPack)
 foreach(component IN LISTS CPACK_COMPONENTS_ALL)
   if(${component} STREQUAL "security-utilities_library_Runtime")
     set(suffix "")
+  elseif(${component} STREQUAL "security-utilities_library_Development")
+    set(suffix "-dev")
+  elseif(${component} STREQUAL "security-utilities_icvutil_Runtime")
+    set(suffix "-utils")
   else()
-    set(suffix "-${component}")
+    set(suffix "")
   endif()
   install(FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/debian/copyright"
