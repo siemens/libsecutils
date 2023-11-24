@@ -116,7 +116,6 @@ if(NOT TARGET changelog)
 endif()
 
 include(cmake/CPackDebianPackageSettings.cmake)
-include(CPack)
 
 set(CPACK_SOURCE_IGNORE_FILES
   ${CPACK_IGNORE_FILES}
@@ -149,6 +148,8 @@ set(CPACK_SOURCE_IGNORE_FILES
   \./doc/
   \./icvutil$
 )
+
+include(CPack)
 
 # see also https://gitlab.kitware.com/cmake/cmake/-/issues/21832
 # CPack Deb lacks a way to configure copyright files by component
