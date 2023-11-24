@@ -118,6 +118,38 @@ endif()
 include(cmake/CPackDebianPackageSettings.cmake)
 include(CPack)
 
+set(CPACK_SOURCE_IGNORE_FILES
+  ${CPACK_IGNORE_FILES}
+  ~$
+  \./\.git/
+  \\.git$
+  \\.deb$
+  \\.gz$
+  \\.o$
+  \\.so
+  \\.dylib$
+  \./attic/
+  \./tmp/
+  CMakeFiles/
+  _CPack_Packages/
+  \\.cmake$
+  /CMakeCache.txt$
+  /compile_commands.json$
+  /install_manifest.*\.txt$
+  /changelog.gz$
+  \./debian/tmp/
+  \\.substvars$
+  \\.log$
+  /debian/\\.debhelper/
+  /debian/files$
+  /debian/debhelper-build-stamp$
+  \./debian/${PROJECT_NAME}/
+  \./debian/${PROJECT_NAME}-dev/
+  \./debian/${PROJECT_NAME}-bin/
+  \./doc/
+  \./icvutil$
+)
+
 # see also https://gitlab.kitware.com/cmake/cmake/-/issues/21832
 # CPack Deb lacks a way to configure copyright files by component
 foreach(component IN LISTS CPACK_COMPONENTS_ALL)
