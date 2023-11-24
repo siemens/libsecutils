@@ -67,5 +67,8 @@ install(FILES
 install(DIRECTORY include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
     COMPONENT security-utilities_library_Development
-    PATTERN CMakeLists.txt EXCLUDE
+    FILES_MATCHING
+        PATTERN "*.h"
+        PATTERN CMakeFiles EXCLUDE
+        PATTERN secutils_static_config.h EXCLUDE
 )
