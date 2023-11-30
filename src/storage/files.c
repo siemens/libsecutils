@@ -324,6 +324,11 @@ typedef struct pw_cb_data
 
 static int password_callback(char* buf, int bufsiz, int verify, void* cb_tmp)
 {
+    if(0 == buf || bufsiz <= 0 || 0 == cb_tmp)
+    {
+        return -1;
+    }
+
     int res = 0 * verify; /* make (artificial) use of 'verify' */
     const char* password = 0;
     PW_CB_DATA* cb_data = (PW_CB_DATA*)cb_tmp;
@@ -340,9 +345,143 @@ static int password_callback(char* buf, int bufsiz, int verify, void* cb_tmp)
         {
             res = bufsiz;
         }
-        memcpy(buf, password, res); /* copy password and length(res) into buf */
+        memcpy(buf, password, (size_t)res); /* copy password and length(res) into buf */
     }
     return res; /* the size */
+}
+
+
+static int get_algo_nid(const X509_ALGOR *alg)
+{
+    int pbenid, aparamtype;
+    const ASN1_OBJECT *aoid;
+    const void *aparam;
+
+    X509_ALGOR_get0(&aoid, &aparamtype, &aparam, alg);
+
+    pbenid = OBJ_obj2nid(aoid);
+
+    if(pbenid == NID_pbes2)
+    {
+        PBE2PARAM *pbe2 = 0;
+        int encnid;
+        if(aparamtype == V_ASN1_SEQUENCE)
+        {
+            pbe2 = ASN1_item_unpack(aparam, ASN1_ITEM_rptr(PBE2PARAM));
+        }
+        if(pbe2 == 0)
+        {
+            BIO_puts(bio_err, ", <unsupported parameters>");
+            return NID_undef;
+        }
+        X509_ALGOR_get0(&aoid, &aparamtype, &aparam, pbe2->keyfunc);
+        pbenid = OBJ_obj2nid(aoid);
+        X509_ALGOR_get0(&aoid, 0, 0, pbe2->encryption);
+        encnid = OBJ_obj2nid(aoid);
+        PBE2PARAM_free(pbe2);
+        return encnid;
+    }
+
+    return NID_undef;
+}
+
+
+static int bag_get_pkey_algo(const PKCS12_SAFEBAG *bag, const char *pass, int passlen)
+{
+    // we only support a shrouded keybag
+    if(PKCS12_SAFEBAG_get_nid(bag) is_eq NID_pkcs8ShroudedKeyBag)
+    {
+        const X509_SIG *tp8;
+        const X509_ALGOR *tp8alg;
+
+        tp8 = PKCS12_SAFEBAG_get0_pkcs8(bag);
+        X509_SIG_get0(tp8, &tp8alg, 0);
+        return get_algo_nid(tp8alg);
+    }
+    return NID_undef;
+}
+
+
+static int bags_get_pkey_algo(const STACK_OF(PKCS12_SAFEBAG) *bags, const char *pass, int passlen, int desired_algo_nid)
+{
+    int i, algo_nid = NID_undef;
+    for(i = 0; i < sk_PKCS12_SAFEBAG_num(bags); ++i)
+    {
+        int bag_algo_nid = bag_get_pkey_algo(sk_PKCS12_SAFEBAG_value(bags, i), pass, passlen);
+        if(bag_algo_nid is_eq NID_undef)
+        {
+            continue;
+        }
+        if(bag_algo_nid not_eq desired_algo_nid)
+        {
+            return bag_algo_nid;
+        }
+        algo_nid = bag_algo_nid;
+    }
+    return algo_nid;
+}
+
+
+/* This function determines whether a given PKCS#12 file contains at least one private key that was encrypted using the
+   desired algorithm. */
+/* Iterates over all keybags in the file but only looks inside Shrouded keybags. Returns 1 if the desired algorithm
+   and no other was found, 0 otherwise. */
+static int algo_allowed(const PKCS12* p12, const char* pass, int passlen, int desired_algo_nid)
+{
+    STACK_OF(PKCS7) *auth_safes = 0;
+    STACK_OF(PKCS12_SAFEBAG) *bags = 0;
+    int i, bagnid;
+    int found_desired_algo = 0;
+    PKCS7 *p7 = 0;
+
+    auth_safes = PKCS12_unpack_authsafes(p12);
+
+    if(0 is_eq auth_safes)
+    {
+        return 0;
+    }
+
+    for(i = 0; i < sk_PKCS7_num(auth_safes); ++i)
+    {
+        p7 = sk_PKCS7_value(auth_safes, i);
+        bagnid = OBJ_obj2nid(p7->type);
+        if(bagnid == NID_pkcs7_data)
+        {
+            bags = PKCS12_unpack_p7data(p7);
+        }
+        else if(bagnid == NID_pkcs7_encrypted)
+        {
+            bags = PKCS12_unpack_p7encdata(p7, pass, passlen);
+        }
+        else
+        {
+            continue;
+        }
+        if(!bags)
+        {
+            sk_PKCS7_pop_free(auth_safes, PKCS7_free);
+            return 0;
+        }
+
+        int algo = bags_get_pkey_algo(bags, pass, passlen, desired_algo_nid);
+        sk_PKCS12_SAFEBAG_pop_free(bags, PKCS12_SAFEBAG_free);
+        bags = 0;
+
+        if(algo is_eq NID_undef)
+        {
+            continue;
+        }
+        if(algo is_eq desired_algo_nid)
+        {
+            found_desired_algo = 1;
+            continue;
+        }
+        sk_PKCS7_pop_free(auth_safes, PKCS7_free);
+        return 0;
+    }
+
+    sk_PKCS7_pop_free(auth_safes, PKCS7_free);
+    return found_desired_algo;
 }
 
 /* adapted from OpenSSL:apps/lib/apps.c
@@ -372,32 +511,37 @@ static int load_pkcs12(BIO* in, OPTIONAL const char* desc, OPTIONAL pem_password
     /* See if an empty password will do */
     if(PKCS12_verify_mac(p12, "", 0) not_eq 0 or PKCS12_verify_mac(p12, 0, 0) not_eq 0)
     {
-        LOG(FL_WARN, "Unencrypted PKCS#12 file%s%s", for_str, desc_str);
-        pass = "";
+        LOG(FL_WARN, "Rejecting unencrypted PKCS#12 file%s%s", for_str, desc_str);
+        return 0;
     }
-    else
+    if(pem_cb is_eq 0)
     {
-        if(pem_cb is_eq 0)
-        {
-            pem_cb = password_callback;
-        }
-        len = pem_cb(tpass, PEM_BUFSIZE, 0, cb_data);
-        if(len < 0)
-        {
-            LOG(FL_ERR, "passphrase callback error for %s", desc not_eq 0 ? desc : "PKCS#12 file");
-            goto die;
-        }
-        if(len < PEM_BUFSIZE)
-        {
-            tpass[len] = 0;
-        }
-        if(0 is_eq PKCS12_verify_mac(p12, tpass, len))
-        {
-            LOG(FL_ERR, "mac verify error (wrong password?) in PKCS12 file%s%s", for_str, desc_str);
-            goto die;
-        }
-        pass = tpass;
+        pem_cb = password_callback;
     }
+    len = pem_cb(tpass, PEM_BUFSIZE, 0, cb_data);
+    if(len < 0)
+    {
+        LOG(FL_ERR, "passphrase callback error for %s", desc not_eq 0 ? desc : "PKCS#12 file");
+        goto die;
+    }
+    if(len < PEM_BUFSIZE)
+    {
+        tpass[len] = 0;
+    }
+    if(0 is_eq PKCS12_verify_mac(p12, tpass, len))
+    {
+        LOG(FL_ERR, "mac verify error (wrong password?) in PKCS12 file%s%s", for_str, desc_str);
+        goto die;
+    }
+
+    pass = tpass;
+
+    if(0 is_eq algo_allowed(p12, pass, len, NID_aes_256_cbc))
+    {
+        LOG(FL_ERR, "Rejecting PKCS#12 file%s%s due to unsupported private key encryption algorithm", for_str, desc_str);
+        return 0;
+    }
+
     EVP_PKEY* unused_pkey = 0;
     X509* unused_cert = 0;
     ret = PKCS12_parse(p12, pass, pkey is_eq 0 ? &unused_pkey : pkey, cert is_eq 0 ? &unused_cert : cert, ca);
