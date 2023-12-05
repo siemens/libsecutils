@@ -1,9 +1,9 @@
-include/secutils/*.h             /usr/include/secutils
-include/secutils/certstatus/*.h  /usr/include/secutils/certstatus
-include/secutils/config/*.h      /usr/include/secutils/config
-include/secutils/connections/*.h /usr/include/secutils/connections
-include/secutils/credentials/*.h /usr/include/secutils/credentials
-include/secutils/crypto/*.h      /usr/include/secutils/crypto
-include/secutils/storage/*.h     /usr/include/secutils/storage
-include/secutils/util/*.h        /usr/include/secutils/util
+src/libsecutils/include/secutils/*.h             /usr/include/secutils
+src/libsecutils/include/secutils/certstatus/*.h  /usr/include/secutils/certstatus
+src/libsecutils/include/secutils/config/*.h      /usr/include/secutils/config
+src/libsecutils/include/secutils/connections/*.h /usr/include/secutils/connections
+src/libsecutils/include/secutils/credentials/*.h /usr/include/secutils/credentials
+src/libsecutils/include/secutils/crypto/*.h      /usr/include/secutils/crypto
+src/libsecutils/include/secutils/storage/*.h     /usr/include/secutils/storage
+src/libsecutils/include/secutils/util/*.h        /usr/include/secutils/util
 doc/html                         /usr/share/doc/libsecutils-dev
