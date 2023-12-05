@@ -110,8 +110,8 @@ OUTBIN=icvutil$(EXE)
 DEST_BIN=$(DEST_PRE)/bin
 LOCAL_CFLAGS= -fPIC # -std=gnu90 TODO clean up code and re-enable flag
 override CFLAGS += -isystem $(OPENSSL)/include# # # use of -isystem is critical for selecting wanted OpenSSL version
-override CFLAGS += -Iinclude
-override CFLAGS += -Iinclude/secutils
+override CFLAGS += -Isrc/libsecutils/include
+override CFLAGS += -Isrc/libsecutils/include/secutils
 ifneq ($(SECUTILS_USE_UTA),)
     override CFLAGS += -DSECUTILS_USE_UTA=1
 endif
@@ -181,7 +181,7 @@ ifeq ($(COV_ENABLED), 1)
 endif
 	$(MAKE) -f Makefile_v1 COMPILE_TYPE=$(COMPILE_TYPE) build_only
 
-SECUTILS_CONFIG=include/secutils/secutils_static_config.h
+SECUTILS_CONFIG=src/libsecutils/include/secutils/secutils_static_config.h
 util: $(SECUTILS_CONFIG)
 ifneq ($(SECUTILS_USE_ICV),)
 	$(MAKE) -C util CFLAGS="$(CFLAGS) $(LOCAL_CFLAGS)" LDFLAGS="$(LDFLAGS)" OUT_DIR="$(OUT_DIR)"
@@ -284,7 +284,7 @@ clean_uta:
 clean: clean_config
 	rm -fr $(OUT_DIR)/$(OUTLIB_)*$(DLL)*
 	rm -f $(OUT_DIR)/$(OUTBIN)
-	$(MAKE) -C util clean OUT_DIR="$(OUT_DIR)"
+	$(MAKE) -C src/util clean OUT_DIR="$(OUT_DIR)"
 	rm -fr $(BUILDDIR)
 
 clean_config:
@@ -297,7 +297,7 @@ clean_all: clean clean_deb
 
 doc: doc/html refman.pdf
 
-doc/html: Doxyfile $(wildcard include/*/*.h include/*/*/*.h)
+doc/html: Doxyfile $(wildcard src/libsecutils/include/*/*.h src/libsecutils/include/*/*/*.h)
 	doxygen Doxyfile 1>/dev/null || mkdir -p doc/html # required packages: doxygen graphviz
 
 refman.pdf: doc/html

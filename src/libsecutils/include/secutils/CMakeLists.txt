@@ -28,7 +28,7 @@ if(SECURITY_UTILITIES_NO_TLS)
     set(SECUTILS_NO_TLS ON)
 endif()
 
-configure_file(static_config.h.in static_config.h)
+configure_file(secutils_static_config.h.in secutils_static_config.h)
 
 target_include_directories(security-utilities_library PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
