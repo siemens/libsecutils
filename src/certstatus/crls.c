@@ -225,14 +225,27 @@ int check_cert_crls(X509_STORE_CTX* ctx, OPTIONAL STACK_OF(X509_CRL) * crls)
         LOG(FL_ERR, "cannot set up tmp_ctx");
         goto err;
     }
-    if((certs = sk_X509_new_reserve(0, 2)) is_eq 0
-       or (X509_STORE_CTX_set0_verified_chain(tmp_ctx, certs), 0)
-       or cert   is_eq 0 or not sk_X509_push(certs, X509_dup(cert))
-       or issuer is_eq 0 or not sk_X509_push(certs, X509_dup(issuer)))
-    {
-        LOG(FL_ERR, "cannot set certs in tmp_ctx");
+
+    if ((certs = sk_X509_new_reserve(0, 2)) is_eq 0) {
+        LOG(FL_ERR, "cannot allocate list of copied certs for tmp_ctx");
         goto err;
     }
+    X509_STORE_CTX_set0_verified_chain(tmp_ctx, certs);
+    /*
+     * Not using X509_dup() below because this does take over the cache for
+     * X.509v3 extensions etc, which may cause needless failure, possibly
+     * even giving misleading reasons like X509_V_ERR_DIFFERENT_CRL_SCOPE
+     */
+    if (not X509_up_ref(cert)) {
+        LOG(FL_ERR, "cannot copy target cert for tmp_ctx");
+        goto err;
+    }
+    (void)sk_X509_push(certs, cert); /* cannot fail */
+    if (not X509_up_ref(issuer)) {
+        LOG(FL_ERR, "cannot copy issuer cert for tmp_ctx");
+        goto err;
+    }
+    (void)sk_X509_push(certs, issuer); /* cannot fail */
 
     X509_VERIFY_PARAM* tmp_vpm = X509_STORE_CTX_get0_param(tmp_ctx);
     if(STORE_CTX_nonfinal(ctx))
