@@ -147,6 +147,7 @@ set(CPACK_SOURCE_IGNORE_FILES
   \./debian/${PROJECT_NAME}-bin/
   \./doc/
   \./icvutil$
+  /src/libsecutils/include/secutils/secutils_static_config.h
 )
 
 include(CPack)
