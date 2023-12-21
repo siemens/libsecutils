@@ -192,19 +192,19 @@ build_all: build util
 $(SECUTILS_CONFIG): $(SECUTILS_CONFIG).in # limitation: this is not triggered when any of the env. vars changes
 	cp $< $@
 ifdef SECUTILS_USE_UTA
-	@sed -i -e 's|#cmakedefine SECUTILS_USE_UTA|#define SECUTILS_USE_UTA|' $@
+	@sed -i~ -e 's|#cmakedefine SECUTILS_USE_UTA|#define SECUTILS_USE_UTA|' $@
 else
-	@sed -i -e 's|#cmakedefine SECUTILS_USE_UTA|/* #undef SECUTILS_USE_UTA */|' $@
+	@sed -i~ -e 's|#cmakedefine SECUTILS_USE_UTA|/* #undef SECUTILS_USE_UTA */|' $@
 endif
 ifdef SECUTILS_USE_ICV
-	@sed -i -e 's|#cmakedefine SECUTILS_USE_ICV|#define SECUTILS_USE_ICV|' $@
+	@sed -i~ -e 's|#cmakedefine SECUTILS_USE_ICV|#define SECUTILS_USE_ICV|' $@
 else
-	@sed -i -e 's|#cmakedefine SECUTILS_USE_ICV|/* #undef SECUTILS_USE_ICV */|' $@
+	@sed -i~ -e 's|#cmakedefine SECUTILS_USE_ICV|/* #undef SECUTILS_USE_ICV */|' $@
 endif
 ifdef SECUTILS_NO_TLS
-	@sed -i -e 's|#cmakedefine SECUTILS_NO_TLS|#define SECUTILS_NO_TLS|' $@
+	@sed -i~ -e 's|#cmakedefine SECUTILS_NO_TLS|#define SECUTILS_NO_TLS|' $@
 else
-	@sed -i -e 's|#cmakedefine SECUTILS_NO_TLS|/* #undef SECUTILS_NO_TLS */|' $@
+	@sed -i~ -e 's|#cmakedefine SECUTILS_NO_TLS|/* #undef SECUTILS_NO_TLS */|' $@
 endif
 
 # Binary output target
