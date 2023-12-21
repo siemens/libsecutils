@@ -121,6 +121,7 @@ include(cmake/CPackDebianPackageSettings.cmake)
 set(CPACK_SOURCE_IGNORE_FILES
   ${CPACK_IGNORE_FILES}
   ~$
+  \\.diff$
   \./\.git/
   \\.git$
   \\.deb$
@@ -133,22 +134,29 @@ set(CPACK_SOURCE_IGNORE_FILES
   CMakeFiles/
   _CPack_Packages/
   \\.cmake$
-  /CMakeCache.txt$
+  /Makefile$
+  ./CMakeCache.txt$
+  ./CMakeDoxyfile.in$
+  ./Doxyfile.doc$
   /compile_commands.json$
   /install_manifest.*\.txt$
   /changelog.gz$
-  \./debian/tmp/
   \\.substvars$
   \\.log$
-  /debian/\\.debhelper/
-  /debian/files$
-  /debian/debhelper-build-stamp$
-  \./debian/${PROJECT_NAME}/
-  \./debian/${PROJECT_NAME}-dev/
-  \./debian/${PROJECT_NAME}-bin/
+  \./debian/\\.debhelper/
+  \./debian/tmp/
+  \./debian/files$
+  \./debian/md5sums$
+  \./debian/shlibs$
+  \./debian/substvars$
+  \./debian/triggers$
+  \./debian/debhelper-build-stamp$
+  \./debian/libsecutils/
+  \./debian/libsecutils-dev/
+  \./debian/libsecutils-bin/
   \./doc/
   \./icvutil$
-  /src/libsecutils/include/secutils/secutils_static_config.h
+  /src/libsecutils/include/secutils/secutils_static_config.h$
 )
 
 include(CPack)
