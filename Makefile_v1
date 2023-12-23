@@ -254,8 +254,8 @@ install: # doc/html $(OUT_DIR)/$(OUTLIB) $(OUT_DIR)/$(OUTBIN)
 	ln -sf $(OUTLIBV) $(DEST_LIB)/$(OUTLIB)
 #install_headers:
 	mkdir -p $(DEST_INC)/include/secutils
-	find include/secutils -type d -exec install -d '$(DEST_INC)/{}' ';'
-	find include/secutils -type f -exec install -Dm 0644 '{}' '$(DEST_INC)/{}' ';'
+	cd src/libsecutils; find include/secutils -type d -exec install -d '$(DEST_INC)/{}' ';'
+	cd src/libsecutils; find include/secutils -type f -exec install -Dm 0644 '{}' '$(DEST_INC)/{}' ';'
 #install_bins:
 ifeq ($(SECUTILS_USE_ICV),)
 	touch $(OUT_DIR)/$(OUTBIN) # workaround for Debian packaging
