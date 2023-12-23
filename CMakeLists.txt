@@ -43,7 +43,7 @@ endif()
 option(SECURITY_UTILITIES_USE_UTA "Use UTA API" OFF)
 option(SECURITY_UTILITIES_USE_ICV "Use configuration ICV" OFF)
 option(SECURITY_UTILITIES_NO_TLS "Do not use TLS" OFF)
-set(CMAKE_INSTALL_DOCDIR "/usr/share/doc/${PROJECT_NAME}")
+set(CMAKE_INSTALL_DOCDIR "/usr/share/doc/libsecutils")
 
 if(DEFINED ENV{SECUTILS_USE_UTA})
   set(SECURITY_UTILITIES_USE_UTA ON)
