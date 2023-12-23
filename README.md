@@ -195,6 +195,7 @@ sudo dpkg -i libsecutils*deb
 
 To build the documentation, the following dependencies need to be installed:
 * `doxygen`
+* `graphviz`
 * `latex`, in case LaTeX output is desired; if so, comment out in [`Doxyfile`](Doxyfile): `GENERATE_LATEX = NO`
 
 The documentation is built by
