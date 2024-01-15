@@ -169,7 +169,7 @@ bool CONF_update_vpm(CONF* conf, const char* sections, X509_VERIFY_PARAM* vpm)
             {
                 continue; /* OPT_update_vpm can only set option positively */
             }
-            if(not OPT_update_vpm(vopt->default_value.num, val, vpm))
+            if(not OPT_update_vpm((int)vopt->default_value.num, val, vpm))
             {
                 return false;
             }
