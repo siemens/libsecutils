@@ -329,7 +329,7 @@ int ocsp_stapling_cb(SSL* ssl, OPTIONAL STACK_OF(X509) *untrusted)
     STACK_OF(X509) *chain = SSL_get0_verified_chain(ssl);
     X509* cert = sk_X509_value(chain, 0); /* multi-stapling is not supported */
     const unsigned char* resp_der;
-    int resp_der_len = SSL_get_tlsext_status_ocsp_resp(ssl, &resp_der);
+    long resp_der_len = SSL_get_tlsext_status_ocsp_resp(ssl, &resp_der);
     OCSP_RESPONSE* resp = 0;
     X509_STORE_CTX* ctx = 0;
     int ret = -1; /* tls_process_initial_server_flight reports
@@ -349,7 +349,7 @@ int ocsp_stapling_cb(SSL* ssl, OPTIONAL STACK_OF(X509) *untrusted)
         {
             LOG(FL_ERR, "error parsing stapled OCSP response");
             /* well, this is likely not an internal error (malloc failure) */
-            BIO_dump_indent(bio_trace, (char*)resp_der, resp_der_len, 4);
+            BIO_dump_indent(bio_trace, resp_der, (int)resp_der_len, 4);
             BIO_flush(bio_trace);
             goto end;
         }
