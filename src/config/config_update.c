@@ -29,9 +29,10 @@ static void skip_space(char** p)
 }
 
 
-static bool copy_line_substring(char* dest, const char* src, int* offset, int max_dest_len)
+static bool copy_line_substring(char *dest, const char *src,
+                                size_t *offset, size_t max_dest_len)
 {
-    int copy_len = strnlen(src, max_dest_len);
+    size_t copy_len = strnlen(src, max_dest_len);
     if(*offset + copy_len > max_dest_len)
     {
         return false;
@@ -51,9 +52,10 @@ static int file_modified;
  * Keeps any end-of-line comment.
  * Returns the length of the resulting line, or 0 in case of error.
  */
-static int refactor_entry(char* src_p, char* dest_p, const char* const key_p, const char* const val_p, int max_dest_len)
+static size_t refactor_entry(char *src_p, char *dest_p, const char *const key_p,
+                             const char *const val_p, size_t max_dest_len)
 {
-    int line_len = 0;
+    size_t line_len = 0;
     char* pos_p = src_p;
 
     if(0 is_eq src_p or 0 is_eq key_p or 0 is_eq val_p)
@@ -82,7 +84,7 @@ static int refactor_entry(char* src_p, char* dest_p, const char* const key_p, co
     skip_space(&pos_p);
 
     /* found "key = ", copy in the new value */
-    int val_len = strnlen(val_p, max_dest_len);
+    size_t val_len = strnlen(val_p, max_dest_len);
     line_len = pos_p - src_p;
     if(not copy_line_substring(dest_p, val_p, &line_len, max_dest_len))
     {
@@ -104,7 +106,8 @@ static int refactor_entry(char* src_p, char* dest_p, const char* const key_p, co
     {
         pos_p--;
     }
-    if(pos_p - pos_start not_eq val_len or strncmp(pos_start, val_p, val_len))
+    if(pos_p < pos_start || (size_t)(pos_p - pos_start) != val_len
+       || strncmp(pos_start, val_p, val_len))
     {
         file_modified = 1;
     }
@@ -151,11 +154,11 @@ static size_t read_config_until_section(FILE* file_p, const char* file_name, con
 {
     size_t file_len = 0;
     char* pos_p = 0;
-    int section_name_len = strlen(section_name);
+    size_t section_name_len = strlen(section_name);
     LOG(FL_TRACE, "Reading configuration until section is found or end of file reached");
     while(0 not_eq fgets(input_line, c_line_buf_size, file_p))
     {
-        int line_len = strnlen(input_line, c_line_buf_size);
+        size_t line_len = strnlen(input_line, c_line_buf_size);
         copy_file_line(file_buffer, input_line, line_len);
 
         /* break if line matches "\ *\[\ *section_name\ *\]" */
@@ -221,7 +224,7 @@ static size_t update_config_section(FILE* file_p, const char* file_name, size_t 
     LOG(FL_TRACE, "Replacing 'key = value' pairs in the section");
     while(0 not_eq fgets(input_line, c_line_buf_size, file_p))
     {
-        int line_len = strnlen(input_line, c_line_buf_size);
+        size_t line_len = strnlen(input_line, c_line_buf_size);
         if(line_len > c_line_buf_size - 1)
         {
             return 0;
@@ -283,9 +286,10 @@ static size_t update_config_section(FILE* file_p, const char* file_name, size_t 
 
 
 /* copy the rest of the file into the buffer */
-static int copy_remaining_config(FILE* file_p, int file_len, char* input_line)
+static size_t copy_remaining_config(FILE *file_p, size_t file_len,
+                                    char *input_line)
 {
-    int line_len = strnlen(input_line, c_line_buf_size); /* first line of next section already read */
+    size_t line_len = strnlen(input_line, c_line_buf_size); /* first line of next section already read */
     copy_file_line(file_buffer, input_line, line_len);
 
     while(0 not_eq fgets(input_line, c_line_buf_size, file_p))
@@ -387,7 +391,7 @@ int CONF_update_config(OPTIONAL ossl_unused uta_ctx* ctx, const char* file_name,
             return 0;
         }
 #endif
-        return file_len;
+        return (int)file_len;
     }
     else
     {
