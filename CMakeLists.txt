@@ -110,7 +110,7 @@ if(DEFINED ENV{NDEBUG} OR NOT CMAKE_BUILD_TYPE MATCHES Debug)
   set(CMAKE_BUILD_TYPE Release
       CACHE STRING "Choose the type of build." FORCE)
   add_compile_options(-O2)
-  add_compile_definitions(-DNDEBUG=1)
+  add_compile_definitions(NDEBUG=1)
 else()
   set(CMAKE_BUILD_TYPE Debug
       CACHE STRING "Choose the type of build." FORCE)
@@ -132,7 +132,7 @@ add_compile_options( # TODO clean up code and re-enable warnings instead:
   -Wno-shadow -Wno-declaration-after-statement -Wno-vla
   )
 add_compile_options(-pedantic -Werror)
-add_compile_definitions(-DPEDANTIC)
+add_compile_definitions(PEDANTIC)
 
 if(DEFINED ENV{SECUTILS_USE_UTA})
   set(SECUTILS_USE_UTA 1)
