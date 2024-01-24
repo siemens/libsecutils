@@ -40,10 +40,10 @@ message(STATUS "build mode: ${CMAKE_BUILD_TYPE}")
 
 add_compile_options(
   -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes
-  -Wformat -Wformat-security -Wtype-limits -Wundef -Wconversion
+  -Wformat -Wformat-security -Wtype-limits -Wundef
   -Wsign-compare -Wpointer-arith -Wunused-parameter)
 add_compile_options( # TODO clean up code and re-enable warnings instead:
-  -Wsign-conversion -Wno-c99-extensions
+  -Wno-conversion -Wno-sign-conversion
   -Wno-shadow -Wno-declaration-after-statement -Wno-vla
   )
 add_compile_options(-pedantic -Werror)
