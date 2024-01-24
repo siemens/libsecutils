@@ -451,7 +451,7 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
         p_dirent = readdir(p_dir);
     }
 
-    // set up cert CRL check callback for checking full chain
+    /* set up cert CRL check callback for checking full chain */
     if(found)
     {
         X509_VERIFY_PARAM_set_flags(X509_STORE_get0_param(pstore), X509_V_FLAG_STATUS_CHECK_ALL);

@@ -1,13 +1,13 @@
-/** 
+/**
 * @file crl_mgmt.c
-* 
+*
 * @brief Handling CRLs during certificate revocation check
 *
 * @copyright Copyright (c) Siemens Mobility GmbH, 2021
 *
 * @author David von Oheimb <david.von.oheimb@siemens.com>
 *
-* This work is licensed under the terms of the Apache Software License 
+* This work is licensed under the terms of the Apache Software License
 * 2.0. See the COPYING file in the top-level directory.
 *
 * SPDX-License-Identifier: Apache-2.0
@@ -52,11 +52,11 @@ static int nidCrlNextPublish            = 0;
 static bool chkmkdir(const char *dir) {
     struct stat s;
     if (stat(dir, &s) == 0) {
-        // ok path exists, check, if it is a dir
+        /* ok path exists, check, if it is a dir */
         return S_ISDIR(s.st_mode) != 0;
     }
     if (errno == ENOENT) {
-        // path is not existing
+        /* path is not existing */
         return mkdir(dir, 0700) == 0;
     }
     return false;
@@ -86,7 +86,7 @@ static bool get_cache_filename_from_url(const char * cache_dir, const char * url
         buf[++len] = '\0';
     }
 
-    // create sha256 from url
+    /* create sha256 from url */
     unsigned char hash[SHA256_DIGEST_LENGTH];
     SHA256((unsigned char*)url, strlen(url), hash);
     len += UTIL_bintohex(hash, SHA256_DIGEST_LENGTH, false, 0, 0, buf+len, buflen-len, NULL);
@@ -108,12 +108,14 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
 
     in = BIO_new_file(cachefile, "rb");
     if (in != NULL) {
-        // read crl from ASN1 format
+        /* read crl from ASN1 format */
         crl = d2i_X509_CRL_bio(in, NULL);
-        // the PEM format would be this, format detection is currently not supported
-        // crl = PEM_read_bio_X509_CRL(in, NULL, NULL, NULL);
+        /*
+         * the PEM format would be this, format detection is currently not supported
+         * crl = PEM_read_bio_X509_CRL(in, NULL, NULL, NULL);
+         */
         if (crl == NULL) {
-            // do not unlink an unknown file that is not loadable as CRL
+            /* do not unlink an unknown file that is not loadable as CRL */
             LOG(FL_ERR, "error loading the CRL from cache file: %s", cachefile);
         }
         BIO_free(in);
@@ -170,10 +172,10 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
         LOG(FL_TRACE, "CRL timecheck: isBeforeStart: %d, isAfterEnd: %d, isAfterPublish: %d", isBeforeStart, isAfterEnd, isAfterPublish);
         if (isBeforeStart || isAfterEnd || isAfterPublish) {
             LOG(FL_DEBUG, "CRL is expired, so deleting it from the cache");
-            // crl not within time frame, remove it
+            /* crl not within time frame, remove it */
             X509_CRL_free(crl);
             crl = NULL;
-            // unlink the expired CRL file
+            /* unlink the expired CRL file */
             unlink(cachefile);
         }
         else {
@@ -191,10 +193,12 @@ static int put_crl_into_cache(X509_CRL * crl, const char * cachefile)
 
     BIO *out = BIO_new_file(cachefile, "wb");
     if (out != NULL) {
-        // write the CRL into an ASN1 formatted file
+        /* write the CRL into an ASN1 formatted file */
         res = (int)i2d_X509_CRL_bio(out, crl);
-        // PEM format would be this, different formats are currently not supported
-        // res = PEM_write_bio_X509_CRL(out, crl);
+        /*
+         * PEM format would be this, different formats are currently not supported
+         * res = PEM_write_bio_X509_CRL(out, crl);
+         */
         if (!res) {
             BIO_printf(bio_err, "unable to write CRL\n");
         }
@@ -234,7 +238,7 @@ static X509_CRL *get_crl_by_download_or_from_cache(const CRLMGMT_DATA *data,
 CRLMGMT_DATA *CRLMGMT_DATA_new(void)
 {
     if (nidCrlNextPublish==0) {
-        // TODO this is not thread-safe
+        /* TODO this is not thread-safe */
         nidCrlNextPublish = OBJ_create("1.3.6.1.4.1.311.21.4",
             SN_crl_next_publish, LN_crl_next_publish);
     }
