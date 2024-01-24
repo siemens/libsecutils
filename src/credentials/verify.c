@@ -31,6 +31,7 @@ bool STORE_CTX_tls_active(const X509_STORE_CTX* ctx)
 #ifndef SECUTILS_NO_TLS
     return X509_STORE_CTX_get_ex_data((X509_STORE_CTX*)ctx, SSL_get_ex_data_X509_STORE_CTX_idx()) not_eq 0;
 #else
+    (void)ctx; /* prevent compiler warning on unused variable */
     return false;
 #endif
 }
