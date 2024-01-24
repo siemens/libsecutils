@@ -78,9 +78,13 @@ ifdef NDEBUG
 else
     DEBUG_FLAGS ?= -g -O0 -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all # not every compiler(version) supports -Og
 endif
-override CFLAGS += $(DEBUG_FLAGS) -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes -Wformat -Wformat-security -Wtype-limits -Wundef -Wconversion -Wsign-compare -Wpointer-arith -Wunused-parameter
+override CFLAGS += $(DEBUG_FLAGS) \
+ -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes \
+ -Wformat -Wformat-security -Wtype-limits -Wundef \
+ -Wsign-compare -Wpointer-arith -Wunused-parameter
 # TODO clean up code and re-enable warnings instead:
-override CFLAGS += -Wno-sign-conversion -Wno-c99-extensions -Wno-shadow -Wno-declaration-after-statement -Wno-vla
+override CFLAGS += -Wno-conversion -Wno-sign-conversion \
+ -Wno-shadow -Wno-declaration-after-statement -Wno-vla
 override CFLAGS += -pedantic -DPEDANTIC -Werror
 
 ################################################################################
