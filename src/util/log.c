@@ -1,13 +1,13 @@
-/** 
+/**
 * @file log.c
-* 
+*
 * @brief Logging facility which, by default, outputs to syslog and console
 *
 * @copyright Copyright (c) Siemens Mobility GmbH, 2021
 *
 * @author David von Oheimb <david.von.oheimb@siemens.com>
 *
-* This work is licensed under the terms of the Apache Software License 
+* This work is licensed under the terms of the Apache Software License
 * 2.0. See the COPYING file in the top-level directory.
 *
 * SPDX-License-Identifier: Apache-2.0
@@ -22,8 +22,10 @@
 
 #include <assert.h>
 
-// use the GNU-specific `strerror_r`
-// https://man7.org/linux/man-pages/man3/strerror.3.html : SYNOPSIS
+/*
+ * use the GNU-specific `strerror_r`
+ * https://man7.org/linux/man-pages/man3/strerror.3.html : SYNOPSIS
+ */
 #define _GNU_SOURCE
 
 static LOG_cb_t LOG_fn = 0; /*!< this variable is shared between threads */

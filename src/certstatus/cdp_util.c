@@ -153,8 +153,8 @@ const char *CDP_get_crl_distribution_point_from_distpoint(
              */
 #if 0 /* ignored */
             const STACK_OF(X509_NAME_ENTRY) *relNames = point->distpoint->name.relativename;
-            // X509_NAME_print_ex(out, &ntmp, 0, XN_FLAG_ONELINE);
-            // TODO: add issuer and handle more relative name stuff
+            /* X509_NAME_print_ex(out, &ntmp, 0, XN_FLAG_ONELINE); */
+            /* TODO: add issuer and handle more relative name stuff */
             int j;
             for (j = 0; j < sk_X509_NAME_ENTRY_num(relNames); ++j) {
                 X509_NAME_ENTRY *entry  = sk_X509_NAME_ENTRY_value(relNames, j);

@@ -264,4 +264,4 @@ X509_CRL *CRLMGMT_load_crl_cb(
 # ifdef  __cplusplus
 }
 # endif
-#endif // SECUTILS_HEADER_CRL_MGMT_H
+#endif /* SECUTILS_HEADER_CRL_MGMT_H */
