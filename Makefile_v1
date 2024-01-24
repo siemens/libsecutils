@@ -104,7 +104,7 @@ DEST_INC=$(DEST_PRE)
 DEST_DOC=$(DEST_PRE)/share/doc/libsecutils-dev
 OUTBIN=icvutil$(EXE)
 DEST_BIN=$(DEST_PRE)/bin
-LOCAL_CFLAGS=-std=gnu90 -fPIC
+LOCAL_CFLAGS= -fPIC # -std=gnu90 TODO clean up code and re-enable flag
 override CFLAGS += -isystem $(OPENSSL)/include# # # use of -isystem is critical for selecting wanted OpenSSL version
 override CFLAGS += -Iinclude
 override CFLAGS += -Iinclude/secutils

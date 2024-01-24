@@ -168,6 +168,7 @@ endif()
 configure_file(${INC_DIR}/secutils_static_config.h.in
                ${INC_DIR}/secutils_static_config.h)
 
+# TODO clean up code and re-enable property
 # set_property(TARGET ${LIBSECUTILS_NAME} PROPERTY C_STANDARD 90)
 
 target_link_libraries(${LIBSECUTILS_NAME} ${OPENSSL_LIBRARIES}) # needed for clang/MacOSX
