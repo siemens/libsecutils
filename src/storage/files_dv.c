@@ -104,7 +104,7 @@ static bool store_dv(OPTIONAL uta_ctx* ctx, const char* dvfile, const char* name
         }
         int file_len = fprintf(fp, "[%s]\n", DV_SECTION);
         fclose(fp);
-        if(file_len not_eq strlen("[") + strlen(DV_SECTION) + strlen("]") + 1)
+        if(file_len not_eq (int)(strlen("[") + strlen(DV_SECTION) + strlen("]") + 1))
         {
             LOG(FL_ERR, "Error writing initial DV file '%s'", dvfile);
             return false;

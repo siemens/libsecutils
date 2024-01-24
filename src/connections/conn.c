@@ -120,7 +120,7 @@ char* CONN_get_host(const char* uri)
         {
             end = strchr(uri, '/');
         }
-        int len = end not_eq 0 ? end - uri : strlen(uri);
+        size_t len = end not_eq 0 ? (size_t)(end - uri) : strlen(uri);
         str = OPENSSL_strndup(uri, len);
         if(0 is_eq str)
         {
