@@ -20,6 +20,35 @@ else()
 endif()
 include(GNUInstallDirs) # CMAKE_INSTALL_PREFIX must be set before
 
+# add_compile_options must be set before add_library
+if(DEFINED ENV{NDEBUG} OR NOT CMAKE_BUILD_TYPE MATCHES Debug)
+  set(CMAKE_BUILD_TYPE Release
+      CACHE STRING "Choose the type of build." FORCE)
+  add_compile_options(-O2)
+  add_compile_definitions(NDEBUG=1)
+else()
+  set(CMAKE_BUILD_TYPE Debug
+      CACHE STRING "Choose the type of build." FORCE)
+  add_compile_options(-g -O0)
+
+  set(DEBUG_FLAGS "-fsanitize=address,undefined -fno-sanitize-recover=all") # must use quotes on MacOSX
+  add_compile_options(${DEBUG_FLAGS})
+  link_libraries(${DEBUG_FLAGS})
+  set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS} ${DEBUG_FLAGS}) # workarund for link_libraries() ignored on MacOSX
+endif()
+message(STATUS "build mode: ${CMAKE_BUILD_TYPE}")
+
+add_compile_options(
+  -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes
+  -Wformat -Wformat-security -Wtype-limits -Wundef -Wconversion
+  -Wsign-compare -Wpointer-arith -Wunused-parameter)
+add_compile_options( # TODO clean up code and re-enable warnings instead:
+  -Wsign-conversion -Wno-c99-extensions
+  -Wno-shadow -Wno-declaration-after-statement -Wno-vla
+  )
+add_compile_options(-pedantic -Werror)
+add_compile_definitions(PEDANTIC)
+
 if(NOT("$ENV{OPENSSL_DIR}" STREQUAL ""))
   message(STATUS "using OpenSSL from " $ENV{OPENSSL_DIR})
   if(DEFINED ENV{OPENSSL_LIB})
@@ -105,34 +134,6 @@ set(INC_PUBLIC_HDRS
 )
 
 include_directories(${INC_DIR}/.. ${INC_DIR})
-
-if(DEFINED ENV{NDEBUG} OR NOT CMAKE_BUILD_TYPE MATCHES Debug)
-  set(CMAKE_BUILD_TYPE Release
-      CACHE STRING "Choose the type of build." FORCE)
-  add_compile_options(-O2)
-  add_compile_definitions(NDEBUG=1)
-else()
-  set(CMAKE_BUILD_TYPE Debug
-      CACHE STRING "Choose the type of build." FORCE)
-  add_compile_options(-g -O0)
-
-  set(DEBUG_FLAGS "-fsanitize=address,undefined -fno-sanitize-recover=all") # must use quotes on MacOSX
-  add_compile_options(${DEBUG_FLAGS})
-  link_libraries(${DEBUG_FLAGS})
-  set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_SHARED_LINKER_FLAGS} ${DEBUG_FLAGS}) # workarund for link_libraries() ignored on MacOSX
-endif()
-message(STATUS "build mode: ${CMAKE_BUILD_TYPE}")
-
-add_compile_options(
-  -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes
-  -Wformat -Wformat-security -Wtype-limits -Wundef -Wconversion
-  -Wsign-compare -Wpointer-arith -Wunused-parameter)
-add_compile_options( # TODO clean up code and re-enable warnings instead:
-  -Wsign-conversion -Wno-c99-extensions
-  -Wno-shadow -Wno-declaration-after-statement -Wno-vla
-  )
-add_compile_options(-pedantic -Werror)
-add_compile_definitions(PEDANTIC)
 
 if(DEFINED ENV{SECUTILS_USE_UTA})
   set(SECUTILS_USE_UTA 1)
