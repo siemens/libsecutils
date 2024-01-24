@@ -152,7 +152,7 @@ static bool protect_or_check_icv(OPTIONAL uta_ctx* ctx, const char* file, const 
 
         char icv_hex[ICV_HEX_LEN + 1];
         bool found =
-            fsize >= ICV_LINE_LEN and strncmp((char*)(buf + fsize - ICV_LINE_LEN), ICV_TAG, strlen(ICV_TAG)) is_eq 0;
+            (size_t)fsize >= ICV_LINE_LEN and strncmp((char*)(buf + fsize - ICV_LINE_LEN), ICV_TAG, strlen(ICV_TAG)) is_eq 0;
 
         if(protect)
         {
