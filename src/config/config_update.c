@@ -107,7 +107,7 @@ static size_t refactor_entry(char *src_p, char *dest_p, const char *const key_p,
         pos_p--;
     }
     if(pos_p < pos_start || (size_t)(pos_p - pos_start) != val_len
-       || strncmp(pos_start, val_p, val_len))
+       || strncmp(pos_start, val_p, val_len) not_eq 0)
     {
         file_modified = 1;
     }
@@ -183,7 +183,7 @@ static size_t read_config_until_section(FILE* file_p, const char* file_name, con
         LOG(FL_ERR, "Cannot find section '%s' in config file '%s'", section_name, file_name);
         return 0;
     }
-    return file_len;
+    return file_len; /* TODO check: file_len is always 0 */
 }
 
 
@@ -209,7 +209,7 @@ static size_t add_to_config_section(size_t file_len, const key_val_section* cons
         }
     }
 
-    return file_len;
+    return file_len; /* TODO check: file_len is not updated */
 }
 
 
@@ -297,11 +297,12 @@ static size_t copy_remaining_config(FILE *file_p, size_t file_len,
         line_len = strnlen(input_line, c_line_buf_size);
         copy_file_line(file_buffer, input_line, line_len);
     }
-    return file_len;
+    return file_len; /* TODO check: file_len is not updated */
 }
 
 
 /* returns length of new file, or 0 in case of error */
+/* TODO check: return value is always 0 */
 int CONF_update_config(OPTIONAL ossl_unused uta_ctx* ctx, const char* file_name, const key_val_section* key_val_section,
                        int exclude)
 {
@@ -391,7 +392,7 @@ int CONF_update_config(OPTIONAL ossl_unused uta_ctx* ctx, const char* file_name,
             return 0;
         }
 #endif
-        return (int)file_len;
+        return (int)file_len; /* TODO check: file_len is always 0 */
     }
     else
     {
