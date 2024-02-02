@@ -349,7 +349,11 @@ int ocsp_stapling_cb(SSL* ssl, OPTIONAL STACK_OF(X509) *untrusted)
         {
             LOG(FL_ERR, "error parsing stapled OCSP response");
             /* well, this is likely not an internal error (malloc failure) */
-            BIO_dump_indent(bio_trace, resp_der, (int)resp_der_len, 4);
+            BIO_dump_indent(bio_trace,
+#  if OPENSSL_VERSION_NUMBER < 0x30000000L
+                            (char *)
+#  endif
+                            resp_der, (int)resp_der_len, 4);
             BIO_flush(bio_trace);
             goto end;
         }
