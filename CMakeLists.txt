@@ -43,7 +43,7 @@ endif()
 option(SECURITY_UTILITIES_USE_UTA "Use UTA API" OFF)
 option(SECURITY_UTILITIES_USE_ICV "Use configuration ICV" OFF)
 option(SECURITY_UTILITIES_NO_TLS "Do not use TLS" OFF)
-set(CMAKE_INSTALL_DOCDIR "/usr/share/doc/libsecutils")
+set(CMAKE_INSTALL_DOCDIR "/usr/share/doc")
 
 if(DEFINED ENV{SECUTILS_USE_UTA})
   set(SECURITY_UTILITIES_USE_UTA ON)
@@ -69,15 +69,18 @@ install(FILES libsecutils.svg
 )
 
 find_package(Doxygen QUIET)
-if(NOT TARGET doc AND Doxygen_FOUND)
+if(NOT TARGET security-utilities_doxygen AND Doxygen_FOUND)
   set(DOXYGEN_OUTPUT_DIRECTORY doc)
-  doxygen_add_docs(doc ${CMAKE_CURRENT_LIST_DIR}/src/libsecutils/include/secutils/basic.h)
+  doxygen_add_docs(
+    security-utilities_doxygen
+    ${CMAKE_CURRENT_LIST_DIR}/src/libsecutils/include/secutils/basic.h
+  )
 endif()
 
-install(DIRECTORY doc/html/
-  OPTIONAL # TODO add build for doc/
-  DESTINATION ${CMAKE_INSTALL_DOCDIR}
-)
+if(NOT TARGET doc)
+  add_custom_target(doc)
+  add_dependencies(doc security-utilities_doxygen)
+endif()
 
 if(NOT TARGET uninstall)
   add_custom_target(uninstall COMMAND xargs -I{} rm -vf $ENV{DESTDIR}{} <install_manifest.txt)
@@ -173,11 +176,22 @@ foreach(component IN LISTS CPACK_COMPONENTS_ALL)
   else()
     set(suffix "")
   endif()
+
+  set(COMPONENT_DOC_DIRECTORY "${PROJECT_NAME}${suffix}")
+
+  if(suffix STREQUAL "-dev")
+    install(DIRECTORY doc/html
+      OPTIONAL # TODO add build for doc/
+      DESTINATION "${CMAKE_INSTALL_DOCDIR}/${COMPONENT_DOC_DIRECTORY}"
+      COMPONENT security-utilities_library_Development
+    )
+  endif()
+
   install(FILES
     "${CMAKE_CURRENT_SOURCE_DIR}/debian/copyright"
     "${CMAKE_CURRENT_BINARY_DIR}/changelog.gz"
     "${CMAKE_CURRENT_SOURCE_DIR}/libsecutils.svg"
-    DESTINATION "${CMAKE_INSTALL_FULL_DOCDIR}${suffix}"
+    DESTINATION "${CMAKE_INSTALL_DOCDIR}/${COMPONENT_DOC_DIRECTORY}"
     COMPONENT ${component}
     )
 endforeach()
