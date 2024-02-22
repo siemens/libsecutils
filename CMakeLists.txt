@@ -64,10 +64,6 @@ add_subdirectory(src)
 # =============================
 include(GNUInstallDirs)
 
-install(FILES libsecutils.svg
-  DESTINATION ${CMAKE_INSTALL_DOCDIR}
-)
-
 find_package(Doxygen QUIET)
 if(NOT TARGET security-utilities_doxygen AND Doxygen_FOUND)
   set(DOXYGEN_OUTPUT_DIRECTORY doc)
