@@ -5,6 +5,7 @@
 *.o
 *.so
 *.so.*
+*.dylib
 *.pdf
 *.log
 *.bak
