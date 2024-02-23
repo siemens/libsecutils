@@ -279,7 +279,7 @@ uninstall:
 clean_uta:
 	rm -fr $(BUILDDIR)/uta_api$(OBJ) $(BUILDDIR)/files_icv$(OBJ) \
           $(BUILDDIR)/files_dv$(OBJ) \
-          $(OUT_DIR)/$(OUTLIB_)*$(DLL)* $(OUT_DIR)/$(OUTBIN) $(OUT_DIR)/util/icvutil.o
+          $(OUT_DIR)/$(OUTLIB_)*$(DLL)* $(OUT_DIR)/$(OUTBIN) $(OUT_DIR)/util/icvutil$(OBJ)
 
 clean: clean_config
 	rm -fr $(OUT_DIR)/$(OUTLIB_)*$(DLL)*
