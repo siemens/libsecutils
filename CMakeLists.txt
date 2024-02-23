@@ -69,7 +69,7 @@ if(NOT TARGET security-utilities_doxygen AND Doxygen_FOUND)
   set(DOXYGEN_OUTPUT_DIRECTORY doc)
   doxygen_add_docs(
     security-utilities_doxygen
-    ${CMAKE_CURRENT_LIST_DIR}/src/libsecutils/include/secutils/basic.h
+    ${CMAKE_CURRENT_LIST_DIR}/src
   )
 endif()
 
@@ -176,7 +176,7 @@ foreach(component IN LISTS CPACK_COMPONENTS_ALL)
   set(COMPONENT_DOC_DIRECTORY "${PROJECT_NAME}${suffix}")
 
   if(suffix STREQUAL "-dev")
-    install(DIRECTORY doc/html
+    install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc/html
       OPTIONAL # TODO add build for doc/
       DESTINATION "${CMAKE_INSTALL_DOCDIR}/${COMPONENT_DOC_DIRECTORY}"
       COMPONENT security-utilities_library_Development
