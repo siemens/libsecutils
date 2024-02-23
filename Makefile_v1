@@ -295,7 +295,7 @@ clean_all: clean clean_deb
 	rm -f install_manifest*.txt
 	rm -fr doc refman.pdf CMakeDoxyfile.in Doxyfile.doc *.gcov reports
 
-doc: doc/html refman.pdf
+doc: $(SECUTILS_CONFIG) doc/html refman.pdf
 
 doc/html: Doxyfile $(wildcard src/libsecutils/include/*/*.h src/libsecutils/include/*/*/*.h)
 	doxygen Doxyfile 1>/dev/null || mkdir -p doc/html # required packages: doxygen graphviz
