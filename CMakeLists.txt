@@ -20,22 +20,27 @@ elseif(NOT CMAKE_BUILD_TYPE)
 endif()
 
 if(NOT("$ENV{OPENSSL_DIR}" STREQUAL ""))
-  message(STATUS "Using OpenSSL from " $ENV{OPENSSL_DIR})
+  message(STATUS "Using OpenSSL include files from " $ENV{OPENSSL_DIR})
   set(OPENSSL_ROOT_DIR "$ENV{OPENSSL_DIR}")
+  set(OPENSSL_LIB $ENV{OPENSSL_DIR})
+endif()
+if(DEFINED ENV{OPENSSL_LIB})
+  set(OPENSSL_LIB $ENV{OPENSSL_LIB})
 endif()
 
 find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
 
-if(NOT("$ENV{OPENSSL_LIB}" STREQUAL ""))
+if(NOT("${OPENSSL_LIB}" STREQUAL ""))
+  message(STATUS "Using OpenSSL libraries from " ${OPENSSL_LIB})
   if(TARGET OpenSSL::SSL)
     set_target_properties(OpenSSL::SSL PROPERTIES
-      IMPORTED_LOCATION $ENV{OPENSSL_LIB}/libssl.so
+      IMPORTED_LOCATION ${OPENSSL_LIB}/libssl${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
   endif()
 
   if(TARGET OpenSSL::Crypto)
     set_target_properties(OpenSSL::Crypto PROPERTIES
-      IMPORTED_LOCATION $ENV{OPENSSL_LIB}/libcrypto.so
+      IMPORTED_LOCATION ${OPENSSL_LIB}/libcrypto${CMAKE_SHARED_LIBRARY_SUFFIX}
     )
   endif()
 endif()
