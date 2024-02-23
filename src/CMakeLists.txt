@@ -1,13 +1,15 @@
 add_library(secutils_compilation_options INTERFACE)
 target_compile_options(secutils_compilation_options INTERFACE
-    -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes
-    -Wstrict-prototypes -Wformat -Wtype-limits -Wundef -Wconversion
-    -Wno-shadow -Wno-conversion -Wno-sign-conversion -Wno-sign-compare -Wno-unused-parameter
-    -Wformat-security -Wno-declaration-after-statement -Wno-vla
-    # TODO clean up code and enable -Wshadow -Wsign-conversion -Wsign-compare -Wunused-parameter
-    # -Wpointer-arith -pedantic -DPEDANTIC
-    # -Werror
+    -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes
+    -Wformat -Wformat-security -Wtype-limits -Wundef
+    -Wsign-compare -Wpointer-arith -Wunused-parameter
+    -pedantic -Werror
+
+    # TODO clean up code and re-enable warnings instead:
+    -Wno-conversion -Wno-sign-conversion
+    -Wno-shadow -Wno-declaration-after-statement -Wno-vla
 )
+target_compile_definitions(secutils_compilation_options INTERFACE PEDANTIC)
 
 add_library(security-utlities_sanitizer_options INTERFACE)
 set(SANITIZER_FLAGS -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all)
