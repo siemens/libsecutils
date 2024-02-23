@@ -12,7 +12,7 @@ target_compile_options(secutils_compilation_options INTERFACE
 target_compile_definitions(secutils_compilation_options INTERFACE PEDANTIC)
 
 add_library(security-utlities_sanitizer_options INTERFACE)
-set(SANITIZER_FLAGS -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all)
+set(SANITIZER_FLAGS -fsanitize=address,undefined -fno-sanitize-recover=all)
 target_compile_options(security-utlities_sanitizer_options INTERFACE ${SANITIZER_FLAGS})
 target_link_options(security-utlities_sanitizer_options INTERFACE ${SANITIZER_FLAGS})
 
