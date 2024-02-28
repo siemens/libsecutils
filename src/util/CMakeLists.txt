@@ -9,7 +9,8 @@ set_target_properties(security-utilities_icvutil PROPERTIES
     OUTPUT_NAME icvutil
 )
 
-target_compile_features(security-utilities_icvutil PRIVATE c_std_90)
+# TODO clean up code and re-enable property
+# set_target_properties(security-utilities_icvutil PROPERTIES C_STANDARD 90)
 set_target_properties(security-utilities_icvutil PROPERTIES C_EXTENSIONS ON)
 
 target_link_libraries(security-utilities_icvutil
