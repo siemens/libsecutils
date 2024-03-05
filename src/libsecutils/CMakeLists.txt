@@ -11,8 +11,9 @@ set_target_properties(security-utilities_library PROPERTIES
     VERSION ${security-utilities_VERSION_MAJOR}.${security-utilities_VERSION_MINOR}.${security-utilities_VERSION_PATCH}
 )
 
-# TODO clean up code and re-enable property
+# TODO maybe clean up code and re-enable property
 # set_target_properties(security-utilities_library PROPERTIES C_STANDARD 90)
+# target_compile_features(security-utilities_library PRIVATE c_std_90)  # would have no effect
 set_target_properties(security-utilities_library PROPERTIES C_EXTENSIONS ON)
 
 add_subdirectory(include)
