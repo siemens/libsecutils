@@ -4,8 +4,9 @@ project(
   security-utilities
   VERSION 2.0.0 # always 3 components for correct versioning
   LANGUAGES C)
+message(STATUS "SecurityUtilities version ${security-utilities_VERSION}")
 
-message(STATUS "SecurityUtilities version " ${security-utilities_VERSION})
+# set(CMAKE_VERBOSE_MAKEFILE on)
 
 if(DEFINED ENV{NDEBUG})
   message(STATUS "Setting build type to 'Release' because NDEBUG was set.")
