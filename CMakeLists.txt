@@ -19,31 +19,31 @@ elseif(NOT CMAKE_BUILD_TYPE)
     CACHE STRING "Choose the type of build." FORCE)
 endif()
 
-if(NOT("$ENV{OPENSSL_DIR}" STREQUAL ""))
-  message(STATUS "Using OpenSSL include files from " $ENV{OPENSSL_DIR})
-  set(OPENSSL_ROOT_DIR "$ENV{OPENSSL_DIR}")
+# https://cmake.org/cmake/help/v3.6/module/FindOpenSSL.html
+if(NOT "$ENV{OPENSSL_DIR}" STREQUAL "")
+  set(OPENSSL_ROOT_DIR $ENV{OPENSSL_DIR})
+  set(OPENSSL_INCLUDE_DIR "$ENV{OPENSSL_DIR}/include")
   set(OPENSSL_LIB $ENV{OPENSSL_DIR})
 endif()
 if(DEFINED ENV{OPENSSL_LIB})
   set(OPENSSL_LIB $ENV{OPENSSL_LIB})
 endif()
-
-find_package(OpenSSL REQUIRED COMPONENTS SSL Crypto)
-
-if(NOT("${OPENSSL_LIB}" STREQUAL ""))
-  message(STATUS "Using OpenSSL libraries from " ${OPENSSL_LIB})
-  if(TARGET OpenSSL::SSL)
-    set_target_properties(OpenSSL::SSL PROPERTIES
-      IMPORTED_LOCATION ${OPENSSL_LIB}/libssl${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
-  endif()
-
+find_package(OpenSSL QUIET REQUIRED COMPONENTS SSL Crypto)
+if("$ENV{OPENSSL_DIR}" STREQUAL "" OR NOT DEFINED ENV{OPENSSL_LIB})
+  message(STATUS "using OpenSSL package, with version ${OPENSSL_VERSION}")
+endif()
+message(STATUS "using OpenSSL hdrs from ${OPENSSL_INCLUDE_DIR}")
+if(NOT "${OPENSSL_LIB}" STREQUAL "")
   if(TARGET OpenSSL::Crypto)
-    set_target_properties(OpenSSL::Crypto PROPERTIES
-      IMPORTED_LOCATION ${OPENSSL_LIB}/libcrypto${CMAKE_SHARED_LIBRARY_SUFFIX}
-    )
+    set(OPENSSL_CRYPTO_LIBRARY "${OPENSSL_LIB}/libcrypto${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    set_target_properties(OpenSSL::Crypto PROPERTIES IMPORTED_LOCATION ${OPENSSL_CRYPTO_LIBRARY})
+  endif()
+  if(TARGET OpenSSL::SSL)
+    set(OPENSSL_SSL_LIBRARY "${OPENSSL_LIB}/libssl${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    set_target_properties(OpenSSL::SSL PROPERTIES IMPORTED_LOCATION ${OPENSSL_SSL_LIBRARY})
   endif()
 endif()
+message(STATUS "using OpenSSL libraries ${OPENSSL_CRYPTO_LIBRARY}, ${OPENSSL_SSL_LIBRARY}")
 
 option(SECURITY_UTILITIES_USE_UTA "Use UTA API" OFF)
 option(SECURITY_UTILITIES_USE_ICV "Use configuration ICV" OFF)
