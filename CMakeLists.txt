@@ -132,6 +132,7 @@ set(CPACK_SOURCE_IGNORE_FILES
   \\.git$
   \\.deb$
   \\.gz$
+  \\.zip$
   \\.o$
   \\.so
   \\.dylib$
@@ -199,19 +200,22 @@ foreach(component IN LISTS CPACK_COMPONENTS_ALL)
     )
 endforeach()
 
-if(NOT TARGET deb)
-  if(NOT APPLE)
-    set (deb_pack_full_name
-      "${CMAKE_CURRENT_BINARY_DIR}/${CPACK_PACKAGE_NAME}-dev_${CPACK_PACKAGE_VERSION}_all.deb")
-  endif()
+if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+  set(EXT "deb")
+  set(GEN "DEB")
+else()
+  set(EXT "zip")
+  set(GEN "ZIP")
+endif()
+if(NOT TARGET ${EXT})
+  set (pack_full_name
+       "${CMAKE_CURRENT_BINARY_DIR}/${CPACK_PACKAGE_NAME}-dev_${CPACK_PACKAGE_VERSION}_all.${EXT}")
   add_custom_command(
-    OUTPUT "${deb_pack_full_name}"
+    OUTPUT "${pack_full_name}"
     DEPENDS build
     COMMENT "Building packages possibly including doxygen run"
-    COMMAND cpack --config CPackConfig.cmake
-                -G DEB
-                -D CPACK_PACKAGING_INSTALL_PREFIX=/usr
+    COMMAND cpack --config CPackConfig.cmake  # -D CPACK_PACKAGING_INSTALL_PREFIX=/usr
     COMMAND cpack --config CPackSourceConfig.cmake
     )
-  add_custom_target(deb DEPENDS ${deb_pack_full_name})
+  add_custom_target(${EXT} DEPENDS ${pack_full_name})
 endif()
