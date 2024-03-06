@@ -50,7 +50,6 @@ message(STATUS "using OpenSSL libraries ${OPENSSL_CRYPTO_LIBRARY}, ${OPENSSL_SSL
 option(SECURITY_UTILITIES_USE_UTA "Use UTA API" OFF)
 option(SECURITY_UTILITIES_USE_ICV "Use configuration ICV" OFF)
 option(SECURITY_UTILITIES_NO_TLS "Do not use TLS" OFF)
-set(CMAKE_INSTALL_DOCDIR "/usr/share/doc")
 
 if(DEFINED ENV{SECUTILS_USE_UTA})
   set(SECURITY_UTILITIES_USE_UTA ON)
@@ -69,7 +68,14 @@ add_subdirectory(src)
 # =============================
 # Installing
 # =============================
-include(GNUInstallDirs)
+
+#if(UNIX AND NOT APPLE)
+#  set(CMAKE_INSTALL_PREFIX "/usr")
+#else()
+#  set(CMAKE_INSTALL_PREFIX "tmp")
+#endif()
+#set(CMAKE_INSTALL_DOCDIR "${CMAKE_INSTALL_PREFIX}/share/doc")
+include(GNUInstallDirs) # any CMAKE_INSTALL_PREFIX must be set before
 
 find_package(Doxygen QUIET)
 if(NOT TARGET security-utilities_doxygen AND Doxygen_FOUND)
