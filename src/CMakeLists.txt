@@ -15,6 +15,7 @@ add_library(security-utlities_sanitizer_options INTERFACE)
 set(SANITIZER_FLAGS -fsanitize=address,undefined -fno-sanitize-recover=all)
 target_compile_options(security-utlities_sanitizer_options INTERFACE ${SANITIZER_FLAGS})
 target_link_options(security-utlities_sanitizer_options INTERFACE ${SANITIZER_FLAGS})
+target_compile_options(security-utlities_sanitizer_options INTERFACE -O0)  # workaround for -O0 not being added by default
 
 if(SECURITY_UTILITIES_USE_UTA)
     add_library(security-utilities_uta-api INTERFACE)

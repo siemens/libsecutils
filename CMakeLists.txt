@@ -10,14 +10,15 @@ message(STATUS "SecurityUtilities version " ${security-utilities_VERSION})
 if(DEFINED ENV{NDEBUG})
   message(STATUS "Setting build type to 'Release' because NDEBUG was set.")
   set(CMAKE_BUILD_TYPE
-    Release
+    Release  # automatically leads to CFLAGS += -DNDEBUG -O3
     CACHE STRING "Choose the type of build." FORCE)
 elseif(NOT CMAKE_BUILD_TYPE)
   message(STATUS "Setting build type to 'Debug' as none was specified.")
   set(CMAKE_BUILD_TYPE
-    Debug
+    Debug  # automatically leads to CFLAGS += -g  # -O0 not added by default
     CACHE STRING "Choose the type of build." FORCE)
 endif()
+message(STATUS "Build mode: ${CMAKE_BUILD_TYPE}")
 
 # https://cmake.org/cmake/help/v3.6/module/FindOpenSSL.html
 if(NOT "$ENV{OPENSSL_DIR}" STREQUAL "")
