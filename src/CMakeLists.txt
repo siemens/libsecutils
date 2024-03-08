@@ -6,7 +6,7 @@ target_compile_options(secutils_compilation_options INTERFACE
     -pedantic -Werror
 
     # TODO clean up code and re-enable warnings instead:
-    -Wno-conversion -Wno-sign-conversion
+    -Wno-conversion -Wno-sign-conversion -Wno-c99-extensions
     -Wno-shadow -Wno-declaration-after-statement -Wno-vla
 )
 target_compile_definitions(secutils_compilation_options INTERFACE PEDANTIC)
