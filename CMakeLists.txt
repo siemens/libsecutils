@@ -99,6 +99,37 @@ if(NOT TARGET build)
   add_custom_target(build COMMAND make all)
 endif()
 
+
+# =============================
+# Cleaning
+# =============================
+
+# https://stackoverflow.com/questions/9680420/looking-for-a-cmake-clean-command-to-clear-up-cmake-output/78133906#78133906
+
+set_property(
+  DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+  APPEND
+  PROPERTY ADDITIONAL_CLEAN_FILES
+      # only works for predefined names as globbing would be done on cmake run
+      src/libsecutils/include/secutils/secutils_static_config.h
+      doc CMakeDoxyfile.in Doxyfile.security-utilities_doxygen
+      install_manifest.txt _CPack_Packages
+      )
+
+add_custom_target(clean_all
+   COMMAND ${CMAKE_BUILD_TOOL} clean
+   COMMAND find . -name "*.o" -o -regex "./libsecutils-.*" | xargs rm
+   # after the following, cannot call this target again:
+   COMMAND find . ( -name "*.cmake" -o -name Makefile )
+	-not -path ./src/libsecutils/security-utilities_libraryConfig.cmake
+	-not -path ./src/util/security-utilities_icvutilConfig.cmake
+        -not -path ./coverage/Makefile
+        | xargs rm
+   COMMAND find . -name CMakeFiles | xargs rm -r
+   COMMAND rm CMakeCache.txt
+   VERBATIM
+)
+
 # =============================
 # Packaging
 # =============================

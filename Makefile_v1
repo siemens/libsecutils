@@ -192,6 +192,7 @@ build_all: build util
 $(SECUTILS_CONFIG): $(SECUTILS_CONFIG).in # limitation: this is not triggered when any of the env. vars changes
 	cp $< $@
 ifdef SECUTILS_USE_UTA
+	@ # note that sed -i '' (for not saving a backup file) works on MacOS but not on Linux
 	@sed -i~ -e 's|#cmakedefine SECUTILS_USE_UTA|#define SECUTILS_USE_UTA|' $@
 else
 	@sed -i~ -e 's|#cmakedefine SECUTILS_USE_UTA|/* #undef SECUTILS_USE_UTA */|' $@
@@ -245,7 +246,7 @@ clean_deb:
 	rm -f debian/{files,debhelper-build-stamp} debian/*.{log,substvars}
 	rm -f ../libsecutils*.{deb,dsc,build*,changes,tar.gz}
 	rm -fr _CPack_Packages changelog.gz
-	rm -f libsecutils*.{deb,tar.gz}
+	rm -f libsecutils*.{deb,tar.gz,zip}
 
 # installation target - append ROOTFS=<path> to install into virtual root
 # filesystem
@@ -279,7 +280,7 @@ uninstall:
 clean_uta:
 	rm -fr $(BUILDDIR)/uta_api$(OBJ) $(BUILDDIR)/files_icv$(OBJ) \
           $(BUILDDIR)/files_dv$(OBJ) \
-          $(OUT_DIR)/$(OUTLIB_)*$(DLL)* $(OUT_DIR)/$(OUTBIN) $(OUT_DIR)/util/icvutil$(OBJ)
+          $(OUT_DIR){,/src/libsecutils}/$(OUTLIB_)*$(DLL)* $(OUT_DIR){,/src/util}/$(OUTBIN) $(OUT_DIR)/util/icvutil$(OBJ)
 
 clean: clean_config
 	rm -fr $(OUT_DIR)/$(OUTLIB_)*$(DLL)*
@@ -288,12 +289,18 @@ clean: clean_config
 	rm -fr $(BUILDDIR)
 
 clean_config:
-	rm -f $(SECUTILS_CONFIG)
+	rm -f $(SECUTILS_CONFIG){,~}
 
 clean_all: clean clean_deb
-	rm -fr Makefile CMakeCache.txt *.cmake CMakeFiles/
+	find . \( -name "*.cmake" -o -name Makefile \) \
+	  -not -path ./src/libsecutils/security-utilities_libraryConfig.cmake \
+	  -not -path ./src/util/security-utilities_icvutilConfig.cmake \
+	  -not -path ./coverage/Makefile \
+	  | xargs rm
+	find . -name CMakeFiles | xargs rm -r
 	rm -f install_manifest*.txt
-	rm -fr doc refman.pdf CMakeDoxyfile.in Doxyfile.doc *.gcov reports
+	rm -fr doc refman.pdf CMakeDoxyfile.in Doxyfile.security-utilities_doxygen Doxyfile.doc *.gcov reports
+	rm -fr _CPack_Packages Makefile CMakeCache.txt
 
 doc: $(SECUTILS_CONFIG) doc/html refman.pdf
 
