@@ -116,19 +116,21 @@ set_property(
       install_manifest.txt _CPack_Packages
       )
 
-add_custom_target(clean_all
-   COMMAND ${CMAKE_BUILD_TOOL} clean
-   COMMAND find . -name "*.o" -o -regex "./libsecutils-.*" | xargs rm
-   # after the following, cannot call this target again:
-   COMMAND find . ( -name "*.cmake" -o -name Makefile )
-	-not -path ./src/libsecutils/security-utilities_libraryConfig.cmake
-	-not -path ./src/util/security-utilities_icvutilConfig.cmake
-        -not -path ./coverage/Makefile
-        | xargs rm
-   COMMAND find . -name CMakeFiles | xargs rm -r
-   COMMAND rm CMakeCache.txt
-   VERBATIM
-)
+if(NOT TARGET clean_all)
+  add_custom_target(clean_all
+    COMMAND ${CMAKE_BUILD_TOOL} clean
+    COMMAND find . -name "*.o" -o -regex "./libsecutils-.*" | xargs rm
+    # after the following, cannot call this target again:
+    COMMAND find . ( -name "*.cmake" -o -name Makefile )
+            -not -path ./src/libsecutils/security-utilities_libraryConfig.cmake
+            -not -path ./src/util/security-utilities_icvutilConfig.cmake
+            -not -path ./coverage/Makefile
+            | xargs rm
+    COMMAND find . -name CMakeFiles | xargs rm -r
+    COMMAND rm CMakeCache.txt
+    VERBATIM
+  )
+endif()
 
 # =============================
 # Packaging
