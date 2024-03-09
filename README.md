@@ -125,7 +125,7 @@ and its shared objects in `/usr/lib` (or `/usr/bin` for Cygwin).
 
 When using [`Makefile_v1`](Makefile_v1),
 you may also specify using the environment variable `OUT_DIR`
-where the produced library files (e.g., `libcmp.so.2.0`) shall be placed.
+where the produced library files (e.g., `libsecutils.so.2.0`) shall be placed.
 By default, the current directory (`.`) is used.\
 The environment variable `CC` may be set as needed; it defaults to `gcc`.\
 For further details on optional environment variables,
@@ -136,11 +136,14 @@ see the [`Makefile_v1`](Makefile_v1).
 
 Build the software with `make`.
 
-The result is in, for instance, `./libsecutils.so.2.0`.
+The result is in, for instance,
+`./libsecutils.so` (when using `Makefile_v1` on Linux)
+or `src/libsecutils/libsecutils.dylib` (when using CMake on MacOS).
 
-When getting the linker error: `Undefined symbols: _uta_init_v1`
-likely `secutils_static_config.h` is outdated.  In such situations,
-`make -f Makfile_v1 clean` helps to reset it to a consistent state.
+When getting the linker error: `Undefined symbols: _uta_init_v1`,
+likely `src/libsecutils/include/secutils/secutils_static_config.h` is outdated.
+In such situations, `make clean` can be called to removes it,
+and then the configuration can be done again to obtain a consistent state.
 
 
 ### Installing and uninstalling
@@ -206,6 +209,11 @@ or
 ```
 make -f Makefile_v1 doc
 ```
+
+### Cleaning up
+
+`make clean` removes part of the artifacts, while
+`make clean_all` removes everything produced by `make` and `CMake`.
 
 ### Using the library
 
