@@ -31,7 +31,7 @@
 
 #include <operators.h>
 
-static unsigned int num_CDPs(const X509* cert)
+static int num_CDPs(const X509* cert)
 {
     CRL_DIST_POINTS* cdps = X509_get_ext_d2i(cert, NID_crl_distribution_points, 0, 0);
     if(cdps is_eq 0) /* maybe there is still a CDP for delta CRLs */
@@ -43,7 +43,7 @@ static unsigned int num_CDPs(const X509* cert)
     return res;
 }
 
-static unsigned int num_AIAs(const X509* cert)
+static int num_AIAs(const X509* cert)
 {
     STACK_OF(OPENSSL_STRING) *aias = X509_get1_ocsp((X509 *)cert);
     int res = aias not_eq 0 ? sk_OPENSSL_STRING_num(aias) : 0;
@@ -416,4 +416,160 @@ int check_revocation_any_method(X509_STORE_CTX* ctx)
 
     }
     return true;
+}
+
+
+/*
+ * @brief Function to check certificate revocation of a certificate and its
+ * issuer at depth determined by X509_STORE_CTX error_depth
+ * @param ctx pointer to X509 store context
+ * @return X509_V_OK (0) on success
+ *         X509_V_ERR_ (>0) error code on failure
+ */
+static int check_local_cert_crls(X509_STORE_CTX* ctx)
+{
+    if(0 is_eq ctx)
+    {
+        LOG(FL_ERR, "null parameter ctx");
+        return X509_V_ERR_UNSPECIFIED;
+    }
+
+    X509_STORE_CTX* tmp_ctx = X509_STORE_CTX_new();
+    X509_STORE_CTX_check_revocation_fn check_revocation;
+    int cert_idx = X509_STORE_CTX_get_error_depth(ctx);
+    X509* cert = sk_X509_value(X509_STORE_CTX_get0_chain(ctx), cert_idx);
+    X509* issuer = sk_X509_value(X509_STORE_CTX_get0_chain(ctx), cert_idx+1);
+    int ssl_ex_idx = SSL_get_ex_data_X509_STORE_CTX_idx();
+    SSL* ssl = X509_STORE_CTX_get_ex_data(ctx, ssl_ex_idx);
+    STACK_OF(X509) *certs;
+    int ret = X509_V_ERR_UNSPECIFIED;
+
+    /*
+     * Unfortunately, check_revocation() in crypto/x509/x509_vfy.c is static,
+     * yet we can get hold of it via X509_STORE_CTX_get_check_revocation().
+     */
+    if(tmp_ctx is_eq 0
+       or not X509_STORE_CTX_init(tmp_ctx, 0, 0, 0)
+       or ((check_revocation = X509_STORE_CTX_get_check_revocation(tmp_ctx)) is_eq 0))
+    {
+        LOG(FL_ERR, "cannot get pointer to check_revocation()");
+        goto err;
+    }
+    X509_STORE_CTX_set0_param(tmp_ctx, 0); /* free tmp_ctx->param */
+    if(not X509_STORE_CTX_init(tmp_ctx, X509_STORE_CTX_get0_store(ctx),
+                               0, 0) /* inherits flags etc. of store */
+       or not X509_STORE_CTX_set_ex_data(tmp_ctx, ssl_ex_idx, ssl))
+    {
+        LOG(FL_ERR, "cannot set up tmp_ctx");
+        goto err;
+    }
+    if((certs = sk_X509_new_reserve(0, 2)) is_eq 0
+       or (X509_STORE_CTX_set0_verified_chain(tmp_ctx, certs), 0)
+       or cert   is_eq 0 or not sk_X509_push(certs, X509_dup(cert))
+       or issuer is_eq 0 or not sk_X509_push(certs, X509_dup(issuer)))
+    {
+        LOG(FL_ERR, "cannot set certs in tmp_ctx");
+        goto err;
+    }
+
+    X509_VERIFY_PARAM* tmp_vpm = X509_STORE_CTX_get0_param(tmp_ctx);
+    X509_VERIFY_PARAM_clear_flags(tmp_vpm, X509_V_FLAG_CRL_CHECK_ALL);
+    X509_VERIFY_PARAM_set_flags(tmp_vpm, X509_V_FLAG_NONFINAL_CHECK | X509_V_FLAG_NO_CHECK_TIME);
+    int res = (*check_revocation)(tmp_ctx); /* checks only depth 0 */
+
+    if(res is_eq 0)
+    {
+        ret = X509_STORE_CTX_get_error(tmp_ctx);
+    }
+    else
+    {
+        ret = X509_V_OK;
+    }
+
+ err:
+    X509_STORE_CTX_free(tmp_ctx);
+    return ret;
+}
+
+static bool crl_time_valid(const X509_CRL* crl, const X509_VERIFY_PARAM* vpm)
+{
+    time_t check_time, *ptime = 0;
+    const ASN1_TIME* crl_end_time;
+    const ASN1_TIME* crl_last_update;
+    unsigned long flags = X509_VERIFY_PARAM_get_flags((X509_VERIFY_PARAM*)vpm);
+
+    if((flags bitand X509_V_FLAG_USE_CHECK_TIME) not_eq 0)
+    {
+        check_time = X509_VERIFY_PARAM_get_time(vpm);
+        ptime = &check_time;
+    }
+    crl_end_time = X509_CRL_get0_nextUpdate(crl);
+    crl_last_update = X509_CRL_get0_lastUpdate(crl);
+
+    if ((crl_end_time not_eq 0 and X509_cmp_time(crl_end_time, ptime) not_eq 1) or
+        (crl_last_update not_eq 0 and X509_cmp_time(crl_last_update, ptime) not_eq -1))
+    {
+        return false;
+    }
+
+    return true;
+}
+
+int check_revocation_local_only_method(X509_STORE_CTX* ctx)
+{
+    if(0 is_eq ctx)
+    {
+        LOG(FL_ERR, "null parameter ctx");
+        return 0;
+    }
+
+    STACK_OF(X509) *chain = X509_STORE_CTX_get0_chain(ctx);
+    int i = 0;
+    const int last = sk_X509_num(chain) - 1;
+
+    for(i = 0; i <= last; i++)
+    {
+        X509* cert = sk_X509_value(chain, i);
+        if(i is_eq last and X509_check_issued(cert, cert) is_eq X509_V_OK)
+        {
+            LOG_cert(FL_DEBUG, "skipping revocation check for self-issued last", cert);
+            break;
+        }
+
+        STACK_OF(X509_CRL)* crls = X509_STORE_CTX_get1_crls(ctx, X509_get_issuer_name(cert));
+        if(not crls or 0 is_eq sk_X509_CRL_num(crls) or 0 is_eq sk_X509_CRL_value(crls, 0))
+        {
+            char* issuer = X509_NAME_oneline(X509_get_issuer_name(cert), 0, 0);
+            if (0 not_eq issuer)
+            {
+                LOG(FL_ERR, "Local CRL for %s certificate %s not found",
+                    (i + 1 is_eq last) ? "root" : "issuing", issuer);
+                OPENSSL_free(issuer);
+            }
+            return 0;
+        }
+
+        if(true not_eq crl_time_valid(sk_X509_CRL_value(crls, 0), X509_STORE_CTX_get0_param(ctx)))
+        {
+            char* issuer = X509_NAME_oneline(X509_CRL_get_issuer(sk_X509_CRL_value(crls, 0)), 0, 0);
+            if(issuer not_eq 0)
+            {
+                LOG(FL_WARN, "CRL issued by %s is not valid in time", issuer);
+                OPENSSL_free(issuer);
+            }
+        }
+
+        sk_X509_CRL_pop_free(crls, X509_CRL_free);
+
+        X509_STORE_CTX_set_error_depth(ctx, i);
+        int res = check_local_cert_crls(ctx);
+
+        if(X509_V_OK not_eq res)
+        {
+            verify_cb_cert(ctx, cert, res);
+            return 0;
+        }
+        chain = X509_STORE_CTX_get0_chain(ctx); /* for some reason need again */
+    }
+    return 1;
 }

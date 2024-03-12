@@ -313,8 +313,9 @@ bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
                           OPTIONAL const char* desc, bool recursive,
                           OPTIONAL X509_VERIFY_PARAM *vpm, OPTIONAL uta_ctx* ctx)
 {
-    DIR* p_dir = 0;
     bool found = false;
+    int count = -1;
+    int i;
 
     if(0 is_eq pstore or 0 is_eq trust_dir)
     {
@@ -322,16 +323,18 @@ bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
         goto err;
     }
 
-    p_dir = opendir(trust_dir);
-    if(0 is_eq p_dir)
+    struct dirent** namelist = 0;
+    count = scandir(trust_dir, &namelist, 0, alphasort);
+    if(-1 is_eq count)
     {
         LOG(FL_ERR, "cannot read directory '%s'", trust_dir);
         goto err;
     }
 
-    struct dirent* p_dirent = readdir(p_dir);
-    while(0 not_eq p_dirent)
+    for(i = 0; i < count; ++i)
     {
+        const struct dirent* p_dirent = namelist[i];
+
         char full_path[UTIL_max_path_len + 1];
         snprintf(full_path, sizeof(full_path), "%s/%s", trust_dir, p_dirent->d_name);
 
@@ -339,7 +342,7 @@ bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
         memset(&f_stat, 0x00, sizeof(struct stat));
         if(-1 is_eq stat(full_path, &f_stat))
         {
-            LOG(FL_INFO, "cannot read status of %s - %s", full_path, strerror(errno));
+            LOG(FL_ERR, "cannot read status of %s - %s", full_path, strerror(errno));
         }
         else
         {
@@ -359,7 +362,6 @@ bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
                 }
             }
         }
-        p_dirent = readdir(p_dir);
     }
 
     if(not found)
@@ -370,9 +372,13 @@ bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
             desc not_eq 0 ? desc : "trusted certs", ctx not_eq 0 ? "with valid ICV " : "", trust_dir);
     }
 err:
-    if(p_dir not_eq 0)
+    for(i = 0; i < count; ++i)
     {
-        closedir(p_dir);
+        free(namelist[i]);
+    }
+    if (-1 not_eq count)
+    {
+        free(namelist);
     }
 
     int cert_num = STORE_certs_num(*pstore);
@@ -384,10 +390,13 @@ err:
     return found;
 }
 
-bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const char* desc, bool recursive, OPTIONAL uta_ctx* ctx)
+
+static bool STORE_load_crl_dir_impl(X509_STORE* pstore, const char* crl_dir, OPTIONAL const char* desc, bool recursive,
+                                    OPTIONAL uta_ctx* ctx, int (*callback)(X509_STORE_CTX*))
 {
-    DIR* p_dir = 0;
     bool found = false;
+    int count = -1;
+    int i;
 
     if(0 is_eq pstore or 0 is_eq crl_dir)
     {
@@ -395,16 +404,18 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
         goto err;
     }
 
-    p_dir = opendir(crl_dir);
-    if(0 is_eq p_dir)
+    struct dirent** namelist = 0;
+    count = scandir(crl_dir, &namelist, 0, alphasort);
+    if(-1 is_eq count)
     {
         LOG(FL_ERR, "cannot access directory '%s'", crl_dir);
         goto err;
     }
 
-    struct dirent* p_dirent = readdir(p_dir);
-    while(0 not_eq p_dirent)
+    for(i = 0; i < count; ++i)
     {
+        const struct dirent* p_dirent = namelist[i];
+
         char full_path[UTIL_max_path_len + 1];
         snprintf(full_path, sizeof(full_path), "%s/%s", crl_dir, p_dirent->d_name);
 
@@ -412,7 +423,7 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
         memset(&f_stat, 0x00, sizeof(struct stat));
         if(-1 is_eq stat(full_path, &f_stat))
         {
-            LOG(FL_INFO, "cannot read status of %s - %s", full_path, strerror(errno));
+            LOG(FL_ERR, "cannot read status of %s - %s", full_path, strerror(errno));
         }
         else
         {
@@ -441,29 +452,46 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
             }
             else if(recursive and (f_stat.st_mode bitand S_IFDIR) and (0 not_eq strncmp(p_dirent->d_name, ".", 1)))
             {
-                if(not STORE_load_crl_dir(pstore, full_path, desc, recursive, ctx))
+                if(not STORE_load_crl_dir_impl(pstore, full_path, desc, recursive, ctx, callback))
                 {
                     found = false;
                     goto err;
                 }
             }
         }
-        p_dirent = readdir(p_dir);
     }
 
     /* set up cert CRL check callback for checking full chain */
     if(found)
     {
         X509_VERIFY_PARAM_set_flags(X509_STORE_get0_param(pstore), X509_V_FLAG_STATUS_CHECK_ALL);
-        X509_STORE_set_check_revocation(pstore, &check_revocation_any_method);
+        X509_STORE_set_check_revocation(pstore, callback);
     }
 
 err:
-    if(p_dir not_eq 0)
+    for(i = 0; i < count; ++i)
     {
-        closedir(p_dir);
+        free(namelist[i]);
     }
+    if (-1 not_eq count)
+    {
+        free(namelist);
+    }
+
     return found;
+}
+
+
+bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const char* desc, bool recursive, OPTIONAL uta_ctx* ctx)
+{
+    return STORE_load_crl_dir_impl(pstore, crl_dir, desc, recursive, ctx, &check_revocation_any_method);
+}
+
+
+bool STORE_load_crl_dir_local_only(X509_STORE* pstore, const char* crl_dir, OPTIONAL const char* desc, bool recursive,
+                                   OPTIONAL uta_ctx* ctx)
+{
+    return STORE_load_crl_dir_impl(pstore, crl_dir, desc, recursive, ctx, &check_revocation_local_only_method);
 }
 
 
