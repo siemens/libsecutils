@@ -100,6 +100,8 @@ endif()
 
 if(NOT TARGET doc)
   add_custom_target(doc)
+endif()
+if(Doxygen_FOUND)
   add_dependencies(doc security-utilities_doxygen)
 endif()
 
