@@ -77,6 +77,18 @@ add_subdirectory(src)
 #set(CMAKE_INSTALL_DOCDIR "${CMAKE_INSTALL_PREFIX}/share/doc")
 include(GNUInstallDirs) # any CMAKE_INSTALL_PREFIX must be set before
 
+# https://stackoverflow.com/questions/73248130/how-to-avoid-the-removal-of-the-rpath-during-cmake-install-step
+if (APPLE)
+  set(rbase "@loader_path")
+else ()
+  set(rbase "$ORIGIN")
+endif ()
+file(RELATIVE_PATH lib_dir
+     "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}"
+     "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
+# Honor user overrides, whether at the command line or FetchContent
+set(CMAKE_INSTALL_RPATH "${rbase};${rbase}/${lib_dir}" CACHE STRING "Install RPATH")
+
 find_package(Doxygen QUIET)
 if(NOT TARGET security-utilities_doxygen AND Doxygen_FOUND)
   set(DOXYGEN_OUTPUT_DIRECTORY doc)
