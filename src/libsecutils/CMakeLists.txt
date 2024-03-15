@@ -21,7 +21,7 @@ add_subdirectory(src)
 
 target_link_libraries(security-utilities_library
     PUBLIC
-    OpenSSL::SSL
+    $<$<NOT:$<BOOL:${SECURITY_UTILITIES_NO_TLS}>>:OpenSSL::SSL>
     OpenSSL::Crypto
 
     # must be public, targets linking the library need those too
