@@ -74,7 +74,7 @@ endif
 
 ifdef NDEBUG
     DEBUG_FLAGS ?= -O2
-    override DEBUG_FLAGS += -DNDEBUG=1
+    override DEBUG_FLAGS += -DNDEBUG=1 -Werror
 else
     DEBUG_FLAGS ?= -g -O0 -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all # not every compiler(version) supports -Og
 endif
@@ -84,8 +84,8 @@ override CFLAGS += $(DEBUG_FLAGS) \
  -Wsign-compare -Wpointer-arith -Wunused-parameter
 # TODO clean up code and re-enable warnings instead:
 override CFLAGS += -Wno-conversion -Wno-sign-conversion \
- -Wno-shadow -Wno-declaration-after-statement -Wno-vla
-override CFLAGS += -pedantic -DPEDANTIC -Werror
+ -Wno-shadow -Wno-declaration-after-statement -Wno-vla -Wno-gnu-folding-constant
+override CFLAGS += -pedantic -DPEDANTIC
 
 ################################################################################
 # Obligatory flags
