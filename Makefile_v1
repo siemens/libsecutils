@@ -296,8 +296,8 @@ clean_all: clean clean_deb
 	  -not -path ./src/libsecutils/security-utilities_libraryConfig.cmake \
 	  -not -path ./src/util/security-utilities_icvutilConfig.cmake \
 	  -not -path ./coverage/Makefile \
-	  | xargs rm
-	find . -name CMakeFiles | xargs rm -r
+	  | xargs rm 2>/dev/null || true
+	find . -name CMakeFiles | xargs rm -r 2>/dev/null || true
 	rm -f install_manifest*.txt
 	rm -fr doc refman.pdf CMakeDoxyfile.in Doxyfile.security-utilities_doxygen Doxyfile.doc *.gcov reports
 	rm -fr _CPack_Packages Makefile CMakeCache.txt
