@@ -1,4 +1,4 @@
-# libsecutils
+# libSecUtils
 
 <img src="libsecutils.svg" width="200">
 
@@ -91,6 +91,9 @@ In case the OpenSSL libraries are in an unusual location, set also `OPENSSL_LIB`
 export OPENSSL_LIB=/lib/aarch64-linux-gnu
 ```
 Otherwise some heuristics will try to detect the location.
+
+For all environment variables specifying a directory, relative paths such as `.`
+are interpreted relative to the libSecUtils source directory.
 
 Use of the UTA library can be enabled
 by setting the environment variable `SECUTILS_USE_UTA`.

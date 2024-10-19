@@ -12,13 +12,20 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-# Optional OPENSSL_DIR defines absolute or relative (to ../) path to OpenSSL installation
-# Optional OPENSSL_LIB defines where to find the OpenSSL library installation (default: OPENSSL_DIR/lib).
+# Optional OPENSSL_DIR defines where to find the OpenSSL installation
+#   with header files at include/openssl (default: will try, e.g., /usr).
+# Optional OPENSSL_LIB defines where to find the OpenSSL libraries
+#   (default: will try, e.g., OPENSSL_DIR/lib).
 # Optional CFLAGS and LDFLAGS are appended by local settings.
 # Optional DEBUG_FLAGS may set to prepend to local CFLAGS and LDFLAGS (default see below).
 # Builds are done in release mode if optional NDEBUG is defined.
-# Optional OUT_DIR defines absolute or relative (to ./) path where to place the library.
+# Optional OUT_DIR defines where to place the resulting library (default: '.').
 # Optional DESTDIR defines a prefix for the installation target directories.
+# All paths may be absolute or relative to the directory containing this Makefile.
+
+SHELL=bash # This is needed for supporting extended file name globbing
+
+# variables ####################################################################
 
 ROOTFS ?= $(DESTDIR)$(prefix)
 
@@ -31,39 +38,87 @@ VERSION=2.0
 # PACKAGENAME=libsecutils
 # DIRNAME=$(PACKAGENAME)-$(VERSION)
 
-SHELL=bash # This is needed for supporting extended file name globbing
-
-ifeq ($(OS),Windows_NT)
+# https://stackoverflow.com/questions/714100/os-detecting-makefile
+ifeq ($(OS),Windows_NT) # strange but apparently this string is used also for all later versions
+    # so far, we do not support Windows, but trying to continue anyway
+    override OS=Windows
+    USERS='^([[:alpha:]]:)?\\Users\\'
     EXE=.exe
     DLL=.dll
+    SONAME=
+    LDD=TODO
     OBJ=.obj
     LIB=bin
 else
     EXE=
     OBJ=.o
     LIB=lib
+    override OS = $(shell sh -c 'uname 2>/dev/null || echo Unknown')
+    USERS='^/(home|Users)/'
     ifeq ($(shell uname -s),Darwin)
-        OS=MacOS
+        override OS=MacOS
         DLL=.dylib
         SONAME=install_name,@rpath/
-    else # assuming Linux
+        LDD=otool -l
+    else # assuming other Unix-like
         DLL=.so
         SONAME=soname,
+        LDD=ldd
     endif
 endif
 
-ifeq ($(OPENSSL_DIR),)
-    OPENSSL_DIR=$(ROOTFS)/usr
+ifneq ($(filter-out doc install uninstall clean clean_config clean_all clean_uta clean_deb,$(MAKECMDGOALS)),)
+ifeq ($(OPENSSL_DIR),) # for convenience, use heuristics to determine OPENSSL_DIR
+    ifeq ($(OS),MacOS)
+        SYSTEM_INCLUDE_OPENSSL=/opt/homebrew/include/openssl # usually symlink
+    else # TODO for Windows
+        SYSTEM_INCLUDE_OPENSSL=/usr/include/openssl
+    endif
+    OPENSSL_INCLUDE_DIR = $(realpath $(SYSTEM_INCLUDE_OPENSSL))
+    override OPENSSL_DIR = $(realpath $(OPENSSL_INCLUDE_DIR)/../..)
 endif
-ifeq ($(shell echo $(OPENSSL_DIR) | grep "^/"),)
-# $(OPENSSL_DIR) is relative path, assumed relative to ../
-    OPENSSL=../$(OPENSSL_DIR)
-    OPENSSL_LIB ?= ../$(OPENSSL_DIR)
-else
-# $(OPENSSL_DIR) is absolute path
-    OPENSSL=$(OPENSSL_DIR)
-    OPENSSL_LIB ?= $(OPENSSL_DIR)
+ifneq ($(OPENSSL_DIR),) # due to the above, always true
+    LIB_NAME_PATTERN=libcrypto*$(DLL)*
+    ifeq ($(realpath $(OPENSSL_DIR)),)
+        $(error OPENSSL_DIR appears to be an invalid path: $(OPENSSL_DIR))
+    endif
+    override OPENSSL_DIR := $(realpath $(OPENSSL_DIR))
+
+    ifeq ($(OPENSSL_LIB),) # for convenience, use heuristics to determine OPENSSL_LIB
+        override OPENSSL_LIB = $(OPENSSL_DIR)/$(LIB)
+        ifeq ($(wildcard $(OPENSSL_LIB)/$(LIB_NAME_PATTERN)),)
+            $(warning Warning: cannot find OpenSSL libraries at determined location $(OPENSSL_LIB), now trying $(OPENSSL_DIR))
+            override OPENSSL_LIB = $(OPENSSL_DIR)
+            ifeq ($(wildcard $(OPENSSL_LIB)/$(LIB_NAME_PATTERN)),)
+                ifeq ($(OS),Linux)
+	            ifeq ($(shell echo $(OPENSSL_DIR) | grep -E '^/(home|Users)'),)
+                        override OPENSSL_LIB = $(wildcard /lib/*linux-gnu*)
+                        $(warning Warning: cannot find OpenSSL libraries at $(OPENSSL_DIR), now trying $(OPENSSL_LIB))
+                    endif
+                endif
+            endif
+        endif
+    else
+        ifeq ($(wildcard $(OPENSSL_LIB)/$(LIB_NAME_PATTERN)),)
+            # $(warning Warning: cannot find OpenSSL libraries at given OPENSSL_LIB $(OPENSSL_LIB), now trying OPENSSL_DIR)
+            override OPENSSL_LIB = $(OPENSSL_DIR)
+        endif
+    endif
+    # ifeq ($(findstring $(USERS),$(OPENSSL_FULL_DIR)),)
+    #     $(warning [DEBUG] OPENSSL_DIR is assumed to be an installation directory)
+    # else
+    #     $(warning [DEBUG] OPENSSL_DIR is assumed to be a local build directory)
+    # endif
+    ifeq ($(wildcard $(OPENSSL_LIB)/$(LIB_NAME_PATTERN)),)
+        $(error Error: cannot find OpenSSL library $(LIB_NAME_PATTERN) at $(OPENSSL_LIB)/)
+    endif
+    override OPENSSL_LIB := $(realpath $(OPENSSL_LIB))
 endif
+ifeq ($(wildcard $(OPENSSL_DIR)/include/openssl),)
+    $(error cannot find directory '$(OPENSSL_DIR)/include/openssl', check OPENSSL_DIR variable)
+endif
+endif # neq ($(filter-out doc install uninstall clean clean_config clean_all clean_uta clean_deb,$(MAKECMDGOALS)),)
+
 
 ################################################################################
 # Basic definitions targeted at debugging
@@ -73,10 +128,10 @@ endif
 ################################################################################
 
 ifdef NDEBUG
-    DEBUG_FLAGS ?= -O2
+    override DEBUG_FLAGS ?= -O2
     override DEBUG_FLAGS += -DNDEBUG=1 -Werror
 else
-    DEBUG_FLAGS ?= -g -O0 -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all # not every compiler(version) supports -Og
+    override DEBUG_FLAGS ?= -g -O0 -fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all # not every compiler(version) supports -Og
 endif
 override CFLAGS += $(DEBUG_FLAGS) \
  -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes \
@@ -94,7 +149,7 @@ override CFLAGS += -pedantic -DPEDANTIC
 ################################################################################
 
 CC ?= gcc
-OUTLIB_=libsecutils
+override OUTLIB_= libsecutils
 OUTLIB=$(OUTLIB_)$(DLL)
 ifeq ($(OS),MacOS)
     OUTLIBV=$(OUTLIB_).$(VERSION)$(DLL)
@@ -109,7 +164,7 @@ DEST_DOC=$(DEST_PRE)/share/doc/libsecutils-dev
 OUTBIN=icvutil$(EXE)
 DEST_BIN=$(DEST_PRE)/bin
 LOCAL_CFLAGS= -fPIC # -std=gnu90 TODO clean up code and re-enable flag
-override CFLAGS += -isystem $(OPENSSL)/include# # # use of -isystem is critical for selecting wanted OpenSSL version
+override CFLAGS += -isystem $(OPENSSL_DIR)/include# # use of -isystem is critical for selecting wanted OpenSSL version
 override CFLAGS += -Isrc/libsecutils/include
 override CFLAGS += -Isrc/libsecutils/include/secutils
 ifneq ($(SECUTILS_USE_UTA),)
@@ -120,12 +175,9 @@ ifneq ($(SECUTILS_USE_ICV),)
 endif
 
 override LDFLAGS += $(DEBUG_FLAGS) # needed for -fsanitize=...
-override LDFLAGS += -L $(OPENSSL_LIB) -L $(OPENSSL)
+override LDFLAGS += -L $(OPENSSL_LIB)
 ifeq ($(DEB_TARGET_ARCH),) # not during Debian packaging
   override LDFLAGS += -Wl,-rpath,$(OPENSSL_LIB)
-  ifneq ($(OPENSSL_LIB),$(OPENSSL))
-    override LDFLAGS += -Wl,-rpath,$(OPENSSL)
-  endif
 endif
 ifneq ($(SECUTILS_USE_UTA),)
     override LDFLAGS += -luta
@@ -167,12 +219,22 @@ OBJS := $(patsubst %.c,$(BUILDDIR)/%$(OBJ),$(notdir $(wildcard src/libsecutils/s
 # Targets
 ################################################################################
 
+# building #####################################################################
+
 # Phony (non-file) targets
 .PHONY: all doc util build build_only build_all clean clean_config clean_all clean_uta install uninstall deb clean_deb coverage
 
 # Default target
 all: build_all doc
 
+$(OUT_DIR):
+	@mkdir -p $(OUT_DIR)
+
+ifneq ($(findstring build_only,$(MAKECMDGOALS)),)
+    $(info Build info: source directory is $(PWD))
+    $(info detected OpenSSL base directory $(OPENSSL_DIR))
+    $(info detected OpenSSL lib  directory $(OPENSSL_LIB))
+endif
 build_only: $(OUT_DIR)/$(OUTLIB)
 
 build:
@@ -212,7 +274,7 @@ endif
 $(OUT_DIR)/$(OUTLIBV): $(OBJS)
 	$(CC) $(OBJS) $(LDFLAGS) -shared -o $@ -Wl,-$(SONAME)$(OUTLIBV)
 
-$(OUT_DIR)/$(OUTLIB): $(OUT_DIR)/$(OUTLIBV)
+$(OUT_DIR)/$(OUTLIB): $(OUT_DIR)/$(OUTLIBV) fix_build_lib
 	ln -sf $(OUTLIBV) $(OUT_DIR)/$(OUTLIB)
 
 # Individual object targets; also provide dependencies on header files of the project (not on system headers)
@@ -232,6 +294,23 @@ $(BUILDDIR):
 # (directories are flagged as changed on every object build)
 $(OBJS): | $(BUILDDIR)
 
+# workaround for using local OpenSSL builds by default expecting that
+# its dynamic libs have been installed in ./$(LIB) when using the libs
+# see for binaries that dynamically link to OpenSSL the output of $(LDD) <binary>
+.PHONY: fix_build_lib
+fix_build_lib:
+ifneq ($(shell echo $(realpath $(OPENSSL_LIB)) | grep -E $(USERS)),)
+    ifeq ($(OPENSSL_LIB),$(OPENSSL_DIR))
+	@cd "$(OPENSSL_DIR)"; if [ ! -e $(LIB) ]; then ln -s . $(LIB); fi
+	@ # alternative would be to use, e.g.,
+	@ # install_name_tool -change $(OPENSSL_DIR)/lib/libcrypto.3.dylib $(OPENSSL_DIR)/libcrypto.3.dylib <libname>
+    endif
+endif
+	@true # prevent warning "Nothing to be done for `fix_build_lib'."
+
+
+# Debian packaging #############################################################
+
 deb:
 	debuild -e OPENSSL_DIR="$(OPENSSL_DIR)" -e OPENSSL_LIB="$(OPENSSL_LIB)" \
 	  --preserve-envvar SECUTILS_NO_TLS \
@@ -247,6 +326,9 @@ clean_deb:
 	rm -f ../libsecutils*.{deb,dsc,build*,changes,tar.gz}
 	rm -fr _CPack_Packages changelog.gz
 	rm -f libsecutils*.{deb,tar.gz,zip}
+
+
+# installation #################################################################
 
 # installation target - append ROOTFS=<path> to install into virtual root
 # filesystem
@@ -277,6 +359,9 @@ uninstall:
 	rm -f $(DEST_BIN)/$(OUTBIN)
 	rm -rf $(DEST_DOC)/doc/html
 
+
+# cleaning #####################################################################
+
 clean_uta:
 	rm -fr $(BUILDDIR)/uta_api$(OBJ) $(BUILDDIR)/files_icv$(OBJ) \
           $(BUILDDIR)/files_dv$(OBJ) \
@@ -302,6 +387,9 @@ clean_all: clean clean_deb
 	rm -fr doc refman.pdf CMakeDoxyfile.in Doxyfile.security-utilities_doxygen Doxyfile.doc *.gcov reports
 	rm -fr _CPack_Packages Makefile CMakeCache.txt
 
+
+# documentation ################################################################
+
 doc: $(SECUTILS_CONFIG) doc/html refman.pdf
 
 doc/html: Doxyfile $(wildcard src/libsecutils/include/*/*.h src/libsecutils/include/*/*/*.h)
@@ -311,6 +399,9 @@ refman.pdf: doc/html
 	mkdir -p doc/latex
 	@# for producing doc/latex/*, comment out in Doxyfile: GENERATE_LATEX = NO
 	@# $(MAKE) -C -f Makefile_v1 doc/latex && cp -a doc/latex/refman.pdf . # requires latex
+
+
+# others #######################################################################
 
 coverage: clean
 	$(MAKE) -f Makefile_v1 COMPILE_TYPE=code_coverage
