@@ -63,6 +63,22 @@ if(NOT EXISTS "${OPENSSL_CRYPTO_LIBRARY}")
   message(FATAL_ERROR "OpenSSL crypto library file does not exist: ${OPENSSL_CRYPTO_LIBRARY}")
 endif()
 
+# Workaround for local OpenSSL builds by default expecting that their
+# dynamic libs have been installed in ./${LIB}.
+# See for binaries dynamically linked to OpenSSL the output of 'ldd <binary>'
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+  set(USERS "^(\w:)?\\Users\\")
+  set(LIB "bin")
+else()
+  set(USERS "^/(home|Users)/")
+  set(LIB "lib")
+endif()
+string(REGEX MATCH ${USERS} MATCHED "${OPENSSL_LIB}")
+if(NOT "${MATCHED}" STREQUAL "" AND NOT EXISTS "${OPENSSL_LIB}/${LIB}")
+  execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink "." "${OPENSSL_LIB}/${LIB}")
+  # since CMake 3.13, this works also for Windows
+endif()
+
 option(SECURITY_UTILITIES_USE_UTA "Use UTA API" OFF)
 option(SECURITY_UTILITIES_USE_ICV "Use configuration ICV" OFF)
 option(SECURITY_UTILITIES_NO_TLS "Do not use TLS" OFF)
