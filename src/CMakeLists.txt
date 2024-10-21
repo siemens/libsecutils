@@ -3,11 +3,12 @@ target_compile_options(secutils_compilation_options INTERFACE
     -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes
     -Wformat -Wformat-security -Wtype-limits -Wundef
     -Wsign-compare -Wpointer-arith -Wunused-parameter
-    -pedantic -Werror
+    -pedantic
+    # -Werror is enabled only for development and CI, using Makefile_v1 without NDEBUG
 
     # TODO clean up code and re-enable warnings instead:
     -Wno-conversion -Wno-sign-conversion -Wno-c99-extensions
-    -Wno-shadow -Wno-declaration-after-statement -Wno-vla
+    -Wno-shadow -Wno-declaration-after-statement -Wno-vla -Wno-gnu-folding-constant
 )
 target_compile_definitions(secutils_compilation_options INTERFACE PEDANTIC)
 

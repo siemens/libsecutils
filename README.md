@@ -1,4 +1,4 @@
-# libsecutils
+# libSecUtils
 
 <img src="libsecutils.svg" width="200">
 
@@ -48,15 +48,15 @@ also on a virtual machine or the Windows Subsystem for Linux ([WSL](https://docs
 and with MacOS.
 
 The following network and development tools are needed or recommended.
-* Git (for getting the software, tested with versions 2.7.2, 2.11.0, 2.20, 2.30.2, 2.39.2)
-* CMake (for using [`CMakeLists.txt`](CMakeLists.txt), tested with versions 3.18.4, 3.26.3, 3.27.7)
-* GNU make (tested with versions 3.81, 4.1, 4.2.1, 4.3)
-* GNU C compiler (gcc, tested with versions 5.4.0, 7.3.0, 8.3.0, 10.0.1, 10.2.1)
-  or clang (tested with version 14.0.3 and 17.0.3)
+* Git (for getting the software, tested versions include 2.7.2, 2.11.0, 2.20, 2.30.2, 2.39.2, 2.47.0)
+* CMake (for using [`CMakeLists.txt`](CMakeLists.txt), tested versions include 3.18.4, 3.26.3, 3.27.7, 3.30.5)
+* GNU make (tested versions include 3.81, 4.1, 4.2.1, 4.3)
+* GNU C compiler (gcc, tested versions include 5.4.0, 7.3.0, 8.3.0, 10.0.1, 10.2.1, 12.2.0)
+  or clang (tested versions include 14.0.3, 17.0.3, 19.1.1)
 
 The following OSS components are used.
 * OpenSSL development edition, at least version 1.1.1. Tested, among others,
-  with 1.0.2u, 1.1.0f, 1.1.0g, 1.1.1d, 1.1.1i, 1.1.1l, and 3.0.0.<br>
+  with 1.0.2u, 1.1.0f, 1.1.0g, 1.1.1d, 1.1.1i, 1.1.1l, 3.0, 3.1, 3.2, 3.3, 3.4.<br>
   **Warning:** OpenSSL 1.1.1 (on Mint 19) contains a bug where used cipher suite (level 3) is empty (1.1.1d on Buster works correctly)
 
 * optionally: [github.com/siemens/libuta](https://github.com/siemens/libuta)
@@ -75,15 +75,25 @@ including the C header files needed for development
 (as provided by, e.g., the Debian/Ubuntu package `libssl-dev`).
 
 By default any OpenSSL installation available on the system is used.
-Set the optional environment variable `OPENSSL_DIR` to specify the
-absolute (or relative to `../`) path of the OpenSSL installation to use, e.g.:
+
+It is recommended to set the optional environment variable `OPENSSL_DIR` to specify
+the absolute or relative path of the OpenSSL installation or local build directory to use, e.g.,
 ```
 export OPENSSL_DIR=/usr/local
 ```
-In case its libraries are in a different location, set also `OPENSSL_LIB`, e.g.:
+or some heuristics will try to detect the location.
+This must point to the location in the file system from which the subdirectory `include/openssl`
+is directly accessible with this relative path name.\
+When used with CMake, `$OPENSSL_DIR/OpenSSLConfig.cmake` must exist.
+
+In case the OpenSSL libraries are in an unusual location, set also `OPENSSL_LIB`, e.g.,
 ```
-export OPENSSL_LIB=$OPENSSL_DIR/lib
+export OPENSSL_LIB=/lib/aarch64-linux-gnu
 ```
+Otherwise some heuristics will try to detect the location.
+
+For all environment variables specifying a directory, relative paths such as `.`
+are interpreted relative to the libSecUtils source directory.
 
 Use of the UTA library can be enabled
 by setting the environment variable `SECUTILS_USE_UTA`.
@@ -99,8 +109,9 @@ for instance as follows:
 ```
 cmake .
 ```
-When using CMake, `cmake` must be (re-)run
-after setting or unsetting environment variables.
+After modifying (i.e., setting or unsetting) relevant environment variables,
+it is recommended to remove `CMakeCache.txt` and re-run CMake.
+
 By default, CMake builds are in Release mode.
 This may also be enforced by defining the environment variable `NDEBUG`.
 For switching to Debug mode, use `cmake` with `-DCMAKE_BUILD_TYPE=Debug`.
