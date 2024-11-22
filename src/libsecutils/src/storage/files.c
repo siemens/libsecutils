@@ -1,20 +1,20 @@
-/** 
+/**
 * @file files.c
-* 
+*
 * @brief Private key, certificate, CSR (PKCS#10), and CRL file handling
 *
 * @copyright Copyright (c) Siemens Mobility GmbH, 2021
 *
 * @author David von Oheimb <david.von.oheimb@siemens.com>
 *
-* This work is licensed under the terms of the Apache Software License 
+* This work is licensed under the terms of the Apache Software License
 * 2.0. See the COPYING file in the top-level directory.
 *
 * SPDX-License-Identifier: Apache-2.0
 */
 
 #define OPENSSL_NO_RC4 /* prevent errors on undeclared FORMAT_MSBLOB and FORMAT_PVK */
-#define OSSL_DEPRECATEDIN_3_1
+//#define OSSL_DEPRECATEDIN_3_1
 #include <openssl/pem.h>
 #include <openssl/pkcs12.h>
 #ifndef OPENSSL_NO_ENGINE
