@@ -55,9 +55,9 @@ The following network and development tools are needed or recommended.
   or clang (tested versions include 14.0.3, 17.0.3, 19.1.1)
 
 The following OSS components are used.
-* OpenSSL development edition, at least version 1.1.1. Tested, among others,
-  with 1.0.2u, 1.1.0f, 1.1.0g, 1.1.1d, 1.1.1i, 1.1.1l, 3.0, 3.1, 3.2, 3.3, 3.4.<br>
-  **Warning:** OpenSSL 1.1.1 (on Mint 19) contains a bug where used cipher suite (level 3) is empty (1.1.1d on Buster works correctly)
+* OpenSSL development edition, at least version 3.0. Tested, among others,
+  with <!-- 1.0.2u, 1.1.0f, 1.1.0g, 1.1.1d, 1.1.1i, 1.1.1l,--> 3.0, 3.1, 3.2, 3.3, 3.4.<br>
+  <!-- **Warning:** OpenSSL 1.1.1 (on Mint 19) contains a bug where used cipher suite (level 3) is empty (1.1.1d on Buster works correctly) -->
 
 * optionally: [github.com/siemens/libuta](https://github.com/siemens/libuta)
 
