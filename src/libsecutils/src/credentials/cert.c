@@ -192,7 +192,7 @@ X509_NAME* UTIL_parse_name(const char* dn, long chtype, bool multirdn)
             continue;
         }
 
-        if(0 is_eq * ne_values[i])
+        if(0 is_eq ne_values[i])
         {
             LOG(FL_WARN, "No value provided for DN '%s' attribute %s, skipped", dn, ne_types[i]);
             continue;
