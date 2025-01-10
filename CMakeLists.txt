@@ -98,9 +98,10 @@ endif()
 add_subdirectory(src)
 
 # =============================
-# Installing
+# Installing and uninstalling
 # =============================
 
+# default destination on Linux and macOS: "/usr/local"
 #if(UNIX AND NOT APPLE)
 #  set(CMAKE_INSTALL_PREFIX "/usr")
 #else()
