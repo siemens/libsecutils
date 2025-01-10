@@ -168,7 +168,9 @@ and uninstalled with
 sudo make uninstall
 ```
 
-The destination is `/usr/`, unless specified otherwise by `DESTDIR` or `ROOTFS`.
+The destination is `/usr/local/`,
+unless specified otherwise by `DESTDIR` or `ROOTFS`.
+With that directory, artifacts are placed in the usual subdirectories.
 
 
 ### Building Debian packages

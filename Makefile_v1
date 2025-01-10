@@ -157,7 +157,7 @@ else
     OUTLIBV=$(OUTLIB).$(VERSION)
     override CFLAGS += -D_FORTIFY_SOURCE=2
 endif
-DEST_PRE=$(ROOTFS)/usr
+DEST_PRE=$(ROOTFS)/usr/local
 DEST_LIB=$(DEST_PRE)/lib
 DEST_INC=$(DEST_PRE)
 DEST_DOC=$(DEST_PRE)/share/doc/libsecutils-dev
