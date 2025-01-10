@@ -138,7 +138,12 @@ if(Doxygen_FOUND)
 endif()
 
 if(NOT TARGET uninstall)
-  add_custom_target(uninstall COMMAND xargs -I{} rm -vf $ENV{DESTDIR}{} <install_manifest.txt)
+  add_custom_target(uninstall
+    COMMAND xargs -I% rm -vf \${DESTDIR}% <install_manifest.txt
+    COMMAND rm -vfr "\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}/secutils"
+    COMMAND rm -vfr "\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DOCDIR}"
+    COMMAND rm -vfr "\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
+  )
 endif()
 
 if(NOT TARGET build)
