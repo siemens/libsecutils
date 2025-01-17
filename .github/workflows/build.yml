@@ -45,7 +45,8 @@ jobs:
       - name: build-with-uta
         run: |
           sudo apt-get update
-          sudo apt-get install -y >/dev/null dh-autoreconf debhelper # rsync libssl-dev git pkg-config
+          sudo apt-get install -y >/dev/null debhelper devscripts build-essential:native
+          # dh-autoreconf rsync libssl-dev git pkg-config
           mkdir dependencies
           cd dependencies
           git clone https://github.com/siemens/libuta.git
@@ -67,7 +68,8 @@ jobs:
       - name: build-debian
         run: |
           sudo apt-get update
-          sudo apt-get install -y >/dev/null debhelper devscripts # rsync libssl-dev git pkg-config
+          sudo apt-get install -y >/dev/null debhelper devscripts build-essential:native
+          # dh-autoreconf rsync libssl-dev git pkg-config
           echo "copying everything to subdirectory 'debian-packaging'"
           mkdir -p debian-packaging
           rsync -av --exclude='debian-packaging' . debian-packaging/
