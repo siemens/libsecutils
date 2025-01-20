@@ -96,9 +96,12 @@ For all environment variables specifying a directory, relative paths such as `.`
 are interpreted relative to the libSecUtils source directory.
 
 Use of the UTA library can be enabled
-by setting the environment variable `SECUTILS_USE_UTA`.
+by setting the environment variable `SECUTILS_USE_UTA`
+when calling `cmake` (at generation time).
+The UTA library must have been pre-installed on the system.
 
-When `SECUTILS_USE_ICV` is set, configuration files are expected
+When `SECUTILS_USE_ICV` is set when calling `cmake` (at generation time),
+configuration files are expected
 to be integrity protected with an Integrity Check Value (ICV),
 which may be produced using `icvutil`.
 
