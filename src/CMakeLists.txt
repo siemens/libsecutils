@@ -20,8 +20,8 @@ target_compile_options(security-utlities_sanitizer_options INTERFACE -O0)  # wor
 
 if(SECURITY_UTILITIES_USE_UTA)
     add_library(security-utilities_uta-api INTERFACE)
-    target_include_directories(security-utilities_uta-api INTERFACE /usr/local/include)
-    target_link_directories(security-utilities_uta-api INTERFACE /usr/local/lib)
+    target_include_directories(security-utilities_uta-api INTERFACE "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}") # usually expands to /usr/local/include
+    target_link_directories(   security-utilities_uta-api INTERFACE "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}"    ) # usually expands to /usr/local/lib
     target_link_libraries(security-utilities_uta-api INTERFACE -luta)
 endif()
 
