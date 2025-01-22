@@ -72,5 +72,5 @@ install(DIRECTORY include/
     FILES_MATCHING
         PATTERN "*.h"
         PATTERN CMakeFiles EXCLUDE
-        PATTERN secutils_static_config.h EXCLUDE
+        # PATTERN secutils_static_config.h EXCLUDE # must not be excluded
 )
