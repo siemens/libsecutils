@@ -186,8 +186,11 @@ set_property(
 if(NOT TARGET clean_all)
   add_custom_target(clean_all
     COMMAND ${CMAKE_BUILD_TOOL} clean
-    # cowardly not doing rm -r ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_BINARY_DIR}
     COMMAND find . -name "*.o" -o -regex "./libsecutils-.*" | xargs rm
+    COMMAND find . -type d -name "build" | xargs -r rm -r
+    # cowardly not doing rm -r ${CMAKE_BINARY_DIR}
+
+    COMMAND rm CMakeCache.txt
     # after the following, cannot call this target again:
     COMMAND find . ( -name "*.cmake" -o -name Makefile )
             -not -path ./src/libsecutils/security-utilities_libraryConfig.cmake
@@ -195,7 +198,11 @@ if(NOT TARGET clean_all)
             -not -path ./coverage/Makefile
             | xargs rm
     COMMAND find . -name CMakeFiles | xargs rm -r
-    COMMAND rm CMakeCache.txt
+    COMMAND find . -type d -empty      | xargs -r rmdir
+    COMMAND find . -type d -empty      | xargs -r rmdir
+    COMMAND find . -type d -empty      | xargs -r rmdir
+    COMMAND find . -type d -empty      | xargs -r rmdir
+    COMMAND find . -type d -empty      | xargs -r rmdir
     VERBATIM
   )
 endif()
