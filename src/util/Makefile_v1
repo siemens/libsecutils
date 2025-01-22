@@ -46,7 +46,7 @@ $(OUT_DIR_BIN): icvutil$(OBJ)
 	$(CC) $(LDFLAGS) icvutil$(OBJ) -o $(OUT_DIR_BIN) -L$(OUT_REVERSE_DIR) -lsecutils -lssl -lcrypto
 
 icvutil$(OBJ): icvutil.c
-	$(CC) $(CFLAGS) -I../include -c icvutil.c
+	$(CC) $(CFLAGS) -I../libsecutils/include/secutils -c icvutil.c
 
 run: build
 	LD_LIBRARY_PATH=../ $(OUT_DIR_BIN) || true
