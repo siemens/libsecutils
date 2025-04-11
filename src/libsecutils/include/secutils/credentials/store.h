@@ -252,6 +252,7 @@ bool STORE_EX_check_index(void);
  * @param store the affected certificate store
  * @param host the host name to set, or null to clear it
  * @return true on success, false on failure
+ * @note since OpenSSL 3.0, this is no more needed due to X509_VERIFY_PARAM_get0_host() being available
  */
 bool STORE_set1_host(X509_STORE* store, OPTIONAL const char* host);
 
@@ -259,7 +260,7 @@ bool STORE_set1_host(X509_STORE* store, OPTIONAL const char* host);
  * @brief get expected host name for cert verification diagnostics
  *
  * @param store the certificate store to read from
- * @return the host name that has been set, or null if unset or on failure
+ * @return the first host name that has been set, or null if unset or on failure
  */
 const char* STORE_get0_host(X509_STORE* store);
 
