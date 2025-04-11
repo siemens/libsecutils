@@ -27,6 +27,7 @@
  * @note The RSA key length may be 1024, 2048, or 4096 and the available ECC curves can be shown with the command
  *openssl ecparam -list_curves.
  * @note This function cannot be used for generating keys managed by a crypto engine.
+ * @note Since OpenSSL 3.0, this may depend on the availability of a suitable provider.
  * @return the new key on success and null otherwise.
  *******************************************************************************/
 /* this function is part of the genCMPClient API */

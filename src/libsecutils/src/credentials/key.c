@@ -198,7 +198,7 @@ EVP_PKEY* KEY_new(const char* spec)
         }
 
 #if OPENSSL_VERSION_NUMBER >= OPENSSL_V_3_0_0
-        pkey = EVP_RSA_gen(nbits);
+        pkey = EVP_RSA_gen(nbits); // This may depend on the availability of a suitable OpenSSL provider.
         if (pkey == NULL) {
             LOG(FL_ERR, "cannot generate RSA key with length %d", nbits);
             goto err;
@@ -263,7 +263,7 @@ EVP_PKEY* KEY_new(const char* spec)
         }
 
 #if OPENSSL_VERSION_NUMBER >= OPENSSL_V_3_0_0
-        pkey = EVP_EC_gen(OSSL_EC_curve_nid2name(nid));
+        pkey = EVP_EC_gen(OSSL_EC_curve_nid2name(nid)); // This may depend on the availability of a suitable OpenSSL provider.
         if (pkey == NULL) {
             LOG(FL_ERR, "cannot generate EC key with curve name %.40s", spec);
             goto err;
