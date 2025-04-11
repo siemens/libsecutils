@@ -467,7 +467,7 @@ err:
 }
 
 
-bool STORE_set1_host_ip(X509_STORE* ts, const char* name, const char* ip)
+bool STORE_set1_host_ip(X509_STORE* ts, OPTIONAL const char* name, OPTIONAL const char* ip)
 {
     if(ts is_eq 0)
     {
@@ -482,7 +482,7 @@ bool STORE_set1_host_ip(X509_STORE* ts, const char* name, const char* ip)
        0 is_eq X509_VERIFY_PARAM_set1_ip(ts_vpm, 0, 0) or
        0 is_eq X509_VERIFY_PARAM_set1_email(ts_vpm, 0, 0))
     {
-        LOG_err("Could not clear host name and IP address from store");
+        LOG_err("Could not clear host names and IP and email addresses from store");
         return false;
     }
 
