@@ -26,22 +26,26 @@ static const char* const CONN_https_prefix = "https://";
 #define CONN_IS_HTTPS(uri) ((uri) != NULL && HAS_PREFIX(uri, OSSL_HTTPS_PREFIX))
 
 /*!*****************************************************************************
- * @brief parse URI of the form "[http[s]://]host[:port][/path]"
+ * @brief parse hostname or URI of the form "[http[s]://][<userinfo>@]<host>[:<port>][/<path>]"
+ * @note an IPv6 address must be enclosed in '[' and ']'.
  * @param p_uri pointer to variable holding the URI to be parsed.
- * The variable is advanced past any leading "http[s]://" and any given port and/or path strings are chopped.
+ * The variable is advanced past any leading "http[s]://" and "<userinfo>@" parts to the host name/address;
+ * anything following it (i.e., <port> and/or <path> URI components) are chopped in the input string buffer.
  * @param default_port specifies the default port to return:
  * may give an actual default port number or 0, which is replaced by 443 for https else by 80
  * @param p_path if this pointer is not null it will be used to assign on success
- * the pointer to any path component included in the input string, or null if not included.
+ * the pointer to any <path> component (including and query and fragment parts)
+ * included in the input string, or null if not included.
  * @param desc description of the server to connect to, for use in diagnostic messages, or null
  * @return valid port number from input string or default, or <= 0 on error
  ******************************************************************************/
 int CONN_parse_uri(char** p_uri, int default_port, const char** p_path, char* desc);
 
 /*!*****************************************************************************
- * @brief copy host name or IP address from URI of the form "[http[s]://]host[:port][/path]"
+ * @brief copy host name or IP address from URI of the form "[http[s]://][userinfo@]<host>[:<port>][/<path>]"
  *
- * @param uri (optional) containing host name or IP address
+ * @param uri (optional) containing host name or IP address.
+ * @note an IPv6 address must be enclosed in '[' and ']'.
  * @return pointer to a copy of the host specifier or null, null also on error
  ******************************************************************************/
 char* CONN_get_host(OPTIONAL const char* uri);
