@@ -22,6 +22,9 @@ static const char* const CONN_scheme_postfix = "://";
 static const char* const CONN_http_prefix = "http://";
 static const char* const CONN_https_prefix = "https://";
 
+#define CONN_IS_HTTP( uri) ((uri) != NULL && HAS_PREFIX(uri, OSSL_HTTP_PREFIX ))
+#define CONN_IS_HTTPS(uri) ((uri) != NULL && HAS_PREFIX(uri, OSSL_HTTPS_PREFIX))
+
 /*!*****************************************************************************
  * @brief parse URI of the form "[http[s]://]host[:port][/path]"
  * @param p_uri pointer to variable holding the URI to be parsed.
