@@ -24,6 +24,7 @@ static const char* const CONN_https_prefix = "https://";
 
 #define CONN_IS_HTTP( uri) ((uri) != NULL && HAS_PREFIX(uri, OSSL_HTTP_PREFIX ))
 #define CONN_IS_HTTPS(uri) ((uri) != NULL && HAS_PREFIX(uri, OSSL_HTTPS_PREFIX))
+#define CONN_IS_IP_ADDR(host) ((host) != NULL && ((*(host) >= '0' && *(host) <= '9') || *(host) == '['))
 
 /*!*****************************************************************************
  * @brief parse hostname or URI of the form "[http[s]://][<userinfo>@]<host>[:<port>][/<path>]"

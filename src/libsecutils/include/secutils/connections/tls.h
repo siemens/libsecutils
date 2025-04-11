@@ -92,11 +92,17 @@ void TLS_CTX_free(OPTIONAL SSL_CTX* ctx);
  *
  * @param ctx SSL/TLS context, typically obtained using TLS_CTX_new()
  * @param host the host name or IP address, which may be given as a URL, of the server to connect to
- * @note host name checking is enabled for the given host name or IP address
  * @param port (optional) the port number, given as string, to connect to
+ * @note an IPv6 address must be enclosed in '[' and ']'.
  * @note The host parameter may contain a ':' followed by a port specification.
  * In this case the port parameter must be null or contain the same string.
  * @param timeout number of seconds the HTTP transaction may take, or 0 for infinite
+ * @note the function performs Server Name Indication (SNI) according to RFC 3546 section 3.1.
+ * If the ctx parameter contains a trust store in which a host name has been set
+ * for host name validation (e.g., using STORE_set1_host_ip()), the function uses this name for SNI.
+ * Otherwise, it uses the host parameter given here for SNI (unless it is an IP address)
+ * and sets host name validation if a trust store is contained in the ctx
+ * and no IP address nor email address validation has been set there, neither.
  * @return pointer to a new SSL/TLS structure, or null on error
  *******************************************************************************/
 SSL* TLS_connect(SSL_CTX* ctx, const char* host, OPTIONAL const char* port, int timeout);

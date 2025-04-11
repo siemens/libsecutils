@@ -267,12 +267,12 @@ SSL* TLS_connect(SSL_CTX* ctx, const char* host, OPTIONAL const char* port, int 
     SSL *ssl = 0, *res = 0;
 
     /* check parameters */
-    if(0 is_eq ctx)
+    if(0 is_eq ctx or host is_eq 0)
     {
         return 0;
     }
     char* host_str = CONN_get_host(host);
-    if(host not_eq 0 and host_str is_eq 0)
+    if(host_str is_eq 0)
     {
         return 0;
     }
@@ -292,9 +292,23 @@ SSL* TLS_connect(SSL_CTX* ctx, const char* host, OPTIONAL const char* port, int 
 
     /* set up TLS host name / IP address verification */
     X509_STORE* ts = SSL_CTX_get_cert_store(ctx);
-    if(ts not_eq 0 and not STORE_set1_host_ip(ts, host, host))
+    X509_VERIFY_PARAM* vpm = ts not_eq 0 ? X509_STORE_get0_param(ts) : 0;
+    const char* hostaddr = ts not_eq 0 ? STORE_get0_host(ts) : 0;
+
+    if (hostaddr is_eq 0)
     {
-        goto err;
+        hostaddr = host_str;
+        /* set expected host in ts, if no name validation has been set there so far */
+        if (vpm not_eq 0 and X509_VERIFY_PARAM_get0_email(vpm) is_eq 0)
+        {
+            char *ip = X509_VERIFY_PARAM_get1_ip_asc(vpm);
+
+            OPENSSL_free(ip);
+            if (ip is_eq 0 and not STORE_set1_host_ip(ts, host_str, host_str))
+            {
+                goto err;
+            }
+        }
     }
 
     /* allocate SSL/TLS structure */
@@ -306,9 +320,8 @@ SSL* TLS_connect(SSL_CTX* ctx, const char* host, OPTIONAL const char* port, int 
     /* link it with BIO connection */
     SSL_set_bio(ssl, conn, conn);
 
-    /* set the server name indication ClientHello extension */
-    if(host_str not_eq 0 and host_str[0] < '0' and host_str[0] > '9' /* no IPc4 address */
-       and not SSL_set_tlsext_host_name(ssl, host_str))
+    if(not CONN_IS_IP_ADDR(hostaddr)
+       and not SSL_set_tlsext_host_name(ssl, hostaddr))
     {
         goto err;
     }
