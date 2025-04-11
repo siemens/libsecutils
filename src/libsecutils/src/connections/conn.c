@@ -33,6 +33,20 @@ static const char* skip_scheme(const char* str)
     return str;
 }
 
+static const char* skip_userinfo(const char* str)
+{
+    static const char* const delims = "@[]/?#";
+    const char* p = str;
+
+    while (*p not_eq '\0' and strchr(delims, *p) is_eq 0)
+        p++;
+    if (*(p++) not_eq '@')
+    {
+        p = str;
+    }
+    return p;
+}
+
 int CONN_parse_uri(char** p_uri, int default_port, const char** p_path, char* desc)
 {
     char* port_string;
@@ -59,10 +73,23 @@ int CONN_parse_uri(char** p_uri, int default_port, const char** p_path, char* de
     }
     else
     {
-        *p_uri = (char*)skip_scheme((const char*)*p_uri);
+        *p_uri = (char*)skip_scheme(*p_uri);
     }
 
-    if((port_string = strrchr(*p_uri, ':')) not_eq 0)
+    *p_uri = (char*)skip_userinfo(*p_uri);
+    char* cont = *p_uri;
+    if(*p_uri[0] is_eq '[')
+    {
+        cont = strrchr(++(*p_uri), ']');
+        if(cont is_eq 0)
+        {
+            LOG(FL_ERR, "the <host> part in %s starts with '[' indicating an IPv6 address, but missing the closing ']' in \"%s\"", desc, *p_uri);
+            return 0;
+        }
+        cont++;
+    }
+
+    if((port_string = strrchr(cont, ':')) not_eq 0)
     {
         char* error = 0;
 
@@ -94,7 +121,7 @@ int CONN_parse_uri(char** p_uri, int default_port, const char** p_path, char* de
         {
             default_port = 80; /* == integer value of OSSL_HTTP_PORT */
         }
-        path_string = strchr(*p_uri, '/');
+        path_string = strchr(cont, '/');
     }
 
     if(path_string not_eq 0 and *path_string is_eq '/')
@@ -115,8 +142,17 @@ char* CONN_get_host(const char* uri)
     if(uri not_eq 0)
     {
         uri = skip_scheme(uri);
-        char* end = strrchr(uri, ':');
-        if(0 is_eq end)
+        uri = skip_userinfo(uri);
+        char* end;
+        if(*uri is_eq '[')
+        {
+            end = strrchr(++uri, ']');
+            if(end is_eq 0)
+            {
+                return 0;
+            }
+        }
+        else if(0 is_eq (end = strrchr(uri, ':')))
         {
             end = strchr(uri, '/');
         }
