@@ -24,8 +24,9 @@
 # include "../certstatus/certstatus.h"
 
 /*!*****************************************************************************
- * @brief enable TLS host verification and define the expected server host name and/or IP address
- * @note it is crucial for TLS clients to verify the identity of the host to connect to
+ * @brief disable host name/address verification if the name and ip parameters are null, otherwise
+ enable TLS host verification and define the expected server host name and/or IP address
+ * @note it is crucial for TLS clients to verify the identity of the host to connect with
  *
  * @param truststore the trust store (typically returned from TLS_CTX_new()) where to set the host verification options
  * @param name the host DNS name to be expected, which may be given as a URL, or null
@@ -35,7 +36,7 @@
  * @return true on success, else false
  *******************************************************************************/
 /* this function is used by the genCMPClient API implementation */
-bool STORE_set1_host_ip(X509_STORE* truststore, const char* name, const char* ip);
+bool STORE_set1_host_ip(X509_STORE* truststore, OPTIONAL const char* name, OPTIONAL const char* ip);
 
 /*!*****************************************************************************
  * @brief add CRLs to trust store and enable CRL-based status checks for end-entity certificates
