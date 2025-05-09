@@ -104,7 +104,7 @@ void CERTS_free(OPTIONAL STACK_OF(X509) *certs);
  *
  * @param dn string to be parsed, format "/type0=value0/type1=value1/type2=..." where characters may be escaped by '\'.
  * The NULL-DN may be given as "/" or "".
- * @param chtype type of the string, e.g., MBSTRING_ASC, as defined in openssl/asn1.h
+ * @param chtype type of the string, e.g., MBSTRING_UTF8, as defined in openssl/asn1.h
  * @param multirdn flag whether to allow multi-valued RDNs
  * @return ASN.1 representation of the DN, or null on error
  *******************************************************************************/
