@@ -301,8 +301,9 @@ SSL* TLS_connect(SSL_CTX* ctx, const char* host, OPTIONAL const char* port, int 
         /* set expected host in ts, if no name validation has been set there so far */
         if (vpm not_eq 0 and X509_VERIFY_PARAM_get0_email(vpm) is_eq 0)
         {
+            ERR_set_mark();
             char *ip = X509_VERIFY_PARAM_get1_ip_asc(vpm);
-
+            ERR_pop_to_mark();
             OPENSSL_free(ip);
             if (ip is_eq 0 and not STORE_set1_host_ip(ts, host_str, host_str))
             {
