@@ -51,29 +51,28 @@ const char* UTIL_skip_string(const char* s, OPTIONAL const char* p)
 }
 
 
-char* UTIL_next_item(char* str)
+char *UTIL_next_item(char *opt) /* in list separated by comma and/or spaces */
 {
     /* advance to separator (comma or whitespace), if any */
-    while(*str not_eq ',' and not isspace(*str) and *str not_eq '\0')
-    {
-        if(*str is_eq '\\' and str[1] not_eq '\0')
+    while (*opt != '\0' && *opt != ',' && !isspace(*opt)) {
+        if (*opt == '\\' && opt[1] != '\0')
         {
-            /* skip and unescape '\' escaped char */
-            memmove(str, str + 1, strlen(str));
+            /* skip and unescape '\'-escaped char */
+            memmove(opt, opt + 1, strlen(opt));
         }
-        str++;
+        opt++;
     }
-    if(*str not_eq '\0')
-    {
+    if (*opt != '\0') {
+        int found_comma = *opt == ',';
+
         /* terminate current item */
-        *str++ = '\0';
-        /* skip over any whitespace after separator */
-        while(isspace(*str))
-        {
-            str++;
-        }
+        *opt++ = '\0';
+        /* skip over any further separators, but only one comma */
+        while ((!found_comma && *opt == ',' && (found_comma = 1))
+               || isspace(*opt))
+            opt++;
     }
-    return *str is_eq '\0' ? 0 : str;
+    return *opt == '\0' ? NULL : opt; /* NULL indicates end of input */
 }
 
 
