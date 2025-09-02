@@ -51,6 +51,17 @@ const char* UTIL_skip_string(const char* s, OPTIONAL const char* p)
 }
 
 
+char *UTIL_first_item(char *str)
+{
+    if (str == NULL)
+        return NULL;
+
+    /* skip any initial separators (comma or whitespace) */
+    while (*str == ',' || isspace(*str))
+        str++;
+    return *str == '\0' ? NULL : str;
+}
+
 char *UTIL_next_item(char *opt) /* in list separated by comma and/or spaces */
 {
     /* advance to separator (comma or whitespace), if any */

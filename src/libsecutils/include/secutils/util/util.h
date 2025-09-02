@@ -230,6 +230,14 @@ int UTIL_atoint(const char *str); /* returns INT_MIN on error */
 const char *UTIL_skip_string(const char *s, OPTIONAL const char *p);
 
 /*!*****************************************************************************
+ * @brief skip any initial separators (commas or whitespace) in given string
+ *
+ * @param str input string
+ * @return pointer to first non-separator part of string, or null at end of input
+ ******************************************************************************/
+char *UTIL_first_item(char *str);
+
+/*!*****************************************************************************
  * @brief successively split string of items
  *     separated by commas and/or whitespace, which may be escapted using '\'
  *
