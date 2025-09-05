@@ -35,6 +35,7 @@
 # include "../basic.h"
 # include "../operators.h"
 
+# include <openssl/opensslv.h>
 # include <openssl/err.h>
 # include <openssl/x509v3.h>
 
@@ -52,10 +53,6 @@ static const int UTIL_max_name_len = 128;  /*!< max length of file name */
 #  if OPENSSL_VERSION_NUMBER < 0x10100000L
 #   define OpenSSL_version_num SSLeay
 #  elif OPENSSL_VERSION_NUMBER >= OPENSSL_V_3_0_0
-#   define OpenSSL_version_num() \
-    ((unsigned long) \
-     ((OPENSSL_version_major() << 28) | (OPENSSL_version_minor() << 20) | \
-      (OPENSSL_version_patch() << 4) | _OPENSSL_VERSION_PRE_RELEASE))
 #   define SHA256(data, len, buf) \
     (EVP_Digest(data, len, buf, NULL, EVP_sha256(), NULL), buf)
 #  endif
