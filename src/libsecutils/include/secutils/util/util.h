@@ -194,6 +194,8 @@ typedef u_int64_t uint64_t;
 
 # if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
 STACK_OF(X509) *X509_STORE_get1_all_certs(X509_STORE *store);
+#  define X509_VERIFY_PARAM_get0_email(vpm) ((void)(vpm), NULL) /* dummy */
+#  define X509_VERIFY_PARAM_get1_ip_asc(vpm) ((void)(vpm), NULL) /* dummy */
 # endif
 
 /*!*****************************************************************************
@@ -228,8 +230,16 @@ int UTIL_atoint(const char *str); /* returns INT_MIN on error */
 const char *UTIL_skip_string(const char *s, OPTIONAL const char *p);
 
 /*!*****************************************************************************
+ * @brief skip any initial separators (commas or whitespace) in given string
+ *
+ * @param str input string
+ * @return pointer to first non-separator part of string, or null at end of input
+ ******************************************************************************/
+char *UTIL_first_item(char *str);
+
+/*!*****************************************************************************
  * @brief successively split string of items
- *     separated by commas and/or whitespace, which may be escapted using '\'
+ *     separated by commas and/or whitespace, which may be escaped using '\'
  *
  * @param str input string, which is split by overwriting separator(s) by '\0'
  * @return pointer to next item in string, or null at end of input

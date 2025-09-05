@@ -51,10 +51,21 @@ const char* UTIL_skip_string(const char* s, OPTIONAL const char* p)
 }
 
 
+char *UTIL_first_item(char *str)
+{
+    if (str == NULL)
+        return NULL;
+
+    /* skip any initial separators (comma or whitespace) */
+    while (*str == ',' || isspace(*str))
+        str++;
+    return *str == '\0' ? NULL : str;
+}
+
 char* UTIL_next_item(char* str)
 {
     /* advance to separator (comma or whitespace), if any */
-    while(*str not_eq ',' and not isspace(*str) and *str not_eq '\0')
+    while(*str not_eq '\0' and *str not_eq ',' and not isspace(*str))
     {
         if(*str is_eq '\\' and str[1] not_eq '\0')
         {
@@ -67,8 +78,8 @@ char* UTIL_next_item(char* str)
     {
         /* terminate current item */
         *str++ = '\0';
-        /* skip over any whitespace after separator */
-        while(isspace(*str))
+        /* skip over any further separators */
+        while(*str is_eq ',' or isspace(*str))
         {
             str++;
         }
