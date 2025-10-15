@@ -40,9 +40,9 @@ struct credentials
 } /* CREDENTIALS */;
 
 
-CREDENTIALS* CREDENTIALS_new(OPTIONAL const EVP_PKEY* pkey, const OPTIONAL X509* cert,
-                             OPTIONAL const STACK_OF(X509) * chain, OPTIONAL const char* pwd,
-                             OPTIONAL const char* pwdref)
+CREDENTIALS* CREDENTIALS_new(OPTIONAL const EVP_PKEY *pkey, OPTIONAL const X509 *cert,
+                             OPTIONAL const STACK_OF(X509) *chain, OPTIONAL const char *pwd,
+                             OPTIONAL const char *pwdref)
 {
     const char* pass = pwd;
     if (pwd not_eq 0 and strncmp(pwd, sec_PASS_STR, strlen(sec_PASS_STR)) is_eq 0)
