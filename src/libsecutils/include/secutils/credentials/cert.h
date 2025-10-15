@@ -109,7 +109,7 @@ void CERTS_free(OPTIONAL STACK_OF(X509) *certs);
  * @return ASN.1 representation of the DN, or null on error
  *******************************************************************************/
 /* this function is used by the genCMPClient API implementation */
-X509_NAME* UTIL_parse_name(const char* dn, long chtype, bool multirdn);
+X509_NAME* UTIL_parse_name(const char* dn, int chtype, bool multirdn);
 
 
 /*!*****************************************************************************
