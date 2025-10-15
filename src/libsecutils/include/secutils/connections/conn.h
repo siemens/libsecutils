@@ -24,7 +24,15 @@ static const char* const CONN_https_prefix = "https://";
 
 #define CONN_IS_HTTP( uri) ((uri) != NULL && HAS_PREFIX(uri, OSSL_HTTP_PREFIX ))
 #define CONN_IS_HTTPS(uri) ((uri) != NULL && HAS_PREFIX(uri, OSSL_HTTPS_PREFIX))
-#define CONN_IS_IP_ADDR(host) ((host) != NULL && ((*(host) >= '0' && *(host) <= '9') || *(host) == '['))
+#define CONN_IS_IP_ADDR(host) CONN_is_IP_address(host)
+
+/*!*****************************************************************************
+ * @brief check if host string is an IP address (as opposed to domain name)
+ * @note an IPv6 address must be enclosed in '[' and ']'.
+ * @param host identifier string to be checked, or null.
+ * @return 1 if string is an IP address, 0 otherwise
+ ******************************************************************************/
+bool CONN_is_IP_address(OPTIONAL const char *host);
 
 /*!*****************************************************************************
  * @brief parse hostname or URI of the form "[http[s]://][<userinfo>@]<host>[:<port>][/<path>]"
