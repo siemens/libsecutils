@@ -40,9 +40,9 @@ typedef const char* component_creds_id; /**< component credentials identifier */
  * @return pointer to a new CREDENTIALS structure, or null on error
  *******************************************************************************/
 /* this function is part of the genCMPClient API */
-CREDENTIALS* CREDENTIALS_new(OPTIONAL const EVP_PKEY* pkey, OPTIONAL const OPTIONAL X509* cert,
-                             OPTIONAL const STACK_OF(X509) * chain, OPTIONAL const char* pwd,
-                             OPTIONAL const char* pwdref);
+CREDENTIALS* CREDENTIALS_new(OPTIONAL const EVP_PKEY *pkey, OPTIONAL const X509 *cert,
+                             OPTIONAL const STACK_OF(X509) *chain, OPTIONAL const char *pwd,
+                             OPTIONAL const char *pwdref);
 
 /*!*****************************************************************************
  * @brief get private key component of the given credentials
