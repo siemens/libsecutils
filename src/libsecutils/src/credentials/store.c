@@ -120,7 +120,7 @@ static void STORE_EX_free_index(void)
     }
 }
 
-static STORE_EX* STORE_get_ex_data(X509_STORE* store)
+static STORE_EX *STORE_get_ex_data(const X509_STORE *store)
 {
     STORE_EX* res = 0;
     if(store is_eq 0)
@@ -129,7 +129,7 @@ static STORE_EX* STORE_get_ex_data(X509_STORE* store)
     }
     else
     {
-        res = X509_STORE_get_ex_data(store, STORE_EX_data_idx);
+        res = X509_STORE_get_ex_data((/* needed for OpenSSL < 3.0: */ X509_STORE *)store, STORE_EX_data_idx);
         if(res is_eq 0)
         {
             LOG(FL_ERR, "STORE_EX not found");
@@ -617,7 +617,7 @@ bool STORE_set1_desc(X509_STORE* store, OPTIONAL const char *desc)
     return (ex_data->desc == NULL) == (desc == NULL);
 }
 
-const char* STORE_get0_desc(OPTIONAL X509_STORE* store)
+const char *STORE_get0_desc(OPTIONAL const X509_STORE *store)
 {
     if(0 is_eq store)
     {
@@ -799,8 +799,8 @@ static X509_CRL *load_crl_http(OPTIONAL void *arg, OPTIONAL const char *url, int
     return 0;
 }
 
-X509_CRL* STORE_fetch_crl(X509_STORE* ts, OPTIONAL const char* url, int timeout,
-                          const X509* cert, OPTIONAL const char* desc)
+X509_CRL *STORE_fetch_crl(const X509_STORE *ts, OPTIONAL const char *url, int timeout,
+                          const X509 *cert, OPTIONAL const char *desc)
 {
     if (url not_eq 0 and strncmp(url, "file:", 5) is_eq 0)
     {
@@ -843,7 +843,7 @@ bool STORE_set1_host(X509_STORE* store, OPTIONAL const char* host)
     return true;
 }
 
-const char* STORE_get0_host(X509_STORE* store)
+const char *STORE_get0_host(const X509_STORE *store)
 {
     const STORE_EX* ex_data = STORE_get_ex_data(store);
     const char* host = ex_data not_eq 0 ? ex_data->host : 0;

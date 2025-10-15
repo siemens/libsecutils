@@ -62,7 +62,7 @@ bool STORE_set1_desc(X509_STORE* store, OPTIONAL const char* desc);
  * @param store the certificate trust store
  * @return description to use for diagnostics, or null on failure or if not set
  */
-const char* STORE_get0_desc(OPTIONAL X509_STORE* store);
+const char *STORE_get0_desc(OPTIONAL const X509_STORE *store);
 
 /*!*****************************************************************************
  * @brief set various optional verification parameters in the given trust store
@@ -127,8 +127,8 @@ bool STORE_set_crl_callback(X509_STORE* store,
  * @param desc description of the CRL to use for any error messages, or null
  * @return pointer to downloaded CRL, or null on error
  */
-X509_CRL* STORE_fetch_crl(X509_STORE* store, OPTIONAL const char* url, int timeout,
-                          const X509* cert, OPTIONAL const char* desc);
+X509_CRL *STORE_fetch_crl(const X509_STORE *store, OPTIONAL const char *url, int timeout,
+                          const X509 *cert, OPTIONAL const char *desc);
 
 /*!
  * @brief create or extend cert store structure with any given cert(s)
@@ -262,7 +262,7 @@ bool STORE_set1_host(X509_STORE* store, OPTIONAL const char* host);
  * @param store the certificate store to read from
  * @return the first host name that has been set, or null if unset or on failure
  */
-const char* STORE_get0_host(X509_STORE* store);
+const char *STORE_get0_host(const X509_STORE *store);
 
 # ifndef SECUTILS_NO_TLS
 /*!
