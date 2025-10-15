@@ -180,10 +180,13 @@ bool LOG_generic(OPTIONAL const char* func, OPTIONAL const char* file, int linen
 
     char loc[loc_len];
     memset(loc, 0x00, loc_len);
-    int len = snprintf(loc, sizeof(loc), "%s", app_name);
 #ifndef NDEBUG
+    int len = snprintf(loc, sizeof(loc), "%s", app_name);
+    if (len < 0)
+        len = 0; /* on error, cannot assume any string written to loc buffer */
     /* print function name, source file name, and line number only if debugging is enabled at build time */
-    (void)snprintf(loc + len, sizeof(loc) - len, ":%s():%s:%d:", func, file, lineno);
+    if (snprintf(loc + len, sizeof(loc) - (size_t)len, ":%s():%s:%d:", func, file, lineno) < 0)
+        loc[0] = '\0'; /* on error, resort to empty string */
 #endif
 
     /* print string corresponding to level */
@@ -223,8 +226,8 @@ bool LOG_generic(OPTIONAL const char* func, OPTIONAL const char* file, int linen
     }
 
     /* print message, making sure that newline is printed  */
-    len = strlen(msg);
-    const int msg_nl = len > 0 and msg[len - 1] is_eq '\n';
+    size_t msg_len = strlen(msg);
+    const int msg_nl = msg_len > 0 and msg[msg_len - 1] is_eq '\n';
     const int ret = fprintf(fd, "%s %s: %s%s", loc, lvl, msg, msg_nl ? "" : "\n");
 
     /* make sure that printing is done right away, return info on success  */
