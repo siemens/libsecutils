@@ -252,7 +252,8 @@ bool STORE_EX_check_index(void);
  * @param store the affected certificate store
  * @param host the host name to set, or null to clear it
  * @return true on success, false on failure
- * @note since OpenSSL 3.0, this is no more needed due to X509_VERIFY_PARAM_get0_host() being available
+ * @note since OpenSSL 3.0, due to X509_VERIFY_PARAM_get0_host() being available,
+ *       this function is no more needed and just returns true
  */
 bool STORE_set1_host(X509_STORE* store, OPTIONAL const char* host);
 
