@@ -34,8 +34,9 @@ typedef struct STORE_ex_st
     BIO* tls_bio; /* indicates CMP_PKIMESSAGE_http_perform() with TLS is active */
 #endif
     const char* desc; /* description to be used for diagnostic purposes */
+#if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
     const char* host; /* expected host name in cert, for diagnostic purposes */
-    /* Since OpenSSL 3.0, the host part could be replaced by using X509_VERIFY_PARAM_get0_host() */
+#endif
     CONN_load_crl_cb_t crl_cb;
     OPTIONAL void* crl_cb_arg;
     revstatus_access cdps;
@@ -80,7 +81,9 @@ static void STORE_EX_free(ossl_unused X509_STORE* ts, STORE_EX* ex_data, ossl_un
     if(0 not_eq ex_data)
     {
         OPENSSL_free((char*)ex_data->desc);
+#if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
         OPENSSL_free((char*)ex_data->host);
+#endif
         OPENSSL_free((char*)ex_data->cdps.urls);
         OPENSSL_free((char*)ex_data->ocsp.urls);
         OPENSSL_free(ex_data);
@@ -478,7 +481,10 @@ bool STORE_set1_host_ip(X509_STORE* ts, OPTIONAL const char* name, OPTIONAL cons
     X509_VERIFY_PARAM* ts_vpm = X509_STORE_get0_param(ts);
 
     /* first clear any host names, IP addresses, and email addresses */
-    if(not STORE_set1_host(ts, 0) or
+    if(
+#if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
+       not STORE_set1_host(ts, 0) or
+#endif
        0 is_eq X509_VERIFY_PARAM_set1_host(ts_vpm, 0, 0) or
        0 is_eq X509_VERIFY_PARAM_set1_ip(ts_vpm, 0, 0) or
        0 is_eq X509_VERIFY_PARAM_set1_email(ts_vpm, 0, 0))
@@ -515,15 +521,19 @@ bool STORE_set1_host_ip(X509_STORE* ts, OPTIONAL const char* name, OPTIONAL cons
     }
     if(name_str not_eq 0 and (ip_str is_eq 0 or (res is_eq false and strcmp(name, ip) is_eq 0)))
     {
-        /* Unfortunately, before OpenSSL 3.0, there was no API function for retrieving the
-           hostname/ip entries in X509_VERIFY_PARAM. So we store the host value
-           in ex_data for use in CREDENTIALS_print_cert_verify_cb(). */
         res = X509_VERIFY_PARAM_set1_host(ts_vpm, name_str, 0) not_eq 0;
+#if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
+        /*
+         * Before OpenSSL 3.0, there was no API function for retrieving the
+         * hostname/ip entries in X509_VERIFY_PARAM. So we store the host value
+         * in ex_data for use in CREDENTIALS_print_cert_verify_cb().
+         * Since OpenSSL 3.0, this is no more needed as X509_VERIFY_PARAM_get0_host() is available.
+         */
         if(res not_eq false)
         {
-            /* Since OpenSSL 3.0, this is no more needed due to X509_VERIFY_PARAM_get0_host() being available */
             res = STORE_set1_host(ts, name_str);
         }
+#endif
     }
     if(res is_eq false)
     {
@@ -833,6 +843,7 @@ X509_CRL *STORE_fetch_crl(const X509_STORE *ts, OPTIONAL const char *url, int ti
 /* Since OpenSSL 3.0, this is no more needed due to X509_VERIFY_PARAM_get0_host() being available */
 bool STORE_set1_host(X509_STORE* store, OPTIONAL const char* host)
 {
+#if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
     STORE_EX* ex_data = STORE_get_ex_data(store);
     if(ex_data is_eq 0)
     {
@@ -841,20 +852,29 @@ bool STORE_set1_host(X509_STORE* store, OPTIONAL const char* host)
     OPENSSL_free((char*)ex_data->host);
     ex_data->host = OPENSSL_strdup(host);
     return true;
+#else
+    /* prevent warnings on unused parameters: */
+    (void)store;
+    (void)host;
+    return true;
+#endif
 }
 
 const char *STORE_get0_host(const X509_STORE *store)
 {
+#if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
+    /*
+     * Before OpenSSL 3.0, there is no OpenSSL API function for retrieving the
+     * hostname/ip entries in X509_VERIFY_PARAM. So we use ts->ex_data.
+     * This works for names we set ourselves but not verify_hostname.
+     */
     const STORE_EX* ex_data = STORE_get_ex_data(store);
-    const char* host = ex_data not_eq 0 ? ex_data->host : 0;
-#if OPENSSL_VERSION_NUMBER >= OPENSSL_V_3_0_0
-    if (host is_eq 0)
-    {
-        X509_VERIFY_PARAM *vpm = X509_STORE_get0_param(store);
-        host = X509_VERIFY_PARAM_get0_host(vpm, 0 /* first hostname set in store vpm */);
-    }
+
+    return ex_data != NULL ? ex_data->host : NULL;
+#else
+     /* first hostname set in store vpm: */
+    return X509_VERIFY_PARAM_get0_host(X509_STORE_get0_param(store), 0);
 #endif
-    return host;
 }
 
 #ifndef SECUTILS_NO_TLS

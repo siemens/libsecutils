@@ -93,9 +93,6 @@ int CREDENTIALS_print_cert_verify_cb(int ok, X509_STORE_CTX* store_ctx)
                 break;
             case X509_V_ERR_HOSTNAME_MISMATCH:
             case X509_V_ERR_IP_ADDRESS_MISMATCH:
-                /* Unfortunately there is no OpenSSL API function for retrieving the
-                   hostname/ip entries in X509_VERIFY_PARAM. So we use ts->ex_data.
-                   This works for names we set ourselves but not verify_hostname. */
                 expected = STORE_get0_host(ts);
                 break;
             case X509_V_ERR_INVALID_PURPOSE:
