@@ -77,7 +77,7 @@ void CERTS_free(OPTIONAL STACK_OF(X509) *certs)
  * The NULL-DN may be given as "/" or "".
  */
 /* adapted from OpenSSL:apps/lib/apps.c */
-X509_NAME* UTIL_parse_name(const char* dn, long chtype, bool multirdn)
+X509_NAME* UTIL_parse_name(const char* dn, int chtype, bool multirdn)
 {
     size_t buflen = strlen(dn) + 1; /* to copy the types and values.
                                      * Due to escaping, the copy can only become shorter */
