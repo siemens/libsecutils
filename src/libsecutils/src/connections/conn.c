@@ -21,7 +21,39 @@
 # include <openssl/ssl.h>
 #endif
 
+/* for getaddrinfo() and freeaddrinfo() */
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#ifdef _WIN32
+# include <winsock2.h>
+# include <ws2tcpip.h>
+#endif
+
 #include <operators.h>
+
+bool CONN_is_IP_address(OPTIONAL const char *host)
+{
+    size_t len;
+    struct addrinfo hints, *res;
+    int ret;
+
+    if (host == NULL)
+        return false;
+
+    /* presume IPv6 address literal if host has the form "[<other-chars>]" */
+    len = strlen(host);
+    if (len > 2 && *host == '[' && strchr(host + 1, '[') == NULL
+            && strchr(host + 1, ']') == host + len - 1)
+        return true;
+
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_flags = AI_NUMERICHOST;
+    ret = getaddrinfo(host, NULL, &hints, &res);
+    if (res != NULL)
+        freeaddrinfo(res);
+    return ret == 0;
+}
 
 static const char* skip_scheme(const char* str)
 {
