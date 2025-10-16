@@ -48,10 +48,10 @@ also on a virtual machine or the Windows Subsystem for Linux ([WSL](https://docs
 and with MacOS.
 
 The following network and development tools are needed or recommended.
-* Git (for getting the software, tested versions include 2.7.2, 2.11.0, 2.20, 2.30.2, 2.39.2, 2.47.0)
-* CMake (for using [`CMakeLists.txt`](CMakeLists.txt), tested versions include 3.18.4, 3.26.3, 3.27.7, 3.30.5)
+* Git (for getting the software, tested versions include 2.7.2, 2.11.0, 2.20, 2.34.1, 2.48.0)
+* CMake (for using [`CMakeLists.txt`](CMakeLists.txt), tested versions include 3.18.4, 3.22.1, 3.27.7, 3.31.5)
 * GNU make (tested versions include 3.81, 4.1, 4.2.1, 4.3)
-* GNU C compiler (gcc, tested versions include 5.4.0, 7.3.0, 8.3.0, 10.0.1, 10.2.1, 12.2.0)
+* GNU C compiler (gcc, tested versions include 5.4.0, 7.3.0, 8.3.0, 10.2.1, 11.4.0, 12.2.0)
   or clang (tested versions include 14.0.3, 17.0.3, 19.1.1)
 
 The following OSS components are used.
