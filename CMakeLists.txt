@@ -28,7 +28,11 @@ if(NOT DEFINED OPENSSL_ROOT_DIR AND NOT "$ENV{OPENSSL_DIR}" STREQUAL "")
 endif()
 if(NOT DEFINED OPENSSL_FOUND) # not already done by superordinate module
   set(OPENSSL_VERSION "(unknown)")
-  set(OPENSSL_COMPONENTS COMPONENTS Crypto SSL) # TODO SSL should not be needed if SECUTILS_NO_TLS
+  if(${SECUTILS_NO_TLS})
+    set(OPENSSL_COMPONENTS COMPONENTS Crypto)
+  else()
+    set(OPENSSL_COMPONENTS COMPONENTS Crypto SSL)
+  endif()
   if(DEFINED OPENSSL_ROOT_DIR)
     find_package(OpenSSL HINTS "${OPENSSL_ROOT_DIR}" NO_DEFAULT_PATH ${OPENSSL_COMPONENTS})
   else()
