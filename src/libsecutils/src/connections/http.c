@@ -29,6 +29,10 @@
 # endif
 # include <openssl/ocsp.h>
 
+# if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
+#  define OSSL_HTTP_parse_url(url, s, u, h, p, n, path, q, f) OCSP_parse_url(url, h, p, path, s)
+# endif
+
 /* TODO replace this all by new API in http.h of OpenSSL 3.0 */
 
 static int REQ_CTX_i2d(OCSP_REQ_CTX* rctx, const char* content_type,
@@ -196,7 +200,7 @@ ASN1_VALUE* CONN_load_ASN1_http(const char* url, int req_timeout,
         LOG(FL_ERR, "null URL argument for downloading %s", desc);
         return 0;
     }
-    if(not OCSP_parse_url(url, &host, &port, &path, &use_ssl))
+    if(not OSSL_HTTP_parse_url(url, &use_ssl, NULL, &host, &port, NULL, &path, NULL, NULL))
     {
         LOG(FL_ERR, "cannot parse URL: '%s' for downloading %s", url, desc);
         goto err;
