@@ -31,9 +31,9 @@ jobs:
           #sudo apt-get install -y >/dev/null cmake # build-essential git libssl-dev
           mkdir build
           cd build
-          SECUTILS_NO_TLS=1 cmake -S .. -B .
+          SECUTILS_NO_TLS=1 cmake -S .. -B . # Release by default
           cmake --build .
-          SECUTILS_USE_ICV=1 cmake -DCMAKE_BUILD_TYPE=Release -S .. -B .
+          SECUTILS_USE_ICV=1 cmake -DCMAKE_BUILD_TYPE=Debug -S .. -B .
           make clean build
           DESTDIR=tmp make install uninstall
           make deb

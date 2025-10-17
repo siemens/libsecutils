@@ -8,13 +8,16 @@ message(STATUS "SecurityUtilities version ${security-utilities_VERSION}")
 
 # set(CMAKE_VERBOSE_MAKEFILE on)
 
-if(DEFINED ENV{NDEBUG})
-  message(STATUS "Setting build type to 'Release' because NDEBUG was set.")
+if(DEFINED ENV{NDEBUG} OR NOT CMAKE_BUILD_TYPE MATCHES Debug)
+  if(DEFINED ENV{NDEBUG})
+    message(STATUS "Setting build type to 'Release' because NDEBUG was set.")
+  elseif(NOT CMAKE_BUILD_TYPE)
+    message(STATUS "Setting build type to 'Release' by default.")
+  endif()
   set(CMAKE_BUILD_TYPE
     Release  # automatically leads to CFLAGS += -DNDEBUG -O3
     CACHE STRING "Choose the type of build." FORCE)
-elseif(NOT CMAKE_BUILD_TYPE)
-  message(STATUS "Setting build type to 'Debug' as none was specified.")
+else()
   set(CMAKE_BUILD_TYPE
     Debug  # automatically leads to CFLAGS += -g  # -O0 not added by default
     CACHE STRING "Choose the type of build." FORCE)
