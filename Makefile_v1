@@ -33,7 +33,7 @@ ifeq ($(OUT_DIR),)
      override OUT_DIR = .
 endif
 
-VERSION=2.0
+VERSION=2.1
 # must be kept in sync with debian/changelog and CMakeLists.txt
 # PACKAGENAME=libsecutils
 # DIRNAME=$(PACKAGENAME)-$(VERSION)

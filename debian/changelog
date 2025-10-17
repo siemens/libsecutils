@@ -1,3 +1,9 @@
+libsecutils (2.1) stable; urgency=medium
+
+  * Various fixes on build system, code, and OpenSSL version compatibility
+
+ -- David von Oheimb <David.von.Oheimb@siemens.com>  Fri, 17 Oct 2025 08:53:10 +0200
+
 libsecutils (2.0) stable; urgency=medium
 
   * Improved build system; various small fixes

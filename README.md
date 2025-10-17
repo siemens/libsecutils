@@ -178,7 +178,7 @@ With that directory, artifacts are placed in the usual subdirectories.
 
 ### Building Debian packages
 
-This repository can build the following Debian and source packages.
+On Linux, this repository can build the following Debian and source packages.
 
 * `libsecutils` -- the shared library
 * `libsecutils-dev` -- development headers and documentation
