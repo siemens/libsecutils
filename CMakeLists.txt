@@ -4,6 +4,10 @@ project(
   security-utilities
   VERSION 2.2.0 # always 3 components for correct versioning
   LANGUAGES C)
+set(CMAKE_PROJECT_DESCRIPTION "Wrapper library for OpenSSL providing utilities for credential storage, certificate validation including status checks, TLS helpers, and logging")
+set(CMAKE_PROJECT_HOMEPAGE_URL "https://github.com/siemens/libsecutils")
+set(pc_req_public "openssl")
+set(pc_req_private "")
 message(STATUS "SecurityUtilities version ${security-utilities_VERSION}")
 
 # set(CMAKE_VERBOSE_MAKEFILE on)
@@ -186,12 +190,11 @@ if(NOT TARGET uninstall)
     COMMAND rm -vfr "\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}" -empty | xargs -r rmdir
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake" -empty | xargs -r rmdir
+    COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/pkgconfig" -empty | xargs -r rmdir
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" -empty | xargs -r rmdir
     COMMAND rm -vfr "\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DOCDIR}"
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share/doc" -empty | xargs -r rmdir
-    COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share/pkgconfig" -empty | xargs -r rmdir
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share" -empty | xargs -r rmdir
-    COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}" -empty | xargs -r rmdir
   )
 endif()
 
