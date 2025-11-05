@@ -36,6 +36,7 @@ jobs:
           SECUTILS_USE_ICV=1 cmake -DCMAKE_BUILD_TYPE=Debug -S .. -B .
           make clean build
           DESTDIR=tmp make install uninstall
+          [[ -d tmp/usr/local ]] && (echo "uninstall incomplete"; false)
           make deb
 
   make-with-uta:
