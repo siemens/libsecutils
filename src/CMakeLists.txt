@@ -26,7 +26,11 @@ if(SECURITY_UTILITIES_USE_UTA)
 endif()
 
 add_subdirectory(libsecutils)
-
+configure_file(libsecutils.pc.in ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc @ONLY)
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig
+)
 if(SECURITY_UTILITIES_USE_ICV)
     add_subdirectory(util)
 endif()
