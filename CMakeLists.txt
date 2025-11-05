@@ -189,7 +189,9 @@ if(NOT TARGET uninstall)
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" -empty | xargs -r rmdir
     COMMAND rm -vfr "\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DOCDIR}"
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share/doc" -empty | xargs -r rmdir
+    COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share/pkgconfig" -empty | xargs -r rmdir
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share" -empty | xargs -r rmdir
+    COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}" -empty | xargs -r rmdir
   )
 endif()
 
@@ -249,7 +251,7 @@ if(DEFINED CPACK_PACKAGE_NAME)
 endif()
 
 SET(CPACK_PACKAGE_NAME libsecutils)
-SET(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/siemens/libsecutils")
+SET(CPACK_PACKAGE_HOMEPAGE_URL "${CMAKE_PROJECT_HOMEPAGE_URL}")
 SET(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/libsecutils.svg")
 SET(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt")

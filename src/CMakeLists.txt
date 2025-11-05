@@ -25,6 +25,13 @@ if(SECURITY_UTILITIES_USE_UTA)
     target_link_libraries(security-utilities_uta-api INTERFACE -luta)
 endif()
 
+configure_file(libsecutils.pc.in ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc @ONLY)
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+    COMPONENT security-utilities_library_Development
+)
+
 add_subdirectory(libsecutils)
 
 if(SECURITY_UTILITIES_USE_ICV)
