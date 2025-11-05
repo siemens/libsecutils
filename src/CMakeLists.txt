@@ -1,3 +1,5 @@
+include(GNUInstallDirs) # needed for CMAKE_INSTALL_LIBDIR; any CMAKE_INSTALL_PREFIX must be set before
+
 add_library(secutils_compilation_options INTERFACE)
 target_compile_options(secutils_compilation_options INTERFACE
     -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes
@@ -25,7 +27,7 @@ if(SECURITY_UTILITIES_USE_UTA)
     target_link_libraries(security-utilities_uta-api INTERFACE -luta)
 endif()
 
-configure_file(libsecutils.pc.in ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc @ONLY)
+configure_file(security-utilities.pc.in ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc @ONLY)
 install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
