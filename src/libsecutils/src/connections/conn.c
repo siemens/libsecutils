@@ -35,7 +35,7 @@
 bool CONN_is_IP_address(OPTIONAL const char *host)
 {
     size_t len;
-    struct addrinfo hints, *res;
+    struct addrinfo hints, *res = NULL;
     int ret;
 
     if (host == NULL)
@@ -50,7 +50,7 @@ bool CONN_is_IP_address(OPTIONAL const char *host)
     memset(&hints, 0, sizeof(hints));
     hints.ai_flags = AI_NUMERICHOST;
     ret = getaddrinfo(host, NULL, &hints, &res);
-    if (res != NULL)
+    if (ret == 0)
         freeaddrinfo(res);
     return ret == 0;
 }
