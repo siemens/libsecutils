@@ -111,6 +111,19 @@ void CERTS_free(OPTIONAL STACK_OF(X509) *certs);
 /* this function is used by the genCMPClient API implementation */
 X509_NAME* UTIL_parse_name(const char* dn, int chtype, bool multirdn);
 
+/*!*****************************************************************************
+ * @brief check if time frame (e.g., certificate validity period) is currently acceptable
+ *
+ * @param vpm verification parameters, or null, governing if and how to check cert times
+ * @param start begin of the period, or null
+ * @param end conclusion of the period, or null
+ * @return 0 if times should not be checked or reference time (which typically is the current time) is in range,
+ * otherwise 1 if it is past the end, or -1 if it is before the start.
+ * @note With OpenSSL before 4.0, invalid start and end times lead to not checking them.
+ *******************************************************************************/
+/* this function is used by the genCMPClient API implementation */
+int UTIL_cmp_timeframe(OPTIONAL const X509_VERIFY_PARAM *vpm,
+                       OPTIONAL const ASN1_TIME *start, OPTIONAL const ASN1_TIME *end);
 
 /*!*****************************************************************************
  * @brief log message about the given certificate, printing its subject
@@ -150,7 +163,7 @@ void CERTS_print(OPTIONAL const STACK_OF(X509) * certs, OPTIONAL BIO* bio);
 /*!*****************************************************************************
  * @brief check if certificate is within validity period, optionally check type
  *
- * @param src The source of the certificate, e.g., a URL or file name
+ * @param src the source of the certificate, e.g., a URL or file name
  * @param cert certificate to be be checked, or null for no checks
  * @param type_CA check for CA cert if 1 or EE if 0; no type check if < 0
  * @param vpm verification parameters, or null, governing if and how to check cert times,

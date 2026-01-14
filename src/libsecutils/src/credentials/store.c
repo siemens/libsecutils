@@ -546,26 +546,6 @@ bool STORE_set1_host_ip(X509_STORE* ts, OPTIONAL const char* name, OPTIONAL cons
 }
 
 
-static bool crl_expired(const X509_CRL* crl, const X509_VERIFY_PARAM* vpm)
-{
-    time_t check_time, *ptime = 0;
-    unsigned long flags = X509_VERIFY_PARAM_get_flags((X509_VERIFY_PARAM*)vpm);
-
-    if((flags bitand X509_V_FLAG_NO_CHECK_TIME) not_eq 0)
-    {
-        return false;
-    }
-    if((flags bitand X509_V_FLAG_USE_CHECK_TIME) not_eq 0)
-    {
-        check_time = X509_VERIFY_PARAM_get_time(vpm);
-        ptime = &check_time;
-    }
-    const ASN1_TIME* crl_endtime = X509_CRL_get0_nextUpdate(crl);
-    /* well, should ignore expiry of base CRL if delta CRL is valid */
-    return (crl_endtime not_eq 0 and X509_cmp_time(crl_endtime, ptime) < 0);
-}
-
-
 /* extended from add_crls_store() in OpenSSL:apps/s_cb.c */
 bool STORE_add_crls(X509_STORE* ts, OPTIONAL const STACK_OF(X509_CRL) * crls)
 {
@@ -580,7 +560,7 @@ bool STORE_add_crls(X509_STORE* ts, OPTIONAL const STACK_OF(X509_CRL) * crls)
     for(i = 0; i < sk_X509_CRL_num(crls); i++)
     {
         crl = sk_X509_CRL_value(crls, i);
-        if(crl_expired(crl, X509_STORE_get0_param(ts)) not_eq 0)
+        if (UTIL_cmp_timeframe(X509_STORE_get0_param(ts), NULL, X509_CRL_get0_nextUpdate(crl)) > 0)
         {
             char* issuer = X509_NAME_oneline(X509_CRL_get_issuer(crl), 0, 0);
             if(issuer not_eq 0)
