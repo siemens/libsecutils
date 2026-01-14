@@ -223,7 +223,7 @@ bool check_cert_revocation(X509_STORE_CTX* ctx, OPTIONAL OCSP_RESPONSE* resp)
         {
             X509_VERIFY_PARAM_clear_flags(param, X509_V_FLAG_NONFINAL_CHECK);
         }
-        ok = check_cert_crls(ctx, 0); /* try locally available CRLs */
+        ok = check_cert_crls(ctx, 0, "local trust store"); /* try locally available CRLs */
         if(ok >= 0 or final)
         {
             if(ok > 0)

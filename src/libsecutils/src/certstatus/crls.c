@@ -159,7 +159,7 @@ bool CRL_check(const char *src, OPTIONAL X509_CRL *crl, OPTIONAL const X509_VERI
 }
 
 /* like check_cert() of OpenSSL:crypto/x509/x509_vfy.c, may use extra CRLs */
-int check_cert_crls(X509_STORE_CTX* ctx, OPTIONAL STACK_OF(X509_CRL) * crls)
+int check_cert_crls(X509_STORE_CTX* ctx, OPTIONAL STACK_OF(X509_CRL) * crls, const char* src)
 {
     int res = -1;
     if(0 is_eq ctx)
@@ -338,7 +338,8 @@ static int try_cdp(X509_STORE_CTX* ctx, int timeout, const X509* cert,
     {
         return res;
     }
-    LOG(FL_TRACE, "successfully retrieved CRL, URL %s", url not_eq 0 ? url : "based on any info in cert");
+    const char* src = url not_eq 0 ? url : desc;
+    LOG(FL_TRACE, "successfully retrieved CRL from %s", src);
     UTIL_print_crl(bio_trace, crl);
 
     crls = sk_X509_CRL_new_null();
@@ -352,7 +353,7 @@ static int try_cdp(X509_STORE_CTX* ctx, int timeout, const X509* cert,
         if (sk_X509_CRL_push(crls, delta_crl) == 0)
             goto err;
     }
-    res = check_cert_crls(ctx, crls);
+    res = check_cert_crls(ctx, crls, src);
     if (delta_crl not_eq 0)
     {
         sk_X509_CRL_pop(crls); /* delta_crl */

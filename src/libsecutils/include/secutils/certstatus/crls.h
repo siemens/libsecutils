@@ -56,9 +56,10 @@ static const int CRL_DOWNLOAD_DEFAULT_TIMEOUT = 10; /* in seconds */
  *
  * @param ctx pointer to verification context structure including the cert to check
  * @param crls a list of CRLs that may be useful in addition to the local ones in ctx, or null
+ * @param src URL or other description of the CRL source
  * @return 1 on success, 0 on rejection (i.e., cert revoked), -1 on error
  */
-int check_cert_crls(X509_STORE_CTX* ctx, OPTIONAL STACK_OF(X509_CRL) * crls);
+int check_cert_crls(X509_STORE_CTX* ctx, OPTIONAL STACK_OF(X509_CRL) * crls, const char* src);
 
 #ifndef SEC_NO_CRL_DOWNLOAD
 
