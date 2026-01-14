@@ -38,6 +38,10 @@ _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 
 static file_format_t adjust_format(const char* * file, file_format_t format, bool engine_ok)
 {
+#ifdef OPENSSL_NO_ENGINE
+    (void)engine_ok; /* unused parameter */
+#endif
+
     if(strncasecmp(*file, CONN_http_prefix, strlen(CONN_http_prefix)) is_eq 0 or
        strncasecmp(*file, CONN_https_prefix, strlen(CONN_https_prefix)) is_eq 0)
     {
@@ -956,6 +960,7 @@ static EVP_PKEY* load_key_engine(const char* keyid, const char* pass, const char
     }
 #else
     LOG(FL_ERR, "crypto engines not supported in this build, request engine = '%s'", engine);
+    (void)keyid, (void)pass, (void)desc; /* unused parameters */
 #endif
     return pkey;
 }
