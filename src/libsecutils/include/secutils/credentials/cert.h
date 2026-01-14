@@ -150,7 +150,7 @@ void CERTS_print(OPTIONAL const STACK_OF(X509) * certs, OPTIONAL BIO* bio);
 /*!*****************************************************************************
  * @brief check if certificate is within validity period, optionally check type
  *
- * @param uri The source of the certificate, e.g., a URL or file name
+ * @param src The source of the certificate, e.g., a URL or file name
  * @param cert certificate to be be checked, or null for no checks
  * @param type_CA check for CA cert if 1 or EE if 0; no type check if < 0
  * @param vpm verification parameters, or null, governing if and how to check cert times,
@@ -158,14 +158,14 @@ void CERTS_print(OPTIONAL const STACK_OF(X509) * certs, OPTIONAL BIO* bio);
  * @return true if no cert given or cert validity period check passed
  * @note Check failures are logged as a warning if vpm is null, otherwise as an error.
  *******************************************************************************/
-bool CERT_check(const char *uri, OPTIONAL X509 *cert, int type_CA,
+bool CERT_check(const char *src, OPTIONAL X509 *cert, int type_CA,
                 OPTIONAL const X509_VERIFY_PARAM *vpm);
 
 
 /*!*****************************************************************************
  * @brief check if a cert list member is within validity period, optionally check type
  *
- * @param uri The source of the certificates, e.g., a URL or file name
+ * @param src The source of the certificates, e.g., a URL or file name
  * @param certs list of certificates to be be checked, or null for no checks
  * @param type_CA check for CA cert if 1 or EE if 0; no type check if < 0
  * @param vpm verification parameters, or null, governing if and how to check cert times,
@@ -173,7 +173,7 @@ bool CERT_check(const char *uri, OPTIONAL X509 *cert, int type_CA,
  * @return true if no certs given or validity period check passed for all certs
  * @note Check failures are logged as a warning if vpm is null, otherwise as an error.
  *******************************************************************************/
-bool CERT_check_all(const char *uri, OPTIONAL STACK_OF(X509) *certs, int type_CA,
+bool CERT_check_all(const char *src, OPTIONAL STACK_OF(X509) *certs, int type_CA,
                     OPTIONAL const X509_VERIFY_PARAM *vpm);
 
 
