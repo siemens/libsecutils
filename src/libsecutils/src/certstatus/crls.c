@@ -20,6 +20,7 @@
 #include <credentials/store.h>
 #include <credentials/verify.h>
 #include <connections/conn.h>
+#include <credentials/cert.h> /* for UTIL_cmp_timeframe() */
 
 #include <openssl/x509v3.h>
 #include <openssl/x509_vfy.h>
@@ -139,43 +140,22 @@ X509_CRL* CONN_load_crl_http(const char* url, int timeout,
 #endif
 }
 
-static void warn_crl(const X509_STORE_CTX* ctx, const X509_CRL * crl)
+bool CRL_check(const char *src, OPTIONAL X509_CRL *crl, OPTIONAL const X509_VERIFY_PARAM *vpm)
 {
-    if(0 is_eq ctx or 0 is_eq crl)
-    {
-        LOG(FL_ERR, "null argument");
-        return;
-    }
+    int res;
 
-    const X509_VERIFY_PARAM* vpm = X509_STORE_CTX_get0_param((X509_STORE_CTX*)ctx);
-    unsigned long flags = X509_VERIFY_PARAM_get_flags((X509_VERIFY_PARAM*)vpm);
-    if((flags bitand X509_V_FLAG_NO_CHECK_TIME) not_eq 0)
-    {
-        return;
-    }
-    time_t check_time, *ptime = 0;
-    if((flags bitand X509_V_FLAG_USE_CHECK_TIME) not_eq 0)
-    {
-        check_time = X509_VERIFY_PARAM_get_time(vpm);
-        ptime = &check_time;
-    }
-    const ASN1_TIME* crl_end_time = X509_CRL_get0_nextUpdate(crl);
-    const ASN1_TIME* crl_last_update = X509_CRL_get0_lastUpdate(crl);
-    char* issuer = X509_NAME_oneline(X509_CRL_get_issuer(crl), 0, 0);
-    if(issuer not_eq 0)
-    {
-        if(crl_end_time not_eq 0 and X509_cmp_time(crl_end_time, ptime) not_eq 1)
-        {
+    if (crl == NULL)
+        return true;
+    res = UTIL_cmp_timeframe(vpm, X509_CRL_get0_lastUpdate(crl), X509_CRL_get0_nextUpdate(crl));
+    if (res != 0) {
+        severity level = vpm == NULL ? LOG_WARNING : LOG_ERR;
+        char *issuer = X509_NAME_oneline(X509_CRL_get_issuer(crl), 0, 0);
 
-            LOG(FL_WARN, "CRL issued by %s is no more valid", issuer);
-        }
-        if(crl_last_update not_eq 0 and X509_cmp_time(crl_last_update, ptime) not_eq -1)
-        {
-
-            LOG(FL_WARN, "CRL issued by %s is not yet valid", issuer);
-        }
+        LOG(LOG_FUNC_FILE_LINE, level, "CRL from '%s' issued by '%s' %s",
+            src, issuer, res > 0 ? "has expired" : "is not yet valid");
         OPENSSL_free(issuer);
     }
+    return res == 0;
 }
 
 /* like check_cert() of OpenSSL:crypto/x509/x509_vfy.c, may use extra CRLs */
@@ -260,7 +240,7 @@ int check_cert_crls(X509_STORE_CTX* ctx, OPTIONAL STACK_OF(X509_CRL) * crls)
         while(sk_X509_CRL_num(tmp_crls) > 0)
         {
             crl = sk_X509_CRL_shift(tmp_crls);
-            warn_crl(ctx, crl);
+            (void)CRL_check(src, crl, X509_STORE_CTX_get0_param(ctx));
             X509_CRL_free(crl);
         }
         sk_X509_CRL_free(tmp_crls);

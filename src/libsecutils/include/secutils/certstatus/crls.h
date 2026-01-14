@@ -26,6 +26,18 @@
  *******************************************************************************/
 void UTIL_print_crl(OPTIONAL BIO* bio, OPTIONAL const X509_CRL* crl);
 
+/*!*****************************************************************************
+ * @brief check if CRL is within validity period
+ *
+ * @param src the source of the CRL, e.g., a URL or file name
+ * @param crl the CRL to be be checked, or null for no checks
+ * @param vpm verification parameters, or null, governing if and how to check CRL times,
+ * depending on X509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
+ * @return true if no CRL given or CRL validity period check passed
+ * @note check failures are logged as a warning if vpm is null, otherwise as an error.
+ *******************************************************************************/
+bool CRL_check(const char *src, OPTIONAL X509_CRL *crl, OPTIONAL const X509_VERIFY_PARAM *vpm);
+
 /*!
  * @brief retrieve CRL in DER format (ASN.1) from given CRL distribution point
  *
