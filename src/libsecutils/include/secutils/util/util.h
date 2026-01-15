@@ -48,6 +48,7 @@ static const int UTIL_max_name_len = 128;  /*!< max length of file name */
 # define OPENSSL_V_1_1_0 0x10100000L
 # define OPENSSL_V_1_1_1 0x10101000L
 # define OPENSSL_V_3_0_0 0x30000000L
+# define OPENSSL_V_4_0_0 0x40000000L
 
 # ifndef OpenSSL_version_num
 #  if OPENSSL_VERSION_NUMBER < 0x10100000L

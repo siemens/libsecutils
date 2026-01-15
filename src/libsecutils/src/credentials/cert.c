@@ -241,7 +241,7 @@ int UTIL_cmp_timeframe(OPTIONAL const X509_VERIFY_PARAM *vpm,
             return -1;
     }
     return 0;
-#elif OPENSSL_VERSION_NUMBER < 0x40000000L
+#elif OPENSSL_VERSION_NUMBER < OPENSSL_V_4_0_0
     return X509_cmp_timeframe(vpm, start, end);
 #else
     X509 *dummy_cert = X509_new(); /* needed as a workaround for OpenSSL API restriction */
@@ -281,7 +281,7 @@ void CERT_print(OPTIONAL const X509* cert, OPTIONAL BIO* bio, unsigned long neg_
             X509_print_ex(bio, (X509*)cert, flags, compl X509_FLAG_NO_ISSUER);
         }
         X509_print_ex(bio, (X509*)cert, flags, compl(X509_FLAG_NO_SERIAL bitor X509_FLAG_NO_VALIDITY));
-#if OPENSSL_VERSION_NUMBER < 0x40000000L
+#if OPENSSL_VERSION_NUMBER < OPENSSL_V_4_0_0
         if(X509_cmp_current_time(X509_get0_notBefore(cert)) > 0)
         {
             BIO_printf(bio, "        not yet valid\n");
