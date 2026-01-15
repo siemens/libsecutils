@@ -114,10 +114,12 @@ X509_NAME* UTIL_parse_name(const char* dn, int chtype, bool multirdn);
 /*!*****************************************************************************
  * @brief check if time frame (e.g., certificate validity period) is currently acceptable
  *
- * @param vpm verification parameters, or null, governing if and how to check cert times
+ * @param vpm verification parameters, or null, governing if and how to check cert times,
+ * depending on X509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
  * @param start begin of the period, or null
  * @param end conclusion of the period, or null
- * @return 0 if times should not be checked or reference time (which typically is the current time) is in range,
+ * @return 0 if times should not be checked according to vpm or the reference time
+ * (which is the current time unless vpm gives a different one) is in range,
  * otherwise 1 if it is past the end, or -1 if it is before the start.
  * @note With OpenSSL before 4.0, invalid start and end times lead to not checking them.
  *******************************************************************************/
