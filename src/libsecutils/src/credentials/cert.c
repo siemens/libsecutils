@@ -216,15 +216,39 @@ error:
     return n;
 }
 
+#if OPENSSL_VERSION_NUMBER >= OPENSSL_V_4_0_0
+#include <openssl/posix_time.h> /* for OPENSSL_tm_to_posix() */
+
+static int ASN1_TIME_to_posix(const ASN1_TIME *ctm, int64_t *out_time)
+{
+    struct tm stm;
+
+    return ASN1_TIME_to_tm(ctm, &stm)
+        && OPENSSL_tm_to_posix(&stm, out_time);
+}
+
+/* Like OpenSSL X509_cmp_time(), returns 0 on error, otherwise 1 if ctm > cmp_time, else -1 */
+static int X509_cmp_time_new(const ASN1_TIME *ctm, time_t *cmp_time)
+{
+    int64_t posix_time, ref_time = cmp_time == NULL ? (int64_t)time(NULL) : (int64_t)*cmp_time;
+
+    if (!ASN1_TIME_to_posix(ctm, &posix_time))
+        return 0;
+
+    return posix_time > ref_time ? 1 : -1; /* for compat with X509_cmp_time(), do not return 0 if equal */
+}
+#define X509_cmp_time X509_cmp_time_new
+#endif
+
 /*
  * Return 0 if time should not be checked or reference time is in range,
- * otherwise 1 if it is past the end, or -1 if it is before the start.
- * With OpenSSL before 4.0, invalid start and end times leads to not checking them.
+ * otherwise 1 if it is past or equal to the end, or -1 if it is before the start.
+ * If any of the start or end time is null or invalid it is not checked.
+ * This function is a workaround for deprecation of X509_cmp_timeframe() in OpenSSL 4.0.
  */
 int UTIL_cmp_timeframe(OPTIONAL const X509_VERIFY_PARAM *vpm,
                        OPTIONAL const ASN1_TIME *start, OPTIONAL const ASN1_TIME *end)
 {
-#if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
     unsigned long flags = vpm == NULL ? 0 : X509_VERIFY_PARAM_get_flags((X509_VERIFY_PARAM *)vpm);
     time_t ref_time;
     time_t *time = NULL;
@@ -241,22 +265,8 @@ int UTIL_cmp_timeframe(OPTIONAL const X509_VERIFY_PARAM *vpm,
             return -1;
     }
     return 0;
-#elif OPENSSL_VERSION_NUMBER < OPENSSL_V_4_0_0
-    return X509_cmp_timeframe(vpm, start, end);
-#else
-    X509 *dummy_cert = X509_new(); /* needed as a workaround for OpenSSL API restriction */
-    int res = 1, error = X509_V_OK;
-
-    if (dummy_cert != NULL) {
-        (void)X509_set1_notBefore(dummy_cert, start);
-        (void)X509_set1_notAfter(dummy_cert, end);
-        res = X509_check_certificate_times(vpm, dummy_cert, &error);
-        X509_free(dummy_cert);
-    }
-    return res == 1 ? 0 : error == X509_V_ERR_CERT_NOT_YET_VALID ? -1:
-        error == X509_V_ERR_CERT_HAS_EXPIRED ? 1 : 0;
-#endif
 }
+#undef X509_cmp_time
 
 
 void CERT_print(OPTIONAL const X509* cert, OPTIONAL BIO* bio, unsigned long neg_cflags)

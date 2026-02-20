@@ -120,8 +120,9 @@ X509_NAME* UTIL_parse_name(const char* dn, int chtype, bool multirdn);
  * @param end conclusion of the period, or null
  * @return 0 if times should not be checked according to vpm or the reference time
  * (which is the current time unless vpm gives a different one) is in range,
- * otherwise 1 if it is past the end, or -1 if it is before the start.
- * @note With OpenSSL before 4.0, invalid start and end times lead to not checking them.
+ * otherwise 1 if it is past or equal to the end, or -1 if it is before the start.
+ * @note If any of the start or end time is null or invalid it is not checked.
+ * @note This function is a workaround for deprecation of X509_cmp_timeframe() in OpenSSL 4.0.
  *******************************************************************************/
 /* this function is used by the genCMPClient API implementation */
 int UTIL_cmp_timeframe(OPTIONAL const X509_VERIFY_PARAM *vpm,
