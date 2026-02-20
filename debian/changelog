@@ -1,3 +1,9 @@
+libsecutils (2.2) stable; urgency=medium
+
+  * add UTIL_cmp_timeframe() and CRL_check() for support of upcoming OpenSSL 4.0
+
+ -- David von Oheimb <David.von.Oheimb@siemens.com>  Fri, 20 Feb 2026 12:40:40 +0100
+
 libsecutils (2.1) stable; urgency=medium
 
   * Various fixes on build system, code, and OpenSSL version compatibility
