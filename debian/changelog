@@ -1,3 +1,17 @@
+libsecutils (2.3) stable; urgency=medium
+
+    * TODO: complete this and update date below
+    * extend KEY_new() to support ML-DSA-* and potentially further PQC algorithms
+    * add KEY_new_ex() for improved provider support
+    * improve STORE_set1_host_ip() behavior on equal 'name' and 'ip' argument
+    * CREDENTIALS_print_cert_verify_cb(): fix output of expected IP address on mismatch
+    * improve CONN_IS_HTTP(S) and use it to replace respective occurrences of strncasecmp()
+    * credentials.c: fix potential crash of find_update_cb() on NULL tag/description strings
+    * crl_mgmt.c,cdp_util.{c,h}: fix constness for OpenSSL 4.0 compatibility
+    * basic.h: fix compatibility with C23, which provides 'true' and 'false' as keywords
+
+ -- David von Oheimb <David.von.Oheimb@siemens.com>  Fri, 15 May 2026 16:12:48 +0200
+
 libsecutils (2.2) stable; urgency=medium
 
   * add UTIL_cmp_timeframe() and CRL_check() for support of upcoming OpenSSL 4.0

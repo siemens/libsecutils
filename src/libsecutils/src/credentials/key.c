@@ -16,63 +16,114 @@
 #include <openssl/bn.h>
 #include <openssl/ec.h>
 #include <openssl/rsa.h>
-
+#include <errno.h>
+#include <stdlib.h> /* for strtoul() */
+#include <ctype.h> /* for isspace() */
+#include <limits.h> /* for UINT_MAX */
 #include <credentials/key.h>
 #include <util/log.h>
 
 #include <operators.h>
 
-EVP_PKEY* KEY_new(const char* spec)
+
+EVP_PKEY *KEY_new(const char *spec)
+{
+    return KEY_new_ex(spec, NULL, NULL);
+}
+
+EVP_PKEY *KEY_new_ex(const char *spec, OPTIONAL OSSL_LIB_CTX *libctx, OPTIONAL const char *propq)
 {
     if(0 is_eq spec)
     {
         LOG(FL_ERR, "null pointer argument");
-        return 0;
+        return NULL;
     }
-#if OPENSSL_VERSION_NUMBER < 0x10100000L
+#if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
+    if (libctx != NULL) {
+        LOG(FL_ERR, "libctx not supported by OpenSSL < 3.0");
+        return NULL;
+    }
+    if (propq != NULL) {
+        LOG(FL_ERR, "provider property query not supported by OpenSSL < 3.0");
+        return NULL;
+    }
+#endif
 
+    EVP_PKEY *pkey = NULL;
+    int type = EVP_PKEY_NONE;
+    const char *name = spec;
+    int nbits = 0, nid = 0;
+
+    if (CHECK_AND_SKIP_CASE_PREFIX(spec, SECUTILS_RSA_STR)) {
+        type = EVP_PKEY_RSA;
+        name = SECUTILS_RSA_STR;
+    } else if ('0' <= *spec && *spec <= '9') {
+        type = EVP_PKEY_RSA;
+        name = SECUTILS_RSA_STR;
+    } else if (CHECK_AND_SKIP_CASE_PREFIX(spec, SECUTILS_EC_STR)
+               && *spec != '\0' && strchr(" -_:", *spec) != NULL) {
+        type = EVP_PKEY_EC;
+        name = SECUTILS_EC_STR;
+    } else {
+        spec = name;
+
+        /* Backward compatibility: treat bare EC curve names as EC parameters. */
+         int curve_nid = OBJ_sn2nid(spec);
+         if (curve_nid == 0)
+             curve_nid = EC_curve_nist2nid(spec);
+         if (curve_nid != 0) {
+             type = EVP_PKEY_EC;
+             name = SECUTILS_EC_STR;
+         }
+#if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_5_0
+         else {
+             /* For OpenSSL < 3.5, treat everything else as an EC curve name. */
+             type = EVP_PKEY_EC;
+             name = SECUTILS_EC_STR;
+         }
+#endif
+    }
+    if (type != EVP_PKEY_NONE && *spec != '\0' && strchr(" -_:", *spec) != NULL) {
+        spec++;
+    }
+    if (type == EVP_PKEY_RSA) { /* take spec as RSA key length */
+        nbits = UTIL_atoint(spec);
+        if (nbits < 1024 || 8192 < nbits)
+        {
+            LOG(FL_ERR, "bad RSA key length specification '%.40s'; must be integer between 1024 and 8192", spec);
+            return NULL;
+        }
+    } else if (type == EVP_PKEY_EC) { /* take spec as ECC curve name */
+        if (strcmp(spec, "secp192r1") == 0) {
+            LOG(FL_INFO, "using EC curve name prime192v1 instead of secp192r1");
+            nid = NID_X9_62_prime192v1;
+        } else if(strcmp(spec, "secp256r1") == 0) {
+            LOG(FL_INFO, "using EC curve name prime256v1 instead of secp256r1");
+            nid = NID_X9_62_prime256v1;
+        } else {
+            nid = OBJ_sn2nid(spec);
+        }
+        if (nid == 0) {
+            nid = EC_curve_nist2nid(spec);
+        }
+        if (nid == 0)
+        {
+            LOG(FL_ERR, "unknown EC curve name %.40s", spec);
+            return NULL;
+        }
+    }
+
+#if OPENSSL_VERSION_NUMBER < 0x10100000L
+    (void)name;
     BIGNUM* bn = 0;
     RSA* rsa_key = 0;
-    EVP_PKEY* pkey = EVP_PKEY_new();
+    pkey = EVP_PKEY_new();
     if(0 is_eq pkey)
     {
         goto oom;
     }
 
-    int type = EVP_PKEY_NONE;
-    const char* const RSA_STR = "RSA";
-    const char* const EC_STR = "EC";
-    if(0 is_eq strncasecmp(spec, RSA_STR, strlen(RSA_STR)))
-    {
-        spec += strlen(RSA_STR);
-        type = EVP_PKEY_RSA;
-    }
-    else if(0 is_eq strncasecmp(spec, EC_STR, strlen(EC_STR)))
-    {
-        spec += strlen(EC_STR);
-        type = EVP_PKEY_EC;
-    }
-    if(type is_eq EVP_PKEY_NONE)
-    {
-        type = ('0' <= spec[0] and spec[0] <= '9') ? EVP_PKEY_RSA : EVP_PKEY_EC;
-    }
-    else
-    {
-        if(strchr(" -_:", spec[0]) not_eq 0)
-        {
-            spec++;
-        }
-    }
-
-    if(type is_eq EVP_PKEY_RSA)
-    { /* take spec as RSA key length */
-        int nbits = UTIL_atoint(spec);
-        if(nbits < 1024 or 8192 < nbits)
-        {
-            LOG(FL_ERR, "bad RSA key length specification '%.40s'; must be integer between 1024 and 8192", spec);
-            goto err;
-        }
-
+    if (type == EVP_PKEY_RSA) {
         bn = BN_new();
         rsa_key = RSA_new();
         if(0 is_eq bn or 0 is_eq rsa_key)
@@ -96,32 +147,7 @@ EVP_PKEY* KEY_new(const char* spec)
         goto end;
     }
     else
-    { /* take spec as ECC curve name */
-        int nid = 0;
-        if(0 is_eq strcmp(spec, "secp192r1"))
-        {
-            LOG(FL_INFO, "using EC curve name prime192v1 instead of secp192r1");
-            nid = NID_X9_62_prime192v1;
-        }
-        else if(0 is_eq strcmp(spec, "secp256r1"))
-        {
-            LOG(FL_INFO, "using EC curve name prime256v1 instead of secp256r1");
-            nid = NID_X9_62_prime256v1;
-        }
-        else
-        {
-            nid = OBJ_sn2nid(spec);
-        }
-        if(nid is_eq 0)
-        {
-            nid = EC_curve_nist2nid(spec);
-        }
-        if(0 is_eq nid)
-        {
-            LOG(FL_ERR, "unknown EC curve name '%.40s'", spec);
-            goto err;
-        }
-
+    { /* take spec as ECC curve name, even if no "EC:" prefix given */
         EC_KEY* ec_key = EC_KEY_new_by_curve_name(nid);
         if(0 is_eq ec_key)
         {
@@ -160,51 +186,47 @@ EVP_PKEY* KEY_new(const char* spec)
     BN_free(bn);
     return pkey;
 
-#else /* OPENSSL_VERSION_NUMBER < 0x10100000L */
-
-    EVP_PKEY* pkey = 0;
-    int type = EVP_PKEY_NONE;
-    const char* const RSA_STR = "RSA";
-    const char* const EC_STR = "EC";
-    if(0 is_eq strncasecmp(spec, RSA_STR, strlen(RSA_STR)))
-    {
-        spec += strlen(RSA_STR);
-        type = EVP_PKEY_RSA;
+#elif OPENSSL_VERSION_NUMBER >= OPENSSL_V_3_0_0
+    EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new_from_name(libctx, name, propq);
+    if (ctx == NULL) {
+        LOG(FL_ERR, "failed to create key generation context for %.40s (propq=%.100s); algorithm may be unknown or required provider may be unavailable",
+            name, propq != NULL ? propq : "(null)");
+        goto end;
     }
-    else if(0 is_eq strncasecmp(spec, EC_STR, strlen(EC_STR)))
-    {
-        spec += strlen(EC_STR);
-        type = EVP_PKEY_EC;
-    }
-    if(type is_eq EVP_PKEY_NONE)
-    {
-        type = ('0' <= spec[0] and spec[0] <= '9') ? EVP_PKEY_RSA : EVP_PKEY_EC;
-    }
-    else
-    {
-        if(strchr(" -_:", spec[0]) not_eq 0)
-        {
-            spec++;
-        }
+    if (EVP_PKEY_keygen_init(ctx) <= 0) {
+        LOG(FL_ERR, "failed to prepare generating %.40s key pair (propq=%.100s)",
+            name, propq != NULL ? propq : "(null)");
+        goto end;
     }
 
-    if(type is_eq EVP_PKEY_RSA)
-    { /* take spec as RSA key length */
-        int nbits = UTIL_atoint(spec);
-        if(nbits < 1024 or 8192 < nbits)
-        {
-            LOG(FL_ERR, "bad RSA key length specification '%.40s'; must be integer between 1024 and 8192", spec);
-            goto err;
+    if (type == EVP_PKEY_RSA) {
+        if (EVP_PKEY_CTX_set_rsa_keygen_bits(ctx, nbits) <= 0) {
+            LOG(FL_ERR, "Failed to set %d RSA bits", nbits);
+            goto end;
         }
+    } else if (type == EVP_PKEY_EC) {
+        if (EVP_PKEY_CTX_set_ec_paramgen_curve_nid(ctx, nid) <= 0) {
+            LOG(FL_ERR, "Failed to set EC curve nid = %d for %.40s", nid, spec);
+            goto end;
+        }
+    } else {
+        /* With OpenSSL >= 3.5; attempting to use full name/spec by itself, which may be sufficient, e.g., "ML-DSA-65" */
+    }
 
-#if OPENSSL_VERSION_NUMBER >= OPENSSL_V_3_0_0
-        pkey = EVP_RSA_gen(nbits); // This may depend on the availability of a suitable OpenSSL provider.
-        if (pkey == NULL) {
-            LOG(FL_ERR, "cannot generate RSA key with length %d", nbits);
-            goto err;
-        }
-        return pkey;
-#else
+    if (EVP_PKEY_keygen(ctx, &pkey) <= 0) {
+        LOG(FL_ERR, "failed generating %.40s key pair", name);
+        pkey = NULL;
+    }
+
+ end:
+    EVP_PKEY_CTX_free(ctx);
+    if (pkey == NULL)
+        (void)ERR_print_errors(bio_err);
+    return pkey;
+
+#else /* 0x10100000L <= OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0 */
+    (void)name;
+    if (type == EVP_PKEY_RSA) {
         BIGNUM* bn = BN_new();
         RSA* rsa_key = RSA_new();
         pkey = EVP_PKEY_new();
@@ -233,43 +255,7 @@ EVP_PKEY* KEY_new(const char* spec)
         RSA_free(rsa_key);
         BN_free(bn);
         goto err;
-#endif
-    }
-    else
-    { /* take spec as ECC curve name */
-        int nid = 0;
-        if(0 is_eq strcmp(spec, "secp192r1"))
-        {
-            LOG(FL_INFO, "using EC curve name prime192v1 instead of secp192r1");
-            nid = NID_X9_62_prime192v1;
-        }
-        else if(0 is_eq strcmp(spec, "secp256r1"))
-        {
-            LOG(FL_INFO, "using EC curve name prime256v1 instead of secp256r1");
-            nid = NID_X9_62_prime256v1;
-        }
-        else
-        {
-            nid = OBJ_sn2nid(spec);
-        }
-        if(nid is_eq 0)
-        {
-            nid = EC_curve_nist2nid(spec);
-        }
-        if(0 is_eq nid)
-        {
-            LOG(FL_ERR, "unknown EC curve name %.40s", spec);
-            goto err;
-        }
-
-#if OPENSSL_VERSION_NUMBER >= OPENSSL_V_3_0_0
-        pkey = EVP_EC_gen(OSSL_EC_curve_nid2name(nid)); // This may depend on the availability of a suitable OpenSSL provider.
-        if (pkey == NULL) {
-            LOG(FL_ERR, "cannot generate EC key with curve name %.40s", spec);
-            goto err;
-        }
-        return pkey;
-#else
+    } else { /* taking spec as ECC curve name, even if no "EC:" prefix given */
         EC_KEY* ec_key = EC_KEY_new_by_curve_name(nid);
         if(0 is_eq ec_key)
         {
@@ -303,13 +289,12 @@ EVP_PKEY* KEY_new(const char* spec)
 
     ec_err:
         EC_KEY_free(ec_key);
-#endif
     }
 
  err:
     EVP_PKEY_free(pkey);
     (void)ERR_print_errors(bio_err);
-    return 0;
+    return NULL;
 #endif /* OPENSSL_VERSION_NUMBER < 0x10100000L */
 }
 
