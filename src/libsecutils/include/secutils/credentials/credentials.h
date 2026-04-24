@@ -190,19 +190,20 @@ CREDENTIALS* CREDENTIALS_load_dv(OPTIONAL const char* certs, OPTIONAL const char
 
 
 /*!*****************************************************************************
- * @brief save asymmetric credentials (except key held in crypto engine) to the given file(s)
+ * @brief save asymmetric credentials (except key held in crypto engine or provider) to the given file(s)
  * @note If used, encryption indirectly also protects integrity&authenticity of file-based storage.
  *
  * @param creds pointer to the credential structure to save
  * @param certs name of file to store certificates, or null. Any previous contents are overwritten.
- * @param key name of file to store the private key unless the 'source' parameter
- *  refers to an engine (where this parameter may be null). Any previous file contents are overwritten.
+ * @param key name of file to store the private key unless
+ *   the 'source' parameter refers to an engine (where the 'key' parameter may be null).
  * @param source if this parameter is null or of the form "pass:PWD" then the key
  *   is stored to the given key. If present, PWD is taken as password to be
  *   used for key encryption. If the 'source' parameter is of the form "engine:<id>"
  *   the key is not stored because this does not apply for the engine interface.
  * @param desc (optional) is used if present for forming more descriptive error messages
  * @return true on success, else failure
+ * @note Any previous file contents are overwritten.
  * @note If the 'certs' and 'key' arguments are equal and the file name extension is ".p12" or ".pkcs12",
  * the certs and the key are written jointly to the same PKCS#12 file.
  * Otherwise they are written in PEM format, potentially jointly to the same file.

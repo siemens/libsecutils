@@ -20,6 +20,7 @@
 #include <openssl/engine.h>
 
 #include <credentials/cert.h>
+#include <credentials/key.h>
 #include <credentials/store.h>
 #include <credentials/verify.h>
 #include <storage/files.h>
@@ -309,9 +310,11 @@ static struct update_cb_node update_cb_head /*!< this struct variable is shared 
 
 /* find node just before the one related to the given tag assuming mutex */
 /*! @todo does not work if callers use different secutils instances */
-static update_cb_node* find_update_cb(const char* tag)
+static update_cb_node* find_update_cb(OPTIONAL const char* tag)
 {
     update_cb_node* prev = &update_cb_head;
+    if (tag == NULL)
+        tag = "";
     while (prev->next != NULL && strcmp(prev->next->tag == NULL ? "" : prev->next->tag, tag) != 0)
         prev = prev->next;
     return prev;
@@ -322,32 +325,34 @@ bool CREDENTIALS_save(const CREDENTIALS* creds, OPTIONAL const char* certs, OPTI
                       OPTIONAL const char* source, OPTIONAL const char* desc)
 {
     EVP_PKEY* pkey = 0;
+    update_cb_node *prev = NULL;
 
     if(creds is_eq 0 or (certs is_eq 0 and key is_eq 0))
     {
         LOG_err("null pointer argument");
         return false;
     }
-    if(source is_eq 0 or strncmp(source, sec_ENGINE_STR, strlen(sec_ENGINE_STR)) not_eq 0)
-    {
-        pkey = creds->pkey;
-    } else {
+    if (source != NULL && strncmp(source, sec_ENGINE_STR, strlen(sec_ENGINE_STR)) == 0) {
         /* source refers to engine, so cannot save private key */
-        source = 0;
+        key = NULL;
+        source = NULL;
+    } else {
+        pkey = creds->pkey;
     }
 
-    file_format_t format = key not_eq 0 and strcmp(key, certs) is_eq 0 ? FILES_get_format(key) : FORMAT_PEM;
+    file_format_t format = key != NULL && certs != NULL && strcmp(key, certs) == 0 ? FILES_get_format(key) : FORMAT_PEM;
     bool res = FILES_store_credentials(pkey, creds->cert, creds->chain, key, certs, format, source, desc);
     if(0 is_eq res)
     {
-        LOG(FL_ERR, "Could not save %s to %s and %s", desc not_eq 0 ? desc : "credentials", certs, key);
+        LOG(FL_ERR, "Could not save %s to %s and %s", desc != NULL ? desc : "credentials",
+            certs != NULL ? certs : "(none)", key != NULL ? key : "(none)");
         return false;
     }
 
     if (desc == NULL)
         desc = "";
     /*! @todo make thread safe, e.g., by using some mutex on update_cb_head */
-    update_cb_node* prev = find_update_cb(desc /* tag */);
+    prev = find_update_cb(desc /* tag */);
     if(prev->next not_eq 0)
     {
         (*prev->next->fn)(desc /* tag */);
