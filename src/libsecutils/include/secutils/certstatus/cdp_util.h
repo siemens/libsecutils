@@ -43,7 +43,7 @@ typedef int CDP_REASON_FLAGS;
 
 /* Copy a one-line representation of the X509_NAME into the buffer */
 bool CDP_get_x509_name(
-    X509_NAME       *name,
+    const X509_NAME *name,
     char            *name_utf8_buf,
     size_t          name_utf8_buf_len,
     unsigned long   flags

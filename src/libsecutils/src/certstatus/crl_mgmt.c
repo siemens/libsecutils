@@ -143,8 +143,8 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
 
         int nextPublishIdx = X509_CRL_get_ext_by_NID(crl, NID_crl_next_publish, 0);
         if (nextPublishIdx >= 0) {
-            X509_EXTENSION *ex = X509_CRL_get_ext(crl, nextPublishIdx);
-            ASN1_OCTET_STRING *data = X509_EXTENSION_get_data(ex);
+            const X509_EXTENSION *ex = X509_CRL_get_ext(crl, nextPublishIdx);
+            const ASN1_OCTET_STRING *data = X509_EXTENSION_get_data(ex);
             if (B_ASN1_T61STRING == ASN1_STRING_type(data)) {
 #if OPENSSL_VERSION_NUMBER < 0x10101000L
                 LOG(FL_ERR, "CRL nextPublish extension is present, but ASN1_TIME_set_string_X509 is not supported for OpenSSL version <1.1, sorry");
