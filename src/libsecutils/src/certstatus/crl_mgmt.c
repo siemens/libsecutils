@@ -143,7 +143,10 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
 
         int nextPublishIdx = X509_CRL_get_ext_by_NID(crl, NID_crl_next_publish, 0);
         if (nextPublishIdx >= 0) {
-            const X509_EXTENSION *ex = X509_CRL_get_ext(crl, nextPublishIdx);
+#if OPENSSL_VERSION_NUMBER >= OPENSSL_V_4_0_0
+            const
+#endif
+            X509_EXTENSION *ex = X509_CRL_get_ext(crl, nextPublishIdx);
             const ASN1_OCTET_STRING *data = X509_EXTENSION_get_data(ex);
             if (B_ASN1_T61STRING == ASN1_STRING_type(data)) {
 #if OPENSSL_VERSION_NUMBER < 0x10101000L
