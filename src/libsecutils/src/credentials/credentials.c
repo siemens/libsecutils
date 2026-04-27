@@ -312,10 +312,8 @@ static struct update_cb_node update_cb_head /*!< this struct variable is shared 
 static update_cb_node* find_update_cb(const char* tag)
 {
     update_cb_node* prev = &update_cb_head;
-    while(prev->next not_eq 0 and strcmp(prev->next->tag, tag) not_eq 0)
-    {
+    while (prev->next != NULL && strcmp(prev->next->tag == NULL ? "" : prev->next->tag, tag) != 0)
         prev = prev->next;
-    }
     return prev;
 }
 
@@ -346,6 +344,8 @@ bool CREDENTIALS_save(const CREDENTIALS* creds, OPTIONAL const char* certs, OPTI
         return false;
     }
 
+    if (desc == NULL)
+        desc = "";
     /*! @todo make thread safe, e.g., by using some mutex on update_cb_head */
     update_cb_node* prev = find_update_cb(desc /* tag */);
     if(prev->next not_eq 0)
