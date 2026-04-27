@@ -17,7 +17,7 @@
 #include <certstatus/certstatus.h>
 
 bool CDP_get_x509_name(
-    X509_NAME       *name,
+    const X509_NAME *name,
     char            *name_utf8_buf,
     size_t          name_utf8_buf_len,
     unsigned long   flags)
