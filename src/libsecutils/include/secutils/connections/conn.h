@@ -16,14 +16,22 @@
 #ifndef SECUTILS_CONN_H_
 # define SECUTILS_CONN_H_
 
-# include "../basic.h"
+# include "../util/util.h"
 
+# if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
+#  undef  OSSL_HTTP_PREFIX
+#  define OSSL_HTTP_PREFIX "http://"
+#  undef  OSSL_HTTPS_PREFIX
+#  define OSSL_HTTPS_PREFIX "https://"
+# else
+#  include <openssl/http.h>
+# endif
 static const char* const CONN_scheme_postfix = "://";
-static const char* const CONN_http_prefix = "http://";
-static const char* const CONN_https_prefix = "https://";
+static const char* const CONN_http_prefix = OSSL_HTTP_PREFIX;
+static const char* const CONN_https_prefix = OSSL_HTTPS_PREFIX;
 
-#define CONN_IS_HTTP( uri) ((uri) != NULL && HAS_PREFIX(uri, OSSL_HTTP_PREFIX ))
-#define CONN_IS_HTTPS(uri) ((uri) != NULL && HAS_PREFIX(uri, OSSL_HTTPS_PREFIX))
+#define CONN_IS_HTTP( uri) ((uri) != NULL && HAS_CASE_PREFIX(uri, OSSL_HTTP_PREFIX ))
+#define CONN_IS_HTTPS(uri) ((uri) != NULL && HAS_CASE_PREFIX(uri, OSSL_HTTPS_PREFIX))
 #define CONN_IS_IP_ADDR(host) CONN_is_IP_address(host)
 
 /*!*****************************************************************************
@@ -35,15 +43,15 @@ static const char* const CONN_https_prefix = "https://";
 bool CONN_is_IP_address(OPTIONAL const char *host);
 
 /*!*****************************************************************************
- * @brief parse hostname or URI of the form "[http[s]://][<userinfo>@]<host>[:<port>][/<path>]"
+ * @brief parse hostname or URI of the form "[http[s]://][<userinfo>@]<host>[:port][/<path>]"
  * @note an IPv6 address must be enclosed in '[' and ']'.
  * @param p_uri pointer to variable holding the URI to be parsed.
  * The variable is advanced past any leading "http[s]://" and "<userinfo>@" parts to the host name/address;
- * anything following it (i.e., <port> and/or <path> URI components) are chopped in the input string buffer.
+ * anything following it (i.e., port and/or path URI components) are chopped in the input string buffer.
  * @param default_port specifies the default port to return:
  * may give an actual default port number or 0, which is replaced by 443 for https else by 80
  * @param p_path if this pointer is not null it will be used to assign on success
- * the pointer to any <path> component (including and query and fragment parts)
+ * the pointer to any path component (including any query and fragment parts)
  * included in the input string, or null if not included.
  * @param desc description of the server to connect to, for use in diagnostic messages, or null
  * @return valid port number from input string or default, or <= 0 on error

@@ -1,13 +1,13 @@
-/** 
+/**
 * @file conn.c
-* 
+*
 * @brief Communication via OpenSSL BIO
 *
 * @copyright Copyright (c) Siemens Mobility GmbH, 2021
 *
 * @author David von Oheimb <david.von.oheimb@siemens.com>
 *
-* This work is licensed under the terms of the Apache Software License 
+* This work is licensed under the terms of the Apache Software License
 * 2.0. See the COPYING file in the top-level directory.
 *
 * SPDX-License-Identifier: Apache-2.0
@@ -95,7 +95,7 @@ int CONN_parse_uri(char** p_uri, int default_port, const char** p_path, char* de
         desc = "";
     }
 
-    if(strncasecmp(*p_uri, CONN_https_prefix, strlen(CONN_https_prefix)) is_eq 0)
+    if (CONN_IS_HTTPS(*p_uri))
     {
         *p_uri += strlen(CONN_https_prefix);
         if(0 is_eq default_port)
@@ -283,7 +283,7 @@ BIO* CONN_new(const char* host, const char* port)
         return 0;
     }
     if(port not_eq 0 /* else host_port is not null and has been used */
-       and not BIO_set_conn_port(bio, port)) 
+       and not BIO_set_conn_port(bio, port))
     {
         LOG(FL_ERR, "cannot set port for connect BIO");
         BIO_free(bio);
