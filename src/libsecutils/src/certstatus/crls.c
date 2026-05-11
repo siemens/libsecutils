@@ -300,8 +300,7 @@ static const char* get_dp_url(DIST_POINT* dp)
         if(gtype is_eq GEN_URI and ASN1_STRING_length(uri) > 6)
         {
             char* uptr = (char*)ASN1_STRING_get0_data(uri);
-            if(strncasecmp(uptr, CONN_http_prefix, strlen(CONN_http_prefix)) is_eq 0
-               or strncasecmp(uptr, "file:", 5) is_eq 0)
+            if (CONN_IS_HTTP(uptr) || HAS_CASE_PREFIX(uptr, "file:"))
             {
                 return uptr;
             }

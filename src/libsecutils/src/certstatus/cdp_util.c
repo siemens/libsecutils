@@ -1,13 +1,13 @@
-/** 
+/**
 * @file cdp_util.c
-* 
+*
 * @brief Utilities needed by and assisting the CDP functionality
 *
 * @copyright Copyright (c) Siemens Mobility GmbH, 2021
 *
 * @author David von Oheimb <david.von.oheimb@siemens.com>
 *
-* This work is licensed under the terms of the Apache Software License 
+* This work is licensed under the terms of the Apache Software License
 * 2.0. See the COPYING file in the top-level directory.
 *
 * SPDX-License-Identifier: Apache-2.0
@@ -15,6 +15,7 @@
 
 #include <certstatus/cdp_util.h>
 #include <certstatus/certstatus.h>
+#include <connections/conn.h> /* for CONN_IS_HTTP(S) */
 
 bool CDP_get_x509_name(
     const X509_NAME *name,
@@ -87,9 +88,8 @@ const char *CDP_get_uri_from_general_names(
         if(gtype == GEN_URI && ASN1_STRING_length(uri) > 7)
         {
             /* uri is of type ASN1_STRING */
-            const char* asn1_uri = (char*)ASN1_STRING_get0_data(uri);
-            if(strncasecmp(asn1_uri, "http://", 7) == 0
-               || strncasecmp(asn1_uri, "https://", 8) == 0)
+            const char *asn1_uri = (const char *)ASN1_STRING_get0_data(uri);
+            if (CONN_IS_HTTP(asn1_uri) || CONN_IS_HTTPS(asn1_uri))
             {
                 return asn1_uri;
             }

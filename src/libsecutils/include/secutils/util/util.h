@@ -321,8 +321,14 @@ void UTIL_cleanse_free(OPTIONAL char *str);
  */
 bool UTIL_get_random(void *buf, size_t len);
 
+/* Check if |pre|, which must be a string literal, is a prefix of |str| */
 #define HAS_PREFIX(str, pre) (strncmp(str, pre "", sizeof(pre) - 1) == 0)
+/* As before, and if check succeeds, advance |str| past the prefix |pre| */
 #define CHECK_AND_SKIP_PREFIX(str, pre) (HAS_PREFIX(str, pre) ? ((str) += sizeof(pre) - 1, 1) : 0)
+/* Check if the string literal |p| is a case-insensitive prefix of |s| */
+#define HAS_CASE_PREFIX(s, p) (strncasecmp(s, p "", sizeof(p) - 1) == 0)
+/* As before, and if check succeeds, advance |str| past the prefix |pre| */
+#define CHECK_AND_SKIP_CASE_PREFIX(str, pre) (HAS_CASE_PREFIX(str, pre) ? ((str) += sizeof(pre) - 1, 1) : 0)
 
 /*!
  * @brief The function copies the source string into the destination buffer

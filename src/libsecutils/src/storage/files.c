@@ -32,7 +32,7 @@ _Pragma("GCC diagnostic ignored \"-Wdeprecated-declarations\"")
 #include <certstatus/crls.h>
 #include <credentials/cert.h>
 #include <util/log.h>
-# include <connections/conn.h>
+#include <connections/conn.h>
 
 #include <operators.h>
 
@@ -42,8 +42,7 @@ static file_format_t adjust_format(const char* * file, file_format_t format, boo
     (void)engine_ok; /* unused parameter */
 #endif
 
-    if(strncasecmp(*file, CONN_http_prefix, strlen(CONN_http_prefix)) is_eq 0 or
-       strncasecmp(*file, CONN_https_prefix, strlen(CONN_https_prefix)) is_eq 0)
+    if (CONN_IS_HTTP(*file) || CONN_IS_HTTPS(*file))
     {
         format = FORMAT_HTTP;
     }
