@@ -50,6 +50,7 @@ int CREDENTIALS_print_cert_verify_cb(int ok, X509_STORE_CTX* store_ctx)
         bool nonfinal = (flags bitand X509_V_FLAG_NONFINAL_CHECK) not_eq 0;
         X509_STORE* ts = X509_STORE_CTX_get0_store(store_ctx);
         const char* expected = 0;
+        char *expected_to_free = NULL;
 
         /* Not yet valid certificates are OK */
         if(cert_error == X509_V_ERR_CERT_NOT_YET_VALID)
@@ -91,8 +92,14 @@ int CREDENTIALS_print_cert_verify_cb(int ok, X509_STORE_CTX* store_ctx)
             case X509_V_ERR_OCSP_CERT_UNKNOWN:
                 certstatus_error = true;
                 break;
-            case X509_V_ERR_HOSTNAME_MISMATCH:
             case X509_V_ERR_IP_ADDRESS_MISMATCH:
+#if OPENSSL_VERSION_NUMBER >= OPENSSL_V_3_0_0
+                expected = expected_to_free = X509_VERIFY_PARAM_get1_ip_asc(param);
+                break;
+#else
+                /* fall thru */
+#endif
+            case X509_V_ERR_HOSTNAME_MISMATCH:
                 expected = STORE_get0_host(ts);
                 break;
             case X509_V_ERR_INVALID_PURPOSE:
@@ -109,7 +116,7 @@ int CREDENTIALS_print_cert_verify_cb(int ok, X509_STORE_CTX* store_ctx)
            and false is_eq STORE_CTX_tls_active(store_ctx) /* ssl_add_cert_chain() or check_cert_revocation() is active */
            and not certstatus_error and not checking_ocsp)
         {
-            return ok; /* avoid printing spurious errors */
+            goto end; /* avoid printing spurious errors */
         }
 #endif
 
@@ -171,6 +178,8 @@ int CREDENTIALS_print_cert_verify_cb(int ok, X509_STORE_CTX* store_ctx)
                 }
             }
         }
+    end:
+        OPENSSL_free(expected_to_free);
     }
     return ok;
 }
