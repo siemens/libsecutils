@@ -31,7 +31,9 @@
  * @param truststore the trust store (typically returned from TLS_CTX_new()) where to set the host verification options
  * @param name the host DNS name to be expected, which may be given as a URL, or null
  * @param ip the host IP address to be expected, which may be given as a URL, or null
- * @note if both name and ip are non-null and equal, tries to interpret the string first as IP address then as domain name.
+ * @note if both name and ip are non-null and are non-equal strings, both expectations are set.
+ * @note if both name and ip are non-null and equal strings, the function uses CONN_IS_IP_ADDR()
+ * to determine whether to interpret the string as an IP address or as a domain name.
  * @note name and ip strings are copied, so do not need to be preserved after the call.
  * @return true on success, else false
  *******************************************************************************/
