@@ -471,75 +471,69 @@ err:
 }
 
 
-bool STORE_set1_host_ip(X509_STORE* ts, OPTIONAL const char* name, OPTIONAL const char* ip)
+bool STORE_set1_host_ip(X509_STORE *ts, OPTIONAL const char *name, OPTIONAL const char *ip)
 {
-    if(ts is_eq 0)
-    {
+    if (ts == NULL) {
         LOG_err("null pointer argument");
         return false;
     }
-    X509_VERIFY_PARAM* ts_vpm = X509_STORE_get0_param(ts);
+    X509_VERIFY_PARAM *ts_vpm = X509_STORE_get0_param(ts);
 
     /* first clear any host names, IP addresses, and email addresses */
-    if(
-#if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
-       not STORE_set1_host(ts, 0) or
-#endif
-       0 is_eq X509_VERIFY_PARAM_set1_host(ts_vpm, 0, 0) or
-       0 is_eq X509_VERIFY_PARAM_set1_ip(ts_vpm, 0, 0) or
-       0 is_eq X509_VERIFY_PARAM_set1_email(ts_vpm, 0, 0))
-    {
+    if (
+# if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
+        !STORE_set1_host(ts, 0) ||
+# endif
+        !X509_VERIFY_PARAM_set1_host(ts_vpm, 0, 0)
+        || !X509_VERIFY_PARAM_set1_ip(ts_vpm, 0, 0)
+        || !X509_VERIFY_PARAM_set1_email(ts_vpm, 0, 0)) {
         LOG_err("Could not clear host names and IP and email addresses from store");
         return false;
     }
 
-    if(0 is_eq name and 0 is_eq ip)
-    {
+    if (name == NULL && ip == NULL)
         return true;
-    }
 
-    char* name_str = CONN_get_host(name);
-    if(name not_eq 0 and name_str is_eq 0)
-    {
+    char *name_str = CONN_get_host(name);
+    char *ip_str = NULL;
+    if (name != NULL && name_str == NULL)
         return false;
-    }
-
-    char* ip_str = CONN_get_host(ip);
-    if(ip not_eq 0 and ip_str is_eq 0)
-    {
-        OPENSSL_free(name_str);
-        return false;
+    if (name != NULL && ip != NULL && strcmp(name, ip) == 0) {
+        if (CONN_IS_IP_ADDR(name_str)) {
+            ip_str = name_str;
+            name = name_str = NULL;
+        } else {
+            ip = NULL;
+        }
+    } else {
+        ip_str = CONN_get_host(ip);
+        if (ip != NULL && ip_str == NULL) {
+            OPENSSL_free(name_str);
+            return false;
+        }
     }
 
     X509_VERIFY_PARAM_set_hostflags(ts_vpm,
                                     X509_CHECK_FLAG_ALWAYS_CHECK_SUBJECT |
                                     X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS);
     bool res = true;
-    if(ip_str not_eq 0 and X509_VERIFY_PARAM_set1_ip_asc(ts_vpm, ip_str) is_eq 0)
-    {
+    if (ip_str != NULL && !X509_VERIFY_PARAM_set1_ip_asc(ts_vpm, ip_str))
         res = false;
-    }
-    if(name_str not_eq 0 and (ip_str is_eq 0 or (res is_eq false and strcmp(name, ip) is_eq 0)))
-    {
-        res = X509_VERIFY_PARAM_set1_host(ts_vpm, name_str, 0) not_eq 0;
-#if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
+    if (name_str != NULL) {
+        res = res && X509_VERIFY_PARAM_set1_host(ts_vpm, name_str, 0) != 0;
+# if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
         /*
          * Before OpenSSL 3.0, there was no API function for retrieving the
-         * hostname/ip entries in X509_VERIFY_PARAM. So we store the host value
+         * hostname/ip entries in X509_VERIFY_PARAM. So we stored the host value
          * in ex_data for use in CREDENTIALS_print_cert_verify_cb().
          * Since OpenSSL 3.0, this is no more needed as X509_VERIFY_PARAM_get0_host() is available.
          */
-        if(res not_eq false)
-        {
-            res = STORE_set1_host(ts, name_str);
-        }
-#endif
+        res = res && STORE_set1_host(ts, name_str);
+# endif
     }
-    if(res is_eq false)
-    {
-        LOG(FL_ERR, "Could not set host name '%s' and/or IP address '%s' in store", name_str not_eq 0 ? name_str : "",
-            ip_str not_eq 0 ? ip_str : "");
-    }
+    if (!res)
+        LOG(FL_ERR, "Could not set host name '%s' and/or IP address '%s' in store",
+            name_str != NULL ? name_str : "", ip_str != NULL ? ip_str : "");
     OPENSSL_free(ip_str);
     OPENSSL_free(name_str);
     return res;
