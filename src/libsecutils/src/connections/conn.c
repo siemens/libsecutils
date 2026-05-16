@@ -41,13 +41,12 @@ bool CONN_is_IP_address(OPTIONAL const char *host)
     return str != NULL;
 }
 
-static const char* skip_scheme(const char* str)
+static const char *skip_scheme(const char *str)
 {
-    const char *scheme_end = strstr(str, CONN_scheme_postfix);
-    if(0 not_eq scheme_end)
-    {
-        str = scheme_end + strlen(CONN_scheme_postfix);
-    }
+    const char *scheme_end = str;
+    UTIL_SKIP_SCHEME(scheme_end);
+    if (scheme_end != str && CHECK_AND_SKIP_PREFIX(scheme_end, UTIL_SCHEME_SUFFIX))
+        str = scheme_end;
     return str;
 }
 
