@@ -329,6 +329,14 @@ bool UTIL_get_random(void *buf, size_t len);
 #define HAS_CASE_PREFIX(s, p) (strncasecmp(s, p "", sizeof(p) - 1) == 0)
 /* As before, and if check succeeds, advance |str| past the prefix |pre| */
 #define CHECK_AND_SKIP_CASE_PREFIX(str, pre) (HAS_CASE_PREFIX(str, pre) ? ((str) += sizeof(pre) - 1, 1) : 0)
+/* Advance string pointer s, which must a modifiable lvalue, past scheme according to RFC 3986: ALPHA *( ALPHA / DIGIT / "+" / "-" / "." ) */
+#define UTIL_SKIP_SCHEME(s)                                                        \
+    do {                                                                           \
+        if (isalpha(*(s)))                                                         \
+            while (*(s) != '\0' && (isalnum(*(s)) || strchr("+-.", *(s)) != NULL)) \
+                (s)++;                                                             \
+    } while (0)
+#define UTIL_SCHEME_SUFFIX "://"
 
 /*!
  * @brief The function copies the source string into the destination buffer
