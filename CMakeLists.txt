@@ -382,6 +382,7 @@ if(NOT DEBIAN_BUILD)
     \./debian/libsecutils-bin/
     \./doc/
     /icvutil$
+    /src/libsecutils/include/secutils/secutils_static_config.h$
   )
 
   include(CPack)

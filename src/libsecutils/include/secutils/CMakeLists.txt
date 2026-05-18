@@ -31,7 +31,7 @@ endif()
 configure_file(secutils_static_config.h.in ${CMAKE_CURRENT_BINARY_DIR}/secutils_static_config.h)
 install(
     FILES ${CMAKE_CURRENT_BINARY_DIR}/secutils_static_config.h
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/secutils
 
 )
 target_include_directories(security-utilities_library PUBLIC
