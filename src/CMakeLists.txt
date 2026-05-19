@@ -1,3 +1,5 @@
+include(GNUInstallDirs) # needed for CMAKE_INSTALL_LIBDIR; any CMAKE_INSTALL_PREFIX must be set before
+
 add_library(secutils_compilation_options INTERFACE)
 target_compile_options(secutils_compilation_options INTERFACE
     -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes

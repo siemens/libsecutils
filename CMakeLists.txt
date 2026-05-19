@@ -186,12 +186,11 @@ if(NOT TARGET uninstall)
     COMMAND rm -vfr "\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}" -empty | xargs -r rmdir
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake" -empty | xargs -r rmdir
+    COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/pkgconfig" -empty | xargs -r rmdir
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" -empty | xargs -r rmdir
     COMMAND rm -vfr "\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DOCDIR}"
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share/doc" -empty | xargs -r rmdir
-    COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share/pkgconfig" -empty | xargs -r rmdir
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share" -empty | xargs -r rmdir
-    COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}" -empty | xargs -r rmdir
   )
 endif()
 
