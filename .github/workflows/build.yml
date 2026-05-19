@@ -36,6 +36,9 @@ jobs:
           SECUTILS_USE_ICV=1 cmake -DCMAKE_BUILD_TYPE=Debug -S .. -B .
           make clean build
           DESTDIR=tmp make install uninstall
+          [[ -d tmp/usr/local/lib ]] && (echo "uninstall incomplete: lib/ remains"; false)
+          [[ -d tmp/usr/local/include ]] && (echo "uninstall incomplete: include/ remains"; false)
+          [[ -d tmp/usr/local/share ]] && (echo "uninstall incomplete: share/ remains"; false)
           make deb
 
   make-with-uta:
