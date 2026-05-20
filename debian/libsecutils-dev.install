@@ -6,4 +6,5 @@ src/libsecutils/include/secutils/credentials/*.h /usr/include/secutils/credentia
 src/libsecutils/include/secutils/crypto/*.h      /usr/include/secutils/crypto
 src/libsecutils/include/secutils/storage/*.h     /usr/include/secutils/storage
 src/libsecutils/include/secutils/util/*.h        /usr/include/secutils/util
+usr/*/*/pkgconfig/security-utilities.pc
 doc/html                         /usr/share/doc/libsecutils-dev

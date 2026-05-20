@@ -4,6 +4,10 @@ project(
   security-utilities
   VERSION 2.1.0 # always 3 components for correct versioning
   LANGUAGES C)
+set(CMAKE_PROJECT_DESCRIPTION "Wrapper library for OpenSSL providing utilities for credential storage, certificate validation including status checks, TLS helpers, and logging")
+set(CMAKE_PROJECT_HOMEPAGE_URL "https://github.com/siemens/libsecutils")
+set(pc_req_public "openssl")
+set(pc_req_private "")
 message(STATUS "SecurityUtilities version ${security-utilities_VERSION}")
 
 # set(CMAKE_VERBOSE_MAKEFILE on)
@@ -251,7 +255,7 @@ if(NOT DEBIAN_BUILD)
   endif()
 
   SET(CPACK_PACKAGE_NAME libsecutils)
-  SET(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/siemens/libsecutils")
+  SET(CPACK_PACKAGE_HOMEPAGE_URL "${CMAKE_PROJECT_HOMEPAGE_URL}")
   SET(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/libsecutils.svg")
   SET(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
   SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt")
