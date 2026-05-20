@@ -92,7 +92,7 @@ ifneq ($(OPENSSL_DIR),) # due to the above, always true
             ifeq ($(wildcard $(OPENSSL_LIB)/$(LIB_NAME_PATTERN)),)
                 ifeq ($(OS),Linux)
 	            ifeq ($(shell echo $(OPENSSL_DIR) | grep -E '^/(home|Users)'),)
-                        override OPENSSL_LIB = $(wildcard /lib/*linux-gnu*)
+                        override OPENSSL_LIB = $(wildcard /lib/$(shell uname -i)-linux-*)
                         $(warning Warning: cannot find OpenSSL libraries at $(OPENSSL_DIR), now trying $(OPENSSL_LIB))
                     endif
                 endif
