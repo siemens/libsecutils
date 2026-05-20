@@ -48,7 +48,7 @@ jobs:
       - name: build-with-uta
         run: |
           sudo apt-get update
-          sudo apt-get install -y >/dev/null debhelper devscripts build-essential:native
+          sudo apt-get install -y >/dev/null debhelper devscripts build-essential:native cmake
           # dh-autoreconf rsync libssl-dev git pkg-config
           mkdir dependencies
           cd dependencies
@@ -71,7 +71,7 @@ jobs:
       - name: build-debian
         run: |
           sudo apt-get update
-          sudo apt-get install -y >/dev/null debhelper devscripts build-essential:native
+          sudo apt-get install -y >/dev/null debhelper devscripts build-essential:native cmake
           # dh-autoreconf rsync libssl-dev git pkg-config
           echo "copying everything to subdirectory 'debian-packaging'"
           mkdir -p debian-packaging
