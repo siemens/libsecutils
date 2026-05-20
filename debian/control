@@ -18,10 +18,10 @@ Description: OpenSSL enhancement wrapper library
  With extended support for certficate status checking using CRLs and/or OCSP
 
 Package: libsecutils-dev
-Depends: libsecutils (>= 2.1), ${misc:Depends}
+Depends: ${misc:Depends}, ${shlibs:Depends}, libssl-dev
 Suggests: libssl-dev, libuta-dev
 Section: devel
-Architecture: all
+Architecture: any
 Multi-Arch: foreign
 Description: libsecutils C headers and documentation
  Development support for libsecutils
