@@ -35,13 +35,14 @@ override_dh_auto_build:
 	 # OPENSSL_DIR=/usr
 	 #	CC=$(CC) CXX=$(CXX) AR=$(AR) \
 	 #	dh_auto_build -- -f Makefile_v1 OPENSSL_DIR="$(OPENSSL_DIR)" -j1 # build_all doc
-	touch icvutil # workaround in case SECUTILS_USE_ICV is unset
+	 # 	touch icvutil # workaround in case SECUTILS_USE_ICV is unset
 	dh_auto_build
 	dh_auto_build -- doc
+	 #	      dh_auto_install --destdir=$(CURDIR)/debian/tmp
 
-#override_dh_auto_install:
-#	touch icvutil # workaround in case SECUTILS_USE_ICV is unset
-#	dh_auto_install --destdir debian/tmp # -- -f Makefile_v1
+override_dh_auto_install:
+	touch icvutil # workaround in case SECUTILS_USE_ICV is unset
+	dh_auto_install --destdir debian/tmp # -- -f Makefile_v1
 #	 # $(MAKE) DESTDIR=debian/tmp install
 
 #override_dh_shlibdeps:
