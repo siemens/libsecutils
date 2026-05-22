@@ -404,25 +404,25 @@ if(NOT DEBIAN_BUILD)
       set(suffix "")
     endif()
 
-    set(COMPONENT_DOC_DIRECTORY "${PROJECT_NAME}${suffix}")
+    set(COMPONENT_DOC_SUBDIR "") # "/${PROJECT_NAME}${suffix}"
 
     if(suffix STREQUAL "-dev")
-      install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/doc/html
+      install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/html
         OPTIONAL # TODO add build for doc/
-        DESTINATION "${CMAKE_INSTALL_DOCDIR}/${COMPONENT_DOC_DIRECTORY}"
+        DESTINATION "${CMAKE_INSTALL_DOCDIR}${COMPONENT_DOC_SUBDIR}"
         COMPONENT security-utilities_library_Development
       )
     endif()
     install(FILES
       "${CMAKE_CURRENT_SOURCE_DIR}/libsecutils.svg"
-      DESTINATION "${CMAKE_INSTALL_DOCDIR}/${COMPONENT_DOC_DIRECTORY}"
+      DESTINATION "${CMAKE_INSTALL_DOCDIR}${COMPONENT_DOC_SUBDIR}"
       COMPONENT ${component}
     )
     if(CMAKE_SYSTEM_NAME MATCHES "Linux")
       install(FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/debian/copyright"
         "${CMAKE_CURRENT_BINARY_DIR}/changelog.gz"
-        DESTINATION "${CMAKE_INSTALL_DOCDIR}/${COMPONENT_DOC_DIRECTORY}"
+        DESTINATION "${CMAKE_INSTALL_DOCDIR}${COMPONENT_DOC_SUBDIR}"
         COMPONENT ${component}
       )
     endif()
