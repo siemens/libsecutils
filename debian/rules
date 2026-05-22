@@ -27,7 +27,6 @@ override_dh_auto_configure:
 ## make sure that clean_deb is used and CMake is not used
 #override_dh_auto_clean:
 #	make -f Makefile_v1 clean clean_deb
-
 override_dh_auto_build:
 	 # adding compile flags as, defaults are commonly debug flags
 	 #	CFLAGS="-O2 -DNDEBUG" CXXFLAGS="-O2 -DNDEBUG" DEBUG_FLAGS="" LDFLAGS=""
@@ -42,6 +41,7 @@ override_dh_auto_build:
 
 override_dh_auto_install:
 	touch icvutil # workaround in case SECUTILS_USE_ICV is unset
+	mkdir -p doc/html # workaround for being not (always) available
 	dh_auto_install --destdir debian/tmp # -- -f Makefile_v1
 #	 # $(MAKE) DESTDIR=debian/tmp install
 
