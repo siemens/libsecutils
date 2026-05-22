@@ -244,6 +244,11 @@ if(NOT TARGET clean_all)
   )
 endif()
 
+# option(BUILD_DOC "Build documentation" ON)
+# if(BUILD_DOC AND TARGET doc)
+#  add_dependencies(install doc)
+# endif()
+
 if(NOT DEBIAN_BUILD)
   # =============================
   # Packaging
