@@ -19,7 +19,7 @@
 #include <secutils/secutils_static_config.h>
 
 /* this type is part of the genCMPClient API */
-#ifndef __cplusplus
+#if !defined __cplusplus && __STDC_VERSION__ < 202311L
 typedef enum
 {
     false = 0,
