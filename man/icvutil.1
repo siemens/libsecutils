@@ -1,0 +1,35 @@
+.TH ICVUTIL 1 "2026-02-20" "libsecutils 2.2" "User Commands"
+.SH NAME
+icvutil \- ICV protection management utility
+.SH SYNOPSIS
+.B icvutil
+.I option
+.I file
+.RI [ file_location ]
+.SH DESCRIPTION
+.B icvutil
+is a stand-alone command-line utility for managing Integrity Check Value (ICV)
+protection of files, provided by the
+.B libsecutils
+library.
+It is only available when the library has been built with
+.BR SECUTILS_USE_ICV .
+.SH OPTIONS
+.TP
+.I option
+Operation to perform (e.g., set, check, or delete an ICV).
+.TP
+.I file
+Path to the file to protect or verify.
+.TP
+.I file_location
+Optional alternative location of the file, to use in the calculation of the checksum.
+.SH EXIT STATUS
+Returns 0 on success, 1 on failure.
+.SH SEE ALSO
+.BR openssl (1)
+.SH AUTHORS
+David von Oheimb <david.von.oheimb@siemens.com>
+.SH COPYRIGHT
+Copyright (c) Siemens Mobility GmbH, 2021.
+Licensed under the Apache Software License 2.0.
