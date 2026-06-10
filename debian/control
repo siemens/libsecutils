@@ -7,7 +7,7 @@ Build-Depends: libssl-dev, debhelper (>= 10), devscripts, cmake
 Homepage: https://github.com/siemens/libsecutils
 Standards-Version: 4.5.1
 
-Package: libsecutils
+Package: libsecutils2
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Section: libs
 Architecture: any
@@ -17,7 +17,7 @@ Description: OpenSSL enhancement wrapper library
  With extended support for certficate status checking using CRLs and/or OCSP
 
 Package: libsecutils-dev
-Depends: libsecutils (= ${binary:Version}), ${misc:Depends}, libssl-dev
+Depends: libsecutils2 (= ${binary:Version}), ${misc:Depends}, libssl-dev
 Suggests: libuta-dev
 Section: devel
 Architecture: any
