@@ -40,7 +40,8 @@ override_dh_auto_build:
 	 #	      dh_auto_install --destdir=$(CURDIR)/debian/tmp
 
 override_dh_auto_install:
-	touch icvutil # workaround in case SECUTILS_USE_ICV is unset
+	 # workaround in case SECUTILS_USE_ICV is unset: provide a shell script placeholder
+	if [ ! -s icvutil ]; then printf '#!/bin/sh\necho "icvutil: not available (built without SECUTILS_USE_ICV)"\nexit 1\n' > icvutil && chmod +x icvutil; fi
 	mkdir -p doc/html # workaround for being not (always) available
 	dh_auto_install --destdir debian/tmp # -- -f Makefile_v1
 #	 # $(MAKE) DESTDIR=debian/tmp install
