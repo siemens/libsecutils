@@ -268,6 +268,12 @@ if(NOT DEBIAN_BUILD)
   SET(CPACK_PACKAGE_VENDOR "Siemens")
   set(CPACK_PACKAGE_CONTACT "David von Oheimb <David.von.Oheimb@siemens.com>")
 
+  # Ensure installed directories get standard 0755 permissions (non-standard-dir-perm)
+  set(CMAKE_INSTALL_DEFAULT_DIRECTORY_PERMISSIONS
+    OWNER_READ OWNER_WRITE OWNER_EXECUTE
+    GROUP_READ GROUP_EXECUTE
+    WORLD_READ WORLD_EXECUTE)
+
   set(CPACK_STRIP_FILES ON)
 
   set(CPACK_COMPONENTS_ALL
