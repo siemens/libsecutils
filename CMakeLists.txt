@@ -194,6 +194,8 @@ if(NOT TARGET uninstall)
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" -empty | xargs -r rmdir
     COMMAND rm -vfr "\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share/doc"
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share/doc" -empty | xargs -r rmdir
+    COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share/lintian/overrides" -empty | xargs -r rmdir
+    COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share/lintian" -empty | xargs -r rmdir
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share" -empty | xargs -r rmdir
   )
 endif()
@@ -329,8 +331,12 @@ if(NOT DEBIAN_BUILD)
     set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_FILE_NAME DEB-DEFAULT)
     set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_PACKAGE_SECTION "libs")
     # see also https://gitlab.kitware.com/cmake/cmake/-/issues/21834
-    # CPack Deb does not create postinst when installing to /usr/lib/x86_64-linux-gnu
-    set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/triggers")
+    # Custom postinst/postrm suppress CPack's auto-generated ldconfig calls;
+    # ldconfig is handled by the activate-noawait trigger instead (maintscript-calls-ldconfig)
+    set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_PACKAGE_CONTROL_EXTRA
+      "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/triggers"
+      "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/postinst"
+      "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/postrm")
     set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
 
     set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_DEVELOPMENT_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-dev")
@@ -447,6 +453,14 @@ if(NOT DEBIAN_BUILD)
         DESTINATION "share/doc/${COMPONENT_DOC_SUBDIR}"
         COMPONENT ${component}
       )
+      if(${component} STREQUAL "security-utilities_library_Runtime")
+        install(FILES
+          "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/libsecutils2.lintian-overrides"
+          DESTINATION "share/lintian/overrides"
+          RENAME "libsecutils2"
+          COMPONENT ${component}
+        )
+      endif()
     endif()
   endforeach()
 

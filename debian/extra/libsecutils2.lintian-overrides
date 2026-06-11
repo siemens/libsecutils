@@ -1,0 +1,5 @@
+# postinst and postrm are intentionally minimal: they exist only to suppress
+# CPack's auto-generated ldconfig calls; ldconfig is handled by the
+# activate-noawait trigger instead (avoids maintscript-calls-ldconfig).
+libsecutils2: maintainer-script-empty [postinst]
+libsecutils2: maintainer-script-empty [postrm]
