@@ -1,3 +1,18 @@
+if(UNIX AND NOT APPLE)
+  if(DEFINED ENV{DEB_HOST_MULTIARCH})
+    set(_deb_multiarch "$ENV{DEB_HOST_MULTIARCH}")
+  else()
+    execute_process(
+      COMMAND dpkg-architecture -qDEB_HOST_MULTIARCH
+      OUTPUT_VARIABLE _deb_multiarch
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+      ERROR_QUIET)
+  endif()
+  if(_deb_multiarch)
+    set(CMAKE_INSTALL_LIBDIR "lib/${_deb_multiarch}" CACHE PATH
+      "Object code libraries (multiarch)" FORCE)
+  endif()
+endif()
 include(GNUInstallDirs) # needed for CMAKE_INSTALL_LIBDIR; any CMAKE_INSTALL_PREFIX must be set before
 
 add_library(secutils_compilation_options INTERFACE)

@@ -152,6 +152,25 @@ add_subdirectory(src)
 #else()
 #  set(CMAKE_INSTALL_PREFIX "tmp")
 #endif()
+# Ensure the .pc file lands in usr/lib/<triplet>/pkgconfig/ not usr/lib/pkgconfig/
+# (pkg-config-unavailable-for-cross-compilation).
+# Prefer the env var set by dpkg-buildpackage; fall back to calling dpkg-architecture
+# directly so CPack builds and plain cmake invocations are also covered.
+if(UNIX AND NOT APPLE)
+  if(DEFINED ENV{DEB_HOST_MULTIARCH})
+    set(_deb_multiarch "$ENV{DEB_HOST_MULTIARCH}")
+  else()
+    execute_process(
+      COMMAND dpkg-architecture -qDEB_HOST_MULTIARCH
+      OUTPUT_VARIABLE _deb_multiarch
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+      ERROR_QUIET)
+  endif()
+  if(_deb_multiarch)
+    set(CMAKE_INSTALL_LIBDIR "lib/${_deb_multiarch}" CACHE PATH
+      "Object code libraries (multiarch)" FORCE)
+  endif()
+endif()
 include(GNUInstallDirs) # any CMAKE_INSTALL_PREFIX must be set before
 
 # https://stackoverflow.com/questions/73248130/how-to-avoid-the-removal-of-the-rpath-during-cmake-install-step
