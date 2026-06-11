@@ -13,8 +13,11 @@ Section: libs
 Architecture: any
 Suggests: libuta
 Description: OpenSSL enhancement wrapper library
- OpenSSL wrapper library simplifying use of commonly needed functionality
- With extended support for certficate status checking using CRLs and/or OCSP
+ This provides utilities for
+ credential loading and storage with optional integrity protection,
+ certificate validation including status checks using CRLs and/or OCSP,
+ TLS connection and configuration file handling helpers, and logging.
+ This aims at simplifying use of commonly needed functionality.
 
 Package: libsecutils-dev
 Depends: libsecutils2 (= ${binary:Version}), ${misc:Depends}, libssl-dev
