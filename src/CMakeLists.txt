@@ -9,7 +9,7 @@ if(UNIX AND NOT APPLE)
       ERROR_QUIET)
   endif()
   if(_deb_multiarch)
-    set(CMAKE_INSTALL_LIBDIR "lib/${_deb_multiarch}" CACHE PATH
+    set(CMAKE_INSTALL_LIBDIR "lib/${_deb_multiarch}" CACHE STRING
       "Object code libraries (multiarch)" FORCE)
   endif()
 endif()
