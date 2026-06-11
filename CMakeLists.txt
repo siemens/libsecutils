@@ -167,7 +167,7 @@ if(UNIX AND NOT APPLE)
       ERROR_QUIET)
   endif()
   if(_deb_multiarch)
-    set(CMAKE_INSTALL_LIBDIR "lib/${_deb_multiarch}" CACHE PATH
+    set(CMAKE_INSTALL_LIBDIR "lib/${_deb_multiarch}" CACHE STRING
       "Object code libraries (multiarch)" FORCE)
   endif()
 endif()
@@ -210,7 +210,9 @@ if(NOT TARGET uninstall)
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}" -empty | xargs -r rmdir
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake" -empty | xargs -r rmdir
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/pkgconfig" -empty | xargs -r rmdir
+    COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/pkgconfig" -empty | xargs -r rmdir
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" -empty | xargs -r rmdir
+    COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/lib" -empty | xargs -r rmdir
     COMMAND rm -vfr "\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share/doc"
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share/doc" -empty | xargs -r rmdir
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share/lintian/overrides" -empty | xargs -r rmdir
