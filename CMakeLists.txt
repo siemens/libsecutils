@@ -4,7 +4,7 @@ project(
   security-utilities
   VERSION 2.2.0 # always 3 components for correct versioning
   LANGUAGES C)
-set(CMAKE_PROJECT_DESCRIPTION "Wrapper library for OpenSSL providing utilities for credential storage, certificate validation including status checks, TLS helpers, and logging")
+set(CMAKE_PROJECT_DESCRIPTION "Wrapper library for OpenSSL providing utilities for credential loading and storage with optional integrity protection, certificate validation including status checks using CRLs and/or OCSP, TLS connection and configuration file handling helpers, and logging. This aims at simplifying use of commonly needed functionality.")
 set(CMAKE_PROJECT_HOMEPAGE_URL "https://github.com/siemens/libsecutils")
 set(pc_req_public "openssl")
 set(pc_req_private "")
@@ -263,6 +263,8 @@ if(NOT DEBIAN_BUILD)
   endif()
 
   SET(CPACK_PACKAGE_NAME libsecutils)
+  # Short synopsis; CMAKE_PROJECT_DESCRIPTION is too long (synopsis-too-long)
+  set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "OpenSSL enhancement wrapper library")
   SET(CPACK_PACKAGE_HOMEPAGE_URL "${CMAKE_PROJECT_HOMEPAGE_URL}")
   SET(CPACK_PACKAGE_ICON "${CMAKE_CURRENT_SOURCE_DIR}/libsecutils.svg")
   SET(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
@@ -286,9 +288,9 @@ if(NOT DEBIAN_BUILD)
     list(APPEND CPACK_COMPONENTS_ALL security-utilities_icvutil_Runtime)
   endif()
 
-  set(CPACK_COMPONENT_SECURITY-UTILITIES_LIBRARY_RUNTIME_DESCRIPTION "OpenSSL enhancement wrapper library
-  OpenSSL wrapper library simplifying use of commonly needed functionality
-  With extended support for certficate status checking using CRLs and/or OCSP")
+  set(CPACK_COMPONENT_SECURITY-UTILITIES_LIBRARY_RUNTIME_DESCRIPTION
+    "OpenSSL wrapper library simplifying use of commonly needed functionality\n"
+    "with extended support for certificate status checking using CRLs and/or OCSP")
 
   set(CPACK_COMPONENT_SECURITY-UTILITIES_LIBRARY_DEVELOPMENT_DESCRIPTION "libsecutils C headers and documentation
   Development support for libsecutils")
