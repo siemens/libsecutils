@@ -192,7 +192,7 @@ if(NOT TARGET uninstall)
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/cmake" -empty | xargs -r rmdir
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}/pkgconfig" -empty | xargs -r rmdir
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" -empty | xargs -r rmdir
-    COMMAND rm -vfr "\${DESTDIR}${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_DOCDIR}"
+    COMMAND rm -vfr "\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share/doc"
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share/doc" -empty | xargs -r rmdir
     COMMAND find . -path "./\${DESTDIR}${CMAKE_INSTALL_PREFIX}/share" -empty | xargs -r rmdir
   )
@@ -417,23 +417,24 @@ if(NOT DEBIAN_BUILD)
 
     set(COMPONENT_DOC_SUBDIR "") # "/${PROJECT_NAME}${suffix}"
 
+    # using share/doc instead of ${CMAKE_INSTALL_DOCDIR}
     if(suffix STREQUAL "-dev")
       install(DIRECTORY ${PROJECT_BINARY_DIR}/doc/html
         OPTIONAL # TODO add build for doc/
-        DESTINATION "${CMAKE_INSTALL_DOCDIR}${COMPONENT_DOC_SUBDIR}"
+        DESTINATION "share/doc/${COMPONENT_DOC_SUBDIR}"
         COMPONENT security-utilities_library_Development
       )
     endif()
     install(FILES
       "${CMAKE_CURRENT_SOURCE_DIR}/libsecutils.svg"
-      DESTINATION "${CMAKE_INSTALL_DOCDIR}${COMPONENT_DOC_SUBDIR}"
+      DESTINATION "share/doc/${COMPONENT_DOC_SUBDIR}"
       COMPONENT ${component}
     )
     if(CMAKE_SYSTEM_NAME MATCHES "Linux")
       install(FILES
         "${CMAKE_CURRENT_SOURCE_DIR}/debian/copyright"
         "${CMAKE_CURRENT_BINARY_DIR}/changelog.gz"
-        DESTINATION "${CMAKE_INSTALL_DOCDIR}${COMPONENT_DOC_SUBDIR}"
+        DESTINATION "share/doc/${COMPONENT_DOC_SUBDIR}"
         COMPONENT ${component}
       )
     endif()
