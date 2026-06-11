@@ -415,7 +415,17 @@ if(NOT DEBIAN_BUILD)
       set(suffix "")
     endif()
 
-    set(COMPONENT_DOC_SUBDIR "") # "/${PROJECT_NAME}${suffix}"
+    # Use the actual Debian package name as doc subdir so lintian finds
+    # changelog.gz and copyright (no-changelog, no-copyright-file)
+    if(${component} STREQUAL "security-utilities_library_Runtime")
+      set(COMPONENT_DOC_SUBDIR "libsecutils2")
+    elseif(${component} STREQUAL "security-utilities_library_Development")
+      set(COMPONENT_DOC_SUBDIR "libsecutils-dev")
+    elseif(${component} STREQUAL "security-utilities_icvutil_Runtime")
+      set(COMPONENT_DOC_SUBDIR "libsecutils-bin")
+    else()
+      set(COMPONENT_DOC_SUBDIR "libsecutils2")
+    endif()
 
     # using share/doc instead of ${CMAKE_INSTALL_DOCDIR}
     if(suffix STREQUAL "-dev")
