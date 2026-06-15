@@ -337,10 +337,10 @@ if(NOT DEBIAN_BUILD)
 
     # help CPackDeb please dpkg-shlibdeps
     if(${CMAKE_VERSION} VERSION_GREATER_EQUAL "3.20.0")
-      set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS_PRIVATE_DIRS "../lib/${CMAKE_INSTALL_FULL_LIBDIR}")
+      set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS_PRIVATE_DIRS "${CMAKE_INSTALL_FULL_LIBDIR}")
     else()
       set(CMAKE_INSTALL_RPATH # must be done before add_executable()
-          "../lib/${CMAKE_INSTALL_FULL_LIBDIR}")
+          "${CMAKE_INSTALL_FULL_LIBDIR}")
     endif()
 
     set(CPACK_DEBIAN_PACKAGE_GENERATE_SHLIBS ON)
