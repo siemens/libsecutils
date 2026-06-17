@@ -112,7 +112,7 @@ endif()
 # dynamic libs have been installed in ./${LIB}.
 # See for binaries dynamically linked to OpenSSL the output of 'ldd <binary>'
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-  set(USERS "^(\w:)?\\Users\\")
+  set(USERS "^([a-zA-Z]:)?[\\\\/]+Users[\\\\/]+")
   set(LIB "bin")
 else()
   set(USERS "^/(home|Users)/")
