@@ -10,7 +10,7 @@ jobs:
   make:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: build-make
         run: |
           # would need access to azure.archive.ubuntu.com:
@@ -24,7 +24,7 @@ jobs:
   cmake:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: build-cmake
         run: |
           #sudo apt-get update
@@ -45,7 +45,7 @@ jobs:
   make-with-uta:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: build-with-uta
         run: |
           sudo apt-get update
@@ -68,7 +68,7 @@ jobs:
   deb:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: build-debian
         run: |
           sudo apt-get update
@@ -85,7 +85,7 @@ jobs:
   doc:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: doc
         run: |
           sudo apt-get update
@@ -95,7 +95,7 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: coverage
         run: |
           # sudo apt-get update
