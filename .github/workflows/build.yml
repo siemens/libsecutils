@@ -28,7 +28,7 @@ jobs:
       - name: build-cmake
         run: |
           #sudo apt-get update
-          sudo apt-get install -y >/dev/null cmake # build-essential git libssl-dev
+          sudo apt-get install -y >/dev/null cmake lintian # build-essential git libssl-dev
           mkdir build
           cd build
           SECUTILS_NO_TLS=1 cmake -S .. -B . # Release by default
@@ -40,6 +40,7 @@ jobs:
           [[ -d tmp/usr/local/include ]] && (echo "uninstall incomplete: include/ remains"; false)
           [[ -d tmp/usr/local/share ]] && (echo "uninstall incomplete: share/ remains"; false)
           make deb
+          lintian --fail-on error,warning *.deb
 
   make-with-uta:
     runs-on: ubuntu-latest
