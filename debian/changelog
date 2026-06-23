@@ -1,16 +1,29 @@
 libsecutils (2.3) stable; urgency=medium
 
-    * TODO: complete this and update date below
-    * extend KEY_new() to support ML-DSA-* and potentially further PQC algorithms
+    * TODO: complete this and update date below 
+    * extend KEY_new() to support ML-DSA-* and potentially further PQC algs
     * add KEY_new_ex() for improved provider support
     * improve STORE_set1_host_ip() behavior on equal 'name' and 'ip' argument
-    * CREDENTIALS_print_cert_verify_cb(): fix output of expected IP address on mismatch
-    * improve CONN_IS_HTTP(S) and use it to replace respective occurrences of strncasecmp()
-    * credentials.c: fix potential crash of find_update_cb() on NULL tag/description strings
+    * CREDENTIALS_print_cert_verify_cb(): fix print expected IP addr on mismatch
+    * improve CONN_IS_HTTP(S) and use it to replace occurrences of strncasecmp()
+    * credentials.c: fix potential crash of find_update_cb() on NULL tag strings
     * crl_mgmt.c,cdp_util.{c,h}: fix constness for OpenSSL 4.0 compatibility
-    * basic.h: fix compatibility with C23, which provides 'true' and 'false' as keywords
+    * basic.h: fix compat with C23 which provides 'true' and 'false' as keywords
+    * build.yml: add 'lintian --fail-on error,warning *deb' after 'make deb'
+    * CMakeLists.txt: improve Windows support, partly clean up gcc warning opts
+    * CMakeLists.txt,debian/etc. major improvements of Debian packaging
+    * CMakeLists.txt,debian/: add library major version to name (libsecutils2)
+    * CMakeLists.txt,debian/control: shorten CPACK_PACKAGE_DESCRIPTION_SUMMARY
+    * CMakeLists.txt: Ensure installed directories get standard 0755 permissions
+    * CMakeLists.txt,build.yml: improve uninstall and CI checks
+    * CMakeLists.txt: simplify (sub-)directory structure of doc/
+    * add icvutil.1 man page and its Debian installation
+    * add placeholder 'icvutil' script in case binary is not available
+    * chore: add pkgconfig file
+    * Makefile_v1: make fallback determination of OPENSSL_LIB more reliable
+    * Makefile_v1: improve dir pattern for auto-determining OPENSSL_LIB on Linux
 
- -- David von Oheimb <David.von.Oheimb@siemens.com>  Fri, 15 May 2026 16:12:48 +0200
+ -- David von Oheimb <David.von.Oheimb@siemens.com>  Tue, 23 Jun 2026 17:24:50 +0200
 
 libsecutils (2.2) stable; urgency=medium
 
