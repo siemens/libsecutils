@@ -45,6 +45,7 @@ static const int OCSP_DEFAULT_TIMEOUT = 10; /* in seconds */
 /*!
  * @brief check cert status using the given OCSP response
  * @note the OCSP response may be obtained using an OCSP request or OCSP stapling
+ * @note at this level, any nonce and cert ID relating request and response cannot be checked
  *
  * @param ts pointer to trust store containing verification parameters
  * @param untrusted a stack of certs that may be used for chain building, or null
@@ -59,6 +60,8 @@ int check_ocsp_resp(X509_STORE* ts, STACK_OF(X509) *untrusted,
 /*!
  * @brief check cert revocation status via OCSP.
  * @note tries using any AIA entries (if enabled) then try any given fallback OCSP responder URLs, in the given order
+ * @note to avoid performance penalty on OCSP responders, does not use nonce for
+ * replay protection when retrieving OCSP response unless defined SECUTILS_OCSP_USE_NONCE
  *
  * @param ctx verification context containing verification parameters etc.
  * @param untrusted a stack of certs that may be used for chain building, or null
