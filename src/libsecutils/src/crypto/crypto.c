@@ -5,7 +5,7 @@
 *
 * @copyright Copyright (c) Siemens Mobility GmbH, 2021
 *
-* @author David von Oheimb <david.von.oheimb@siemens.com>
+* @author Martin Vitek <martin.vitek@siemens.com>
 *
 * This work is licensed under the terms of the Apache Software License 
 * 2.0. See the COPYING file in the top-level directory.
