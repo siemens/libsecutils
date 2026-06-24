@@ -228,18 +228,20 @@ static OCSP_RESPONSE* get_ocsp_resp(X509* cert, X509* issuer,
     if((br = OCSP_response_get1_basic(resp)) is_eq 0)
     {
         LOG(FL_ERR, "error getting OCSP basic response");
-        goto end;
+        goto err;
     }
     if((res = OCSP_check_nonce(req, br)) <= 0)
     {
         LOG(FL_ERR, res is_eq -1 ? "no nonce in OCSP response" : "nonce verification error");
-        goto end;
+        goto err;
     }
-    if(not OCSP_resp_find_status(br, id_copy, 0, 0, 0, 0, 0))
-    {
-        LOG(FL_ERR, "no OCSP status found matching cert ID in request");
+    if (OCSP_resp_find_status(br, id_copy, 0, 0, 0, 0, 0))
         goto end;
-    }
+    LOG(FL_ERR, "no OCSP status found matching cert ID in request");
+
+ err:
+    OCSP_RESPONSE_free(resp);
+    resp = NULL;
 
  end:
     OCSP_CERTID_free(id);
