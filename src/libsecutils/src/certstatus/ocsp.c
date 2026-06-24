@@ -185,7 +185,6 @@ static OCSP_RESPONSE* get_ocsp_resp(X509* cert, X509* issuer,
 {
     OCSP_REQUEST* req = 0;
     OCSP_CERTID* id_copy, *id = 0;
-    int res;
     OCSP_RESPONSE* resp = 0;
     OCSP_BASICRESP* br = 0;
     int i;
@@ -203,10 +202,12 @@ static OCSP_RESPONSE* get_ocsp_resp(X509* cert, X509* issuer,
         goto end;
     }
     id = 0;
+#ifdef SECUTILS_OCSP_USE_NONCE
     if(not OCSP_request_add1_nonce(req, 0, -1))
     {
         goto end;
     }
+#endif
 
     /* Add any extensions to the request */
     for(i = 0; i < sk_X509_EXTENSION_num(exts); i++)
@@ -230,11 +231,14 @@ static OCSP_RESPONSE* get_ocsp_resp(X509* cert, X509* issuer,
         LOG(FL_ERR, "error getting OCSP basic response");
         goto err;
     }
+#ifdef SECUTILS_OCSP_USE_NONCE
+    int res;
     if((res = OCSP_check_nonce(req, br)) <= 0)
     {
         LOG(FL_ERR, res is_eq -1 ? "no nonce in OCSP response" : "nonce verification error");
         goto err;
     }
+#endif
     if (OCSP_resp_find_status(br, id_copy, 0, 0, 0, 0, 0))
         goto end;
     LOG(FL_ERR, "no OCSP status found matching cert ID in request");
