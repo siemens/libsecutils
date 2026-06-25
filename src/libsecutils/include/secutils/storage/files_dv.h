@@ -31,6 +31,7 @@
 
 /*!
  * @brief get file encryption password from UTA using derivation value based on file path name
+ * @note If SECUTILS_USE_UTA is not set, cannot derive secure password
  *
  * @param pass_buf place to store the derived password as base64 encoded string, must be at least MAX_UTA_PASS_LEN chars
  * long
@@ -55,6 +56,7 @@ bool FILES_get_dv(const char* filename, unsigned char* dv_out);
 
 /*!
  * @brief store private key in given file and format, optionally using DV-based password
+ * @note If SECUTILS_USE_UTA is not set, cannot derive secure password from DV
  *
  * @param pkey private key to save
  * @param file (path) name of the output file. Any previous contents are overwritten.
@@ -70,6 +72,7 @@ bool FILES_store_key_dv(const EVP_PKEY* pkey, const char* file, file_format_t fo
 
 /*!
  * @brief load private key from the given file or engine with flexible format, optionally using DV-based password
+ * @note If SECUTILS_USE_UTA is not set, cannot derive secure password from DV
  *
  * @param key file (path) name of the input file or engine key ID
  * @param file_format the format to try first when reading file contents
@@ -85,6 +88,7 @@ EVP_PKEY* FILES_load_key_autofmt_dv(OPTIONAL const char* key, file_format_t file
 
 /*!
  * @brief load certificates from the given file with flexible format, optionally using DV-based password
+ * @note If SECUTILS_USE_UTA is not set, cannot derive secure password from DV
  *
  * @param file (path) name of the input file
  * @param format the format to try first when reading file contents
