@@ -132,8 +132,22 @@ ssize_t AESGCM_decrypt(EVP_CIPHER_CTX* osslctx, uint8_t* plain_buff, size_t plai
         return ret;
     }
 
-    int plain_len = plain_buff_len;
-    if((EVP_DecryptUpdate(osslctx, plain_buff, &plain_len, cipher, cipher_len) not_eq 1)
+    if (plain_buff_len > INT_MAX) {
+        LOG(FL_ERR, "plain_buff_len > INT_MAX");
+        return ret;
+    }
+    if (cipher_len > INT_MAX) {
+        LOG(FL_ERR, "cipher_len > INT_MAX");
+        return ret;
+    }
+    if (plain_buff_len < cipher_len) {
+        LOG(FL_ERR, "plain_buff_len = %zu too small, should be at least cipher_len = %zu",
+            plain_buff_len, cipher_len);
+        return ret;
+    }
+
+    int plain_len = (int)plain_buff_len;
+    if((EVP_DecryptUpdate(osslctx, plain_buff, &plain_len, cipher, (int)cipher_len) not_eq 1)
        or ((size_t)plain_len not_eq cipher_len))
     {/* The second condition - GCM is used hence length(plain_text) == length(cipher_text) */
         LOG(FL_ERR, "Decryption failed");
