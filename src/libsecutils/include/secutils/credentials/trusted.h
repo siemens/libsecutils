@@ -37,6 +37,7 @@ static const char* const TRUST_CONFIG_ENTRY_CRLS = "crls";
  * @param cid identifier of the component, which indicates the config file section to use, or TRUST_CONFIG_SECTION_DEFAULT if it is 0
  * @param vpm OpenSSL certificate verification parameters to be taken over, or null for default
  * @param ctx (optional) pointer to UTA context for checking file integrity&authenticity using ICV
+ * @note if ctx is null or SECUTILS_USE_ICV not defined, no ICV-based check is done
  * @return pointer to a new CREDENTIALS structure, or null on error
  *******************************************************************************/
 X509_STORE* CREDENTIALS_get_trust_store(component_creds_id cid, OPTIONAL X509_VERIFY_PARAM* vpm, OPTIONAL uta_ctx* ctx);
