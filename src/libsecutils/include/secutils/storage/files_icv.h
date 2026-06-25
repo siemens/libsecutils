@@ -26,6 +26,7 @@
 /*!
  * @brief (re-)protect integrity of file (of any type that allows appending text) with ICV derived via UTA
  *        from the absolute path name of the file
+ * @note If SECUTILS_USE_UTA is not set, cannot derive secure ICV
  *
  * @param ctx pointer to UTA context, which typically is part of the libsecutils context, or null
  * @param file (path) name of the file to be protected
@@ -37,6 +38,7 @@ bool FILES_protect_icv(OPTIONAL uta_ctx* ctx, const char* file);
 /*!
  * @brief (re-)protect integrity of file (of any type that allows appending text) with ICV derived via UTA
  *        from the supplied path name of the file. If none is supplied, the absolute path is derived.
+ * @note If SECUTILS_USE_UTA is not set, cannot derive secure ICV
  *
  * @param ctx pointer to UTA context, which typically is part of the libsecutils context, or null
  * @param file (path) name of the file to be protected
@@ -49,6 +51,7 @@ bool FILES_protect_icv_at(OPTIONAL uta_ctx* ctx, const char* file, const char* l
 /*!
  * @brief (re-)protect integrity of file, if it has suffix .pem, .crt, or .cnf (unless SECUTILS_NO_ICV), with ICV
  * derived via UTA
+ * @note If SECUTILS_USE_UTA is not set, cannot derive secure ICV
  *
  * @param file (path) name of the file to be protected
  * @param ctx pointer to UTA context, which typically is part of the libsecutils context, or null
@@ -60,6 +63,7 @@ bool FILES_protect_icv_config_trusted(const char* file, OPTIONAL uta_ctx* ctx);
 /*!
  * @brief check integrity of file (of any type that allows appending text) using ICV derived via UTA
  *        from the absolute path name of the file
+ * @note If SECUTILS_USE_UTA is not set, cannot derive secure ICV
  *
  * @param ctx pointer to UTA context, which typically is part of the libsecutils context, or null
  * @param file (path) name of the file to be checked
@@ -71,6 +75,7 @@ bool FILES_check_icv(OPTIONAL uta_ctx* ctx, const char* file);
 /*!
  * @brief check integrity of file (of any type that allows appending text) using ICV derived via UTA
  *        from the supplied path name of the file. If none is supplied, the absolute path is derived.
+ * @note If SECUTILS_USE_UTA is not set, cannot derive secure ICV
  *
  * @param ctx pointer to UTA context, which typically is part of the libsecutils context, or null
  * @param file (path) name of the file to be checked
@@ -82,6 +87,7 @@ bool FILES_check_icv_at(OPTIONAL uta_ctx* ctx, const char* file, const char* loc
 
 /*!
  * @brief load a certificate from the given PEM file, checking ICV-based protection
+ * @note If SECUTILS_USE_UTA is not set, cannot derive secure ICV
  *
  * @param ctx pointer to UTA context, which typically is part of the libsecutils context, or null
  * @param file (path) name of the input file
@@ -93,6 +99,7 @@ X509* FILES_load_cert_pem_icv(OPTIONAL uta_ctx* ctx, const char* file, OPTIONAL 
 
 /*!
  * @brief store the given certificate in given PEM file, with ICV-based protection
+ * @note If SECUTILS_USE_UTA is not set, cannot derive secure ICV
  *
  * @param ctx pointer to UTA context, which typically is part of the libsecutils context, or null
  * @param cert certificate to save
@@ -105,6 +112,7 @@ bool FILES_store_cert_pem_icv(OPTIONAL uta_ctx* ctx, const X509* cert, const cha
 
 /*!
  * @brief store the given certificate in given PEM file and optionally add ICV-based protection
+ * @note If SECUTILS_USE_UTA is not set, cannot derive secure ICV
  *
  * @param ctx pointer to UTA context, which typically is part of the libsecutils context, or null
  * @param cert certificate to save
@@ -119,6 +127,7 @@ bool FILES_store_cert_pem(OPTIONAL uta_ctx* ctx, const X509* cert, const char* f
 
 /*!
  * @brief store the given CRL in given PEM file, with ICV-based protection
+ * @note If SECUTILS_USE_UTA is not set, cannot derive secure ICV
  *
  * @param ctx pointer to UTA context, which typically is part of the libsecutils context, or null
  * @param crl CRL to save
