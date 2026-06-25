@@ -60,6 +60,8 @@ CONF* CONF_load_config(OPTIONAL ossl_unused uta_ctx* ctx, const char* file)
     if(0 not_eq file
 #ifdef SECUTILS_USE_ICV
        and FILES_check_icv(ctx, file) not_eq 0
+#else
+       and (ctx == NULL || (LOG(FL_ERR, "UTA not available"), false))
 #endif
       )
     {
