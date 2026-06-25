@@ -176,6 +176,7 @@ CREDENTIALS* CREDENTIALS_load(OPTIONAL const char* certs, OPTIONAL const char* k
 /*!*****************************************************************************
  * @brief load asymmetric credentials from the given file(s),
  * using DV-based decryption and integrity&authenticity check
+ * @note If SECUTILS_USE_UTA is not set, cannot derive secure password from DV
  *
  * @param certs name of file holding certificate and optional chain, or null
  * @param key name of file holding private key, or null
@@ -217,6 +218,7 @@ bool CREDENTIALS_save(const CREDENTIALS* creds, OPTIONAL const char* certs, OPTI
 /*!*****************************************************************************
  * @brief save asymmetric credentials to the given file(s),
  * using DV-based encryption and integrity&authenticity protection
+ * @note If SECUTILS_USE_UTA is not set, cannot derive secure password from DV
  *
  * @param creds pointer to the credential structure to save
  * @param certs name of file to store certificates, or null. Any previous contents are overwritten.
