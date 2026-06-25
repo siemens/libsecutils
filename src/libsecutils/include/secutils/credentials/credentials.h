@@ -153,7 +153,8 @@ void CREDENTIALS_free(OPTIONAL CREDENTIALS* creds);
 
 /*!*****************************************************************************
  * @brief load asymmetric credentials from the given file(s) and optionally crypto engine
- * @note If used, encryption indirectly also protects integrity&authenticity of file-based storage.
+@note If used, password-based decryption indirectly
+* also checks integrity&authenticity of file-based storage.
  *
  * @param certs name of file holding certificate and optional chain, or null
  * @param key name of file holding private key or an engine key identifier, or null
@@ -173,9 +174,8 @@ CREDENTIALS* CREDENTIALS_load(OPTIONAL const char* certs, OPTIONAL const char* k
 
 
 /*!*****************************************************************************
- * @brief load asymmetric credentials from the given file(s) and optionally using DV-based integrity&authenticity
- *protection
- * @note If used, encryption indirectly also protects integrity&authenticity of file-based storage.
+ * @brief load asymmetric credentials from the given file(s),
+ * using DV-based decryption and integrity&authenticity check
  *
  * @param certs name of file holding certificate and optional chain, or null
  * @param key name of file holding private key, or null
@@ -191,7 +191,8 @@ CREDENTIALS* CREDENTIALS_load_dv(OPTIONAL const char* certs, OPTIONAL const char
 
 /*!*****************************************************************************
  * @brief save asymmetric credentials (except key held in crypto engine or provider) to the given file(s)
- * @note If used, encryption indirectly also protects integrity&authenticity of file-based storage.
+ * @note If used, password-based encryption indirectly
+ * also protects integrity&authenticity of file-based storage.
  *
  * @param creds pointer to the credential structure to save
  * @param certs name of file to store certificates, or null. Any previous contents are overwritten.
@@ -214,8 +215,8 @@ bool CREDENTIALS_save(const CREDENTIALS* creds, OPTIONAL const char* certs, OPTI
 
 
 /*!*****************************************************************************
- * @brief save asymmetric credentials to the given file(s)
- * @note If used, encryption indirectly also protects integrity&authenticity of file-based storage.
+ * @brief save asymmetric credentials to the given file(s),
+ * using DV-based encryption and integrity&authenticity protection
  *
  * @param creds pointer to the credential structure to save
  * @param certs name of file to store certificates, or null. Any previous contents are overwritten.
