@@ -235,7 +235,7 @@ static const char* const CREDS_DIR_DEFAULT = "certs/creds";
 /*!*****************************************************************************
  * @brief obtain credentials of the given component (based on its ID) from PKCS#12 file
  * @note file name is derived from CREDS_DIR_ENV (defaulting to CREDS_DIR_DEFAULT), cid, and extension ".p12".
- * @note uses DV-based encryption, which also protects integrity&authenticity.
+ * @note does not use DV-based protection
  *
  * @param cid identifier of the component credentials
  * @return pointer to a new CREDENTIALS structure, or null on error
@@ -245,7 +245,7 @@ CREDENTIALS* CREDENTIALS_get(component_creds_id cid);
 /*!*****************************************************************************
  * @brief store credentials of the given component (based on its ID) in PKCS#12 format
  * @note file name is derived from CREDS_DIR_ENV (defaulting to CREDS_DIR_DEFAULT), cid, and extension ".p12".
- * @note uses DV-based encryption, which also protects integrity&authenticity.
+ * @note does not use DV-based protection
  *
  * @param cid identifier of the component credentials
  * @param creds credentials to store
