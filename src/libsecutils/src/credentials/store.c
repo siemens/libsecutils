@@ -234,6 +234,12 @@ bool STORE_load_more_check(X509_STORE** pstore, const char* file,
         LOG_err("null pointer argument");
         goto err;
     }
+#ifndef SECUTILS_USE_ICV
+    if (ctx != NULL) {
+        LOG(FL_ERR, "SECUTILS_USE_ICV not defined but UTA ctx is set");
+        return false;
+    }
+#endif
 
 #ifdef DEBUG
     LOG(FL_DEBUG, "Loading %s from file '%s'", desc not_eq 0 ? desc : "?", file);
@@ -398,6 +404,12 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
         LOG(FL_ERR, "null pointer argument");
         goto err;
     }
+#ifndef SECUTILS_USE_ICV
+    if (ctx != NULL) {
+        LOG(FL_ERR, "SECUTILS_USE_ICV not defined but UTA ctx is set");
+        return false;
+    }
+#endif
 
     p_dir = opendir(crl_dir);
     if(0 is_eq p_dir)

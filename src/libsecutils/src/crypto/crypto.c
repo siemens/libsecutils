@@ -5,7 +5,7 @@
 *
 * @copyright Copyright (c) Siemens Mobility GmbH, 2021
 *
-* @author David von Oheimb <david.von.oheimb@siemens.com>
+* @author Benjamin Schilling <Schilling.Benjamin@siemens.com>
 *
 * This work is licensed under the terms of the Apache Software License 
 * 2.0. See the COPYING file in the top-level directory.
@@ -93,8 +93,23 @@ ssize_t AESGCM_encrypt(EVP_CIPHER_CTX* osslctx, uint8_t* cipher_buff, size_t cip
         return ret;
     }
 
-    int cipher_len = cipher_buff_len;
-    if((EVP_EncryptUpdate(osslctx, cipher_buff, &cipher_len, plain, plain_len) not_eq 1) or ((size_t)cipher_len not_eq plain_len))
+    if (cipher_buff_len > INT_MAX) {
+        LOG(FL_ERR, "cipher_buff_len > INT_MAX");
+        return ret;
+    }
+    if (plain_len > INT_MAX) {
+        LOG(FL_ERR, "plain_len > INT_MAX");
+        return ret;
+    }
+    int cipher_len = (int)cipher_buff_len;
+    int block_size = EVP_CIPHER_CTX_get_block_size(osslctx);
+    int padding_len = (block_size - (plain_len % block_size)) % block_size;
+    if ((int)plain_len > cipher_len - padding_len) {
+        LOG(FL_ERR, "cipher_buff_len = %zu too small, should be at least plain_len + padding_len = %zu",
+            cipher_buff_len, plain_len + padding_len);
+        return ret;
+    }
+    if((EVP_EncryptUpdate(osslctx, cipher_buff, &cipher_len, plain, (int)plain_len) not_eq 1) or ((size_t)cipher_len not_eq plain_len))
     {/* The second condition - GCM is used, hence length(plain_text) == length(cipher_text) */
         LOG(FL_ERR, "Encryption failed");
         return ret;
@@ -117,8 +132,22 @@ ssize_t AESGCM_decrypt(EVP_CIPHER_CTX* osslctx, uint8_t* plain_buff, size_t plai
         return ret;
     }
 
-    int plain_len = plain_buff_len;
-    if((EVP_DecryptUpdate(osslctx, plain_buff, &plain_len, cipher, cipher_len) not_eq 1)
+    if (plain_buff_len > INT_MAX) {
+        LOG(FL_ERR, "plain_buff_len > INT_MAX");
+        return ret;
+    }
+    if (cipher_len > INT_MAX) {
+        LOG(FL_ERR, "cipher_len > INT_MAX");
+        return ret;
+    }
+    if (plain_buff_len < cipher_len) {
+        LOG(FL_ERR, "plain_buff_len = %zu too small, should be at least cipher_len = %zu",
+            plain_buff_len, cipher_len);
+        return ret;
+    }
+
+    int plain_len = (int)plain_buff_len;
+    if((EVP_DecryptUpdate(osslctx, plain_buff, &plain_len, cipher, (int)cipher_len) not_eq 1)
        or ((size_t)plain_len not_eq cipher_len))
     {/* The second condition - GCM is used hence length(plain_text) == length(cipher_text) */
         LOG(FL_ERR, "Decryption failed");

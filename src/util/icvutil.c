@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
         return ret;
     }
 #else
-    LOG(FL_WARN, "Not using UTA lib because SECUTILS_USE_UTA was not defined");
+    LOG(FL_WARN, "Not using UTA lib because SECUTILS_USE_UTA was not defined; cannot obtain secure ICV");
 #endif
 
     const char *prog = argv[0];

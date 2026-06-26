@@ -320,6 +320,7 @@ SSL* TLS_connect(SSL_CTX* ctx, const char* host, OPTIONAL const char* port, int 
     }
     /* link it with BIO connection */
     SSL_set_bio(ssl, conn, conn);
+    conn = NULL; /* as ownership has been transferred */
 
     if(not CONN_IS_IP_ADDR(hostaddr)
        and not SSL_set_tlsext_host_name(ssl, hostaddr))
@@ -336,7 +337,7 @@ SSL* TLS_connect(SSL_CTX* ctx, const char* host, OPTIONAL const char* port, int 
 
 err:
     OPENSSL_free(host_str);
-    /* release the intermediate connection structure */
+    /* release the connection structure (unless ownership transferred to ssl) */
     CONN_free(conn);
     /* on error, release the SSL/TLS structure */
     if(0 is_eq res)

@@ -153,7 +153,8 @@ void CREDENTIALS_free(OPTIONAL CREDENTIALS* creds);
 
 /*!*****************************************************************************
  * @brief load asymmetric credentials from the given file(s) and optionally crypto engine
- * @note If used, encryption indirectly also protects integrity&authenticity of file-based storage.
+@note If used, password-based decryption indirectly
+* also checks integrity&authenticity of file-based storage.
  *
  * @param certs name of file holding certificate and optional chain, or null
  * @param key name of file holding private key or an engine key identifier, or null
@@ -173,9 +174,9 @@ CREDENTIALS* CREDENTIALS_load(OPTIONAL const char* certs, OPTIONAL const char* k
 
 
 /*!*****************************************************************************
- * @brief load asymmetric credentials from the given file(s) and optionally using DV-based integrity&authenticity
- *protection
- * @note If used, encryption indirectly also protects integrity&authenticity of file-based storage.
+ * @brief load asymmetric credentials from the given file(s),
+ * using DV-based decryption and integrity&authenticity check
+ * @note If SECUTILS_USE_UTA is not set, cannot derive secure password from DV
  *
  * @param certs name of file holding certificate and optional chain, or null
  * @param key name of file holding private key, or null
@@ -191,7 +192,8 @@ CREDENTIALS* CREDENTIALS_load_dv(OPTIONAL const char* certs, OPTIONAL const char
 
 /*!*****************************************************************************
  * @brief save asymmetric credentials (except key held in crypto engine or provider) to the given file(s)
- * @note If used, encryption indirectly also protects integrity&authenticity of file-based storage.
+ * @note If used, password-based encryption indirectly
+ * also protects integrity&authenticity of file-based storage.
  *
  * @param creds pointer to the credential structure to save
  * @param certs name of file to store certificates, or null. Any previous contents are overwritten.
@@ -214,8 +216,9 @@ bool CREDENTIALS_save(const CREDENTIALS* creds, OPTIONAL const char* certs, OPTI
 
 
 /*!*****************************************************************************
- * @brief save asymmetric credentials to the given file(s)
- * @note If used, encryption indirectly also protects integrity&authenticity of file-based storage.
+ * @brief save asymmetric credentials to the given file(s),
+ * using DV-based encryption and integrity&authenticity protection
+ * @note If SECUTILS_USE_UTA is not set, cannot derive secure password from DV
  *
  * @param creds pointer to the credential structure to save
  * @param certs name of file to store certificates, or null. Any previous contents are overwritten.
@@ -235,7 +238,7 @@ static const char* const CREDS_DIR_DEFAULT = "certs/creds";
 /*!*****************************************************************************
  * @brief obtain credentials of the given component (based on its ID) from PKCS#12 file
  * @note file name is derived from CREDS_DIR_ENV (defaulting to CREDS_DIR_DEFAULT), cid, and extension ".p12".
- * @note uses DV-based encryption, which also protects integrity&authenticity.
+ * @note does not use DV-based protection
  *
  * @param cid identifier of the component credentials
  * @return pointer to a new CREDENTIALS structure, or null on error
@@ -245,7 +248,7 @@ CREDENTIALS* CREDENTIALS_get(component_creds_id cid);
 /*!*****************************************************************************
  * @brief store credentials of the given component (based on its ID) in PKCS#12 format
  * @note file name is derived from CREDS_DIR_ENV (defaulting to CREDS_DIR_DEFAULT), cid, and extension ".p12".
- * @note uses DV-based encryption, which also protects integrity&authenticity.
+ * @note does not use DV-based protection
  *
  * @param cid identifier of the component credentials
  * @param creds credentials to store
