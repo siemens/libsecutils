@@ -397,7 +397,7 @@ int check_cert_status_cdps(X509_STORE_CTX* ctx)
     X509_CRL* delta_crl = 0;
     for(i = 0; delta_crl is_eq 0 and i < n_delta; i++)
     {
-        const char* url = get_dp_url(sk_DIST_POINT_value(crldp, i));
+        const char* url = get_dp_url(sk_DIST_POINT_value(delta_crldp, i));
         if(url not_eq 0)
         {
             LOG(FL_DEBUG, "trying to load delta CRL from CDP URL:", url);
