@@ -85,9 +85,13 @@ const char *STORE_get0_desc(OPTIONAL const X509_STORE *store);
  * @param stapling enable OCSP stapling, which makes sense only for TLS
  * @param crls (optional) provide a list of CRLS to be added to the store and enable CRL-based checks
  * @param use_CDP enable using HTTP CDP entries in certificates and enable CRL-based status checking
+ * @note The use of URLs taken from CDP entries in certificates is not limited.
+ * Thus any referenced online endpoints and local file locations may get accessed.
  * @param cdps (optional) provide fallback CDP URL(s) and enable CRL-based status checking
  * @param crls_timeout number of seconds fetching a CRL may take, or 0 for infinite or -1 for default (= 10)
  * @param use_AIA enable using AIA OCSP responder entries in certificates and enable OCSP-based status checking
+ * @note The use of URLs taken from AIA entries in certificates is not limited.
+ * Thus any referenced online endpoints and local file locations may get accessed.
  * @param ocsp (optional) provides fallback OCSP responder URL(s) and enable OCSP-based status checking
  * @param ocsp_timeout number of seconds getting an OCSP response may take, or 0 for infinite or -1 for default (= 10)
  * @return true on success, false on failure
