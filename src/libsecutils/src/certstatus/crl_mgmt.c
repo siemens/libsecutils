@@ -128,17 +128,19 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
         ASN1_TIME *now = ASN1_TIME_new();
         ASN1_TIME_set(now, time(NULL));
         const ASN1_TIME *lastUpdate = X509_CRL_get0_lastUpdate(crl);
-        const ASN1_TIME *nextUpdate = X509_CRL_get0_nextUpdate(crl);
+        const ASN1_TIME *nextUpdate = X509_CRL_get0_nextUpdate(crl); /* may be NULL */
 
         CDP_get_x509_time(now, time_buf, sizeof(time_buf));
         LOG(FL_TRACE, "current time: %s", time_buf);
         CDP_get_x509_time(lastUpdate, time_buf, sizeof(time_buf));
         LOG(FL_TRACE, "CRL lastUpdate: %s", time_buf);
-        CDP_get_x509_time(nextUpdate, time_buf, sizeof(time_buf));
-        LOG(FL_TRACE, "CRL nextUpdate: %s", time_buf);
+        if (nextUpdate != NULL) {
+            CDP_get_x509_time(nextUpdate, time_buf, sizeof(time_buf));
+            LOG(FL_TRACE, "CRL nextUpdate: %s", time_buf);
+        }
 
         int isBeforeStart = ASN1_TIME_compare(now, lastUpdate) < 0;
-        int isAfterEnd = ASN1_TIME_compare(nextUpdate, now) <= 0;
+        int isAfterEnd = nextUpdate != NULL && ASN1_TIME_compare(nextUpdate, now) <= 0;
         int isAfterPublish = 0;
 
         int nextPublishIdx = X509_CRL_get_ext_by_NID(crl, NID_crl_next_publish, 0);
