@@ -135,6 +135,9 @@ X509_CRL *STORE_fetch_crl(const X509_STORE *store, OPTIONAL const char *url, int
 /*!
  * @brief create or extend cert store structure with any given cert(s)
  * @note sets CREDENTIALS_print_cert_verify_cb() enabling diagnostic log output
+ * @note This turns X509_V_ERR_CERT_NOT_YET_VALID into just a warning,
+ * effectively accepting not yet valid certificates, which are considered OK here.
+ *
  * @note use in addition STORE_set_parameters() to enable certificate status checks
  *
  * @param store certificate store to be extended if not null
