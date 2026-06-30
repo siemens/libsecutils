@@ -82,7 +82,7 @@ ssize_t AESGCM_decrypt(EVP_CIPHER_CTX* osslctx, uint8_t* plain_buff, size_t plai
  *
  * @param osslctx pointer to context of decryption operation
  * @param tag_buff     pointer to buffer used to store tag
- * @param tag_len      size of resulting tag to be stored in tag_buff
+ * @param tag_len      size of resulting tag to be stored in tag_buff, should be EVP_GCM_TLS_TAG_LEN
  * @note  If tag_buff is set to null and tag_len is set to 0 then tag will not be generated
  *
  * @return  true  on success
@@ -96,7 +96,7 @@ bool AESGCM_encrypt_final(EVP_CIPHER_CTX* osslctx, uint8_t* tag_buff, size_t tag
  *
  * @param osslctx pointer to context of decryption operation
  * @param tag     pointer to tag
- * @param tag_len size of tag
+ * @param tag_len size of ta, should be EVP_GCM_TLS_TAG_LEN
  * @note  If tag_buff is set to null and tag_len is set 0 then authenticity will not be checked
  * @param plain   pointer to plain text obtained by calling AESGCM_decrypt or null
  * @note  on failure the function cleans plain text if parameter plain is not null
