@@ -152,7 +152,15 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
 #if OPENSSL_VERSION_NUMBER < 0x10101000L
                 LOG(FL_ERR, "CRL nextPublish extension is present, but ASN1_TIME_set_string_X509 is not supported for OpenSSL version <1.1, sorry");
 #else
-                const char *nextPublishString = (const char*)ASN1_STRING_get0_data(data);
+                const char *nextPublishString = (const char *)ASN1_STRING_get0_data(data);
+                int len = ASN1_STRING_length(data);
+
+                if (nextPublishString == NULL || len <= 0
+                    || memchr(nextPublishString, '\0', (size_t)len) != NULL) {
+                    LOG(FL_WARN, "ignoring nextPublishString that is invalid or has embedded NUL byte");
+                    goto ignore;
+                }
+
                 while (*nextPublishString && !((*nextPublishString) & 0xE0)) {
                     ++nextPublishString;
                 }
@@ -165,6 +173,7 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
                     LOG(FL_ERR, "CRL nextPublish extension is present, but time cannot be determined");
                 }
                 ASN1_TIME_free(nextPublish);
+            ignore: ;
 #endif
             }
         }
