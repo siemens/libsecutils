@@ -243,7 +243,8 @@ static X509_CRL *get_crl_by_download_or_from_cache(const CRLMGMT_DATA *data,
     }
 
     crl = CONN_load_crl_http(url, timeout, data->max_download_size, desc);
-    if (usecache && crl != NULL) {
+    if (usecache && crl != NULL
+        && X509_CRL_get0_nextUpdate(crl) != NULL /* otherwise would not know when to remove it again */) {
         put_crl_into_cache(crl, cachefile);
     }
     return crl;
