@@ -297,9 +297,14 @@ static const char* get_dp_url(DIST_POINT* dp)
     {
         gen = sk_GENERAL_NAME_value(gens, i);
         uri = GENERAL_NAME_get0_value(gen, &gtype);
-        if(gtype is_eq GEN_URI and ASN1_STRING_length(uri) > 6)
-        {
-            char* uptr = (char*)ASN1_STRING_get0_data(uri);
+        if (gtype is_eq GEN_URI) {
+            const char *uptr = (const char *)ASN1_STRING_get0_data(uri);
+            int len = ASN1_STRING_length(uri);
+
+            if (uptr == NULL || len <= 6 || memchr(uptr, '\0', (size_t)len) != NULL) {
+                LOG(FL_WARN, "ignoring CDP URI that is invalid, too short, or has embedded NUL byte");
+                continue;
+            }
             if (CONN_IS_HTTP(uptr) || HAS_CASE_PREFIX(uptr, "file:"))
             {
                 return uptr;
