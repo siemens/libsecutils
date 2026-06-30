@@ -66,6 +66,8 @@ int check_cert_crls(X509_STORE_CTX* ctx, OPTIONAL STACK_OF(X509_CRL) * crls, con
 
 /*!
  * @brief check the revocation status of the certificate at current error depth in ctx using CDPs
+ * @note This does not limit the use of URLs taken from CDP entries in the certificate.
+ * Thus any referenced online endpoints and local file locations may get accessed.
  *
  * @param ctx pointer to verification context structure including the cert to check
  * @return 1 on success, 0 on rejection (i.e., cert revoked), -2 on no CRL available, -1 on other error
