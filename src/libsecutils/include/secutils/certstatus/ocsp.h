@@ -32,6 +32,7 @@
  * @brief obtain OCSP response from given OCSP responder
  *
  * @param url the location of the OCSP responder
+ * @note when given an https URL, uses trivial unauthenticated TLS
  * @param timeout number of seconds the HTTP transaction may take, or 0 for infinite or -1 for default
  * @param req the OCSP request to send
  * @param desc description of contents to use for any error messages, or null
