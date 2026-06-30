@@ -357,14 +357,15 @@ int UTIL_safe_string_copy(const char *source, OPTIONAL char *destination,
     }
 
     const char *begin = source;
-    size_t needed = 1;  /* record the buffer size that would be needed == strlen(source) */
-    while (*source != 0) {
+    size_t needed = 1;  /* record the buffer size that would be needed == strlen(source) + 1 */
+    while (*source != '\0') {
         needed++;
-        if (destination != NULL && needed < destination_len) {
-            *destination++ = *source++;
+        if (destination != NULL && needed <= destination_len) {
+            *destination++ = *source;
         }
+        source++;
     }
-     if (destination != NULL) {
+    if (destination != NULL) {
         *destination = '\0';
     }
 
@@ -372,7 +373,12 @@ int UTIL_safe_string_copy(const char *source, OPTIONAL char *destination,
         *size_needed = needed;
     }
 
-    return source - begin;
+    if (destination != NULL && needed > destination_len) {
+        /* source was truncated to fit destination buffer */
+        return -1;
+    }
+
+    return source - begin > INT_MAX ? -1 : (int)(source - begin);
 }
 
 /* implementation of the function url_encode */
