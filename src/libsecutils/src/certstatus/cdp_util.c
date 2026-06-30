@@ -85,10 +85,14 @@ const char *CDP_get_uri_from_general_names(
            protocol prefixes, the distribution point has been found
         */
         uri = GENERAL_NAME_get0_value(name_entry, &gtype);
-        if(gtype == GEN_URI && ASN1_STRING_length(uri) > 7)
-        {
-            /* uri is of type ASN1_STRING */
+        if (gtype == GEN_URI) {
             const char *asn1_uri = (const char *)ASN1_STRING_get0_data(uri);
+            int len = ASN1_STRING_length(uri);
+
+            if (asn1_uri == NULL || len <= 6 || memchr(asn1_uri, '\0', (size_t)len) != NULL) {
+                LOG(FL_WARN, "ignoring CDP URI that is invalid, too short, or has embedded NUL byte");
+                continue;
+            }
             if (CONN_IS_HTTP(asn1_uri) || CONN_IS_HTTPS(asn1_uri))
             {
                 return asn1_uri;
