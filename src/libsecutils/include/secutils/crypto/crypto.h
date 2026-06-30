@@ -78,9 +78,9 @@ ssize_t AESGCM_decrypt(EVP_CIPHER_CTX* osslctx, uint8_t* plain_buff, size_t plai
 
 
 /*!
- * @brief The function finalizes encryption and store tag (integrity protection value).
+ * @brief The function finalizes encryption and stores tag (integrity protection value).
  *
- * @param osslctx pointer to context of decryption operation
+ * @param osslctx pointer to context of encryption operation
  * @param tag_buff     pointer to buffer used to store tag
  * @param tag_len      size of resulting tag to be stored in tag_buff, should be EVP_GCM_TLS_TAG_LEN
  * @note  If tag_buff is set to null and tag_len is set to 0 then tag will not be generated
