@@ -427,7 +427,7 @@ size_t UTIL_url_encode(
     size_t needed = 0; /* record the size needed */
 
     for (is=0,id=0; source[is]!=0; ++is) {
-        if (unreserved[(int)source[is]]) {
+        if (unreserved[(unsigned char)source[is]]) {
             /* character is part of the unreserved ones */
             ++needed;
             if (destination && destination_len >= needed) {
