@@ -359,7 +359,7 @@ bool UTIL_get_random(void *buf, size_t len);
  *        is needed for the copied string. If the size_needed is null the size is not returned.
  *
  * @return number of bytes excluding the terminating NUL that have been copied to destination,
- *         -1 on error, e.g., the source is null or
+ *         -1 on error, e.g., the source is null or the length is > INT_MAX or
  *            the destination is not null and the buffer size is 0.
  */
 int UTIL_safe_string_copy(const char *source, OPTIONAL char *destination,
