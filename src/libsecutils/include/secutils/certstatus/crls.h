@@ -42,6 +42,7 @@ bool CRL_check(const char *src, OPTIONAL X509_CRL *crl, OPTIONAL const X509_VERI
  * @brief retrieve CRL in DER format (ASN.1) from given CRL distribution point
  *
  * @param url the location of the CDP
+ * @note when given an https URL, uses trivial unauthenticated TLS
  * @param timeout number of seconds the HTTP transaction may take, or 0 for infinite or -1 for default
  * @param max_resp_len the maximal size of the response message, or 0 for the OpenSSL default: 100 kiB
  * @param desc description of the CRL to use for any error messages, or null
