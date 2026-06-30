@@ -63,7 +63,7 @@ static bool getBase64Password(OPTIONAL uta_ctx* ctx, const unsigned char* dv, ch
 #endif
     len = UTIL_base64_encode_to_buf(key, TA_OUTLEN, pw, MAX_B64_CHARS_PER_BYTE * TA_OUTLEN);
 
-    LOG(FL_TRACE, "DV-based password: %s", pw);
+    // better not do in productive builds: LOG(FL_TRACE, "DV-based password: %s", pw);
     return len >= 0;
 }
 
