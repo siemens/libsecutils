@@ -63,7 +63,7 @@ static bool getBase64Password(OPTIONAL uta_ctx* ctx, const unsigned char* dv, ch
 #endif
     len = UTIL_base64_encode_to_buf(key, TA_OUTLEN, pw, MAX_B64_CHARS_PER_BYTE * TA_OUTLEN);
 
-    LOG(FL_TRACE, "DV-based password: %s", pw);
+    // better not do in productive builds: LOG(FL_TRACE, "DV-based password: %s", pw);
     return len >= 0;
 }
 
@@ -264,7 +264,7 @@ static char* get_basename(const char* path)
 /**
  * @brief returns canonicalized absolute path
  * @param path path which should be canonicalized
- * @param canonicalized
+ * @param pointer to buffer for canonicalized output, MUST be at least PATH_MAX characters long
  * @note  the pointer has to be freed by OPENSSL_free()
  */
 static char* get_canonicalized(const char* path, char* canonicalized)
@@ -276,7 +276,8 @@ static char* get_canonicalized(const char* path, char* canonicalized)
 
     if((0 not_eq dir_part) and (0 not_eq name_part))
     {
-        if(0 is_eq realpath(dir_part, canonicalized))
+        if(0 is_eq realpath(dir_part, canonicalized)
+           || strlen(canonicalized) + 1 + strlen(name_part) >= PATH_MAX)
         {
             ret_val = 0;
         }

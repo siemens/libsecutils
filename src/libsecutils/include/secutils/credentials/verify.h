@@ -46,6 +46,9 @@ bool STORE_CTX_tls_active(const X509_STORE_CTX* ctx);
  * @param ctx_x509 pointer to structure containing certificate verification options like trusted certs
  * @return 0 if and only if the cert verification is considered failed
  *
+ * @note This callback turns X509_V_ERR_CERT_NOT_YET_VALID into just a warning,
+ * effectively accepting not yet valid certificates, which are considered OK here.
+ *
  * @note OpenSSL's X509_verify_cert function calls this function
  * during certificate verification whenever a problem has been
  * found and on success at the end of the verification to give an opportunity
@@ -78,6 +81,9 @@ bool verify_cb_cert(X509_STORE_CTX* store_ctx, X509* cert, int err);
  * @param cert certificate to be verified
  * @param untrusted (optional) intermediate certs that may be useful for building
  * the chain of certificates between the cert and the trusted certs in the trust store
+ * @note This function turns X509_V_ERR_CERT_NOT_YET_VALID into just a warning,
+ * effectively accepting not yet valid certificates, which are considered OK here.
+ *
  * @param trust_store pointer to structure containing trusted (root) certs and further verification parameters
  * @note trust_store may contain CRLs loaded via STORE_load_crl_dir()
  * @return < 0 on on verification error, 0 for invalid cert, 1 for valid cert

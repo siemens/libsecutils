@@ -85,9 +85,13 @@ const char *STORE_get0_desc(OPTIONAL const X509_STORE *store);
  * @param stapling enable OCSP stapling, which makes sense only for TLS
  * @param crls (optional) provide a list of CRLS to be added to the store and enable CRL-based checks
  * @param use_CDP enable using HTTP CDP entries in certificates and enable CRL-based status checking
+ * @note The use of URLs taken from CDP entries in certificates is not limited.
+ * Thus any referenced online endpoints and local file locations may get accessed.
  * @param cdps (optional) provide fallback CDP URL(s) and enable CRL-based status checking
  * @param crls_timeout number of seconds fetching a CRL may take, or 0 for infinite or -1 for default (= 10)
  * @param use_AIA enable using AIA OCSP responder entries in certificates and enable OCSP-based status checking
+ * @note The use of URLs taken from AIA entries in certificates is not limited.
+ * Thus any referenced online endpoints and local file locations may get accessed.
  * @param ocsp (optional) provides fallback OCSP responder URL(s) and enable OCSP-based status checking
  * @param ocsp_timeout number of seconds getting an OCSP response may take, or 0 for infinite or -1 for default (= 10)
  * @return true on success, false on failure
@@ -135,6 +139,9 @@ X509_CRL *STORE_fetch_crl(const X509_STORE *store, OPTIONAL const char *url, int
 /*!
  * @brief create or extend cert store structure with any given cert(s)
  * @note sets CREDENTIALS_print_cert_verify_cb() enabling diagnostic log output
+ * @note This turns X509_V_ERR_CERT_NOT_YET_VALID into just a warning,
+ * effectively accepting not yet valid certificates, which are considered OK here.
+ *
  * @note use in addition STORE_set_parameters() to enable certificate status checks
  *
  * @param store certificate store to be extended if not null
@@ -157,6 +164,7 @@ X509_STORE* STORE_create(OPTIONAL X509_STORE* store, OPTIONAL const X509* cert, 
  * @param vpm verification parameters, or null, governing if and how to check cert times,
  * depending on X509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
  * @param ctx (optional) pointer to UTA context for checking file integrity&authenticity using ICV
+ * @note if ctx is null or SECUTILS_USE_ICV not defined, no ICV-based check is done
  * @return true on success, false on error
  * @note For loaded certs their validity period and their CA flag are checked.
  *       Failures are logged as a warning if vpm is null, otherwise as an error.
@@ -177,6 +185,7 @@ bool STORE_load_more_check(X509_STORE** pstore, const char* file,
  * @param vpm verification parameters, or null, governing if and how to check cert times,
  * depending on X509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
  * @param ctx (optional) pointer to UTA context for checking file integrity&authenticity using ICV
+ * @note if ctx is null or SECUTILS_USE_ICV not defined, no ICV-based check is done
  * @return pointer to a new X509_STORE structure, or null on error
  * @note For loaded certs their validity period and their CA flag are checked.
  *       Failures are logged as a warning if vpm is null, otherwise as an error.
@@ -198,6 +207,7 @@ X509_STORE* STORE_load_check(const char* files, OPTIONAL const char* desc,
  * @param vpm verification parameters, or null, governing if and how to check cert times,
  * depending on X509_V_FLAG_USE_CHECK_TIME and X509_V_FLAG_NO_CHECK_TIME
  * @param ctx (optional) pointer to UTA context for checking file integrity&authenticity using ICV
+ * @note if ctx is null or SECUTILS_USE_ICV not defined, no ICV-based check is done
  * @note at least one valid certificate file must be found in all tested directories
  * @return true on success, false on error/failure
  * @note For loaded certs their validity period and their CA flag are checked.
@@ -217,7 +227,8 @@ bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
  * @param crl_dir     directory where to search for CRLs
  * @param desc        description of CRLs to use for error reporting, or null
  * @param recursive   if true, use recursive search in subdirectories
- * @param ctx pointer to UTA context for checking file integrity&authenticity using ICV, or null
+ * @param ctx (optional) pointer to UTA context for checking file integrity&authenticity using ICV
+ * @note if ctx is null or SECUTILS_USE_ICV not defined, no ICV-based check is done
  * @note at least one valid CRL file must be found in each visited directory
  * @return true on success, false on error/failure
  ******************************************************************************/

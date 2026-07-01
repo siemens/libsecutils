@@ -36,6 +36,7 @@
 /*
  * derive integrity protection hash for data with given len, using name as DV for key
  * optionally uses ctx pointer to UTA context, which typically is part of the libsecutils context
+ * if SECUTILS_USE_UTA is not set, cannot derive secure ICV
  * if returns true, hash value is placed in buf, which must be of size ICV_HEX_LEN+1
  */
 static bool calculate_icv_hex(OPTIONAL uta_ctx* ctx, const void* data, size_t len, const char* name, char* buf)
@@ -221,9 +222,7 @@ bool FILES_protect_icv_config_trusted(const char* file, OPTIONAL uta_ctx* ctx)
     int str_len = strlen(file);
     const char* name_tail = file + str_len - (str_len >= ext_len ? ext_len : 0);
     if(0 is_eq strcmp(name_tail, ".pem") or 0 is_eq strcmp(name_tail, ".crt")
-#ifdef SECUTILS_USE_ICV
        or 0 is_eq strcmp(name_tail, ".cnf") /* OpenSSL-style config file */
-#endif
     )
     {
         LOG(FL_INFO, "making sure that file '%s' has an ICV", file);

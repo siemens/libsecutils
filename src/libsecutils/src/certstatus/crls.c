@@ -297,9 +297,14 @@ static const char* get_dp_url(DIST_POINT* dp)
     {
         gen = sk_GENERAL_NAME_value(gens, i);
         uri = GENERAL_NAME_get0_value(gen, &gtype);
-        if(gtype is_eq GEN_URI and ASN1_STRING_length(uri) > 6)
-        {
-            char* uptr = (char*)ASN1_STRING_get0_data(uri);
+        if (gtype is_eq GEN_URI) {
+            const char *uptr = (const char *)ASN1_STRING_get0_data(uri);
+            int len = ASN1_STRING_length(uri);
+
+            if (uptr == NULL || len <= 6 || memchr(uptr, '\0', (size_t)len) != NULL) {
+                LOG(FL_WARN, "ignoring CDP URI that is invalid, too short, or has embedded NUL byte");
+                continue;
+            }
             if (CONN_IS_HTTP(uptr) || HAS_CASE_PREFIX(uptr, "file:"))
             {
                 return uptr;
@@ -381,15 +386,16 @@ int check_cert_status_cdps(X509_STORE_CTX* ctx)
     int n_delta = sk_DIST_POINT_num(delta_crldp);
     STACK_OF(DIST_POINT) *crldp =
         use_CDP ? X509_get_ext_d2i(cert, NID_crl_distribution_points, 0, 0) : 0;
+    int n_base = sk_DIST_POINT_num(crldp);
     char* fallback_urls = OPENSSL_strdup(cdps->urls);
     int timeout = cdps->timeout;
     int i;
     int res = -2; /* no CRL available, thus inconclusive */
 
     (void)ERR_set_mark();
-    if(n_delta <= 0 and sk_DIST_POINT_num(crldp) <= 0)
+    if(n_base <= 0 and n_delta <= 0)
     {
-        LOG(FL_DEBUG, use_CDP ? "no HTTP CDP in cert" : "cert CDP use is disabled");
+        LOG(FL_DEBUG, use_CDP ? "no CDP for base or delta CRLs in cert" : "cert CDP use is disabled");
     }
 
     /* Try downloading any delta CRL */
@@ -397,7 +403,7 @@ int check_cert_status_cdps(X509_STORE_CTX* ctx)
     X509_CRL* delta_crl = 0;
     for(i = 0; delta_crl is_eq 0 and i < n_delta; i++)
     {
-        const char* url = get_dp_url(sk_DIST_POINT_value(crldp, i));
+        const char* url = get_dp_url(sk_DIST_POINT_value(delta_crldp, i));
         if(url not_eq 0)
         {
             LOG(FL_DEBUG, "trying to load delta CRL from CDP URL:", url);
@@ -414,7 +420,7 @@ int check_cert_status_cdps(X509_STORE_CTX* ctx)
 
     /* Try downloading any base CRL */
     /* TODO sufficient to use the first CRL found ? */
-    for(i = 0; res < 0 and i < sk_DIST_POINT_num(crldp); i++)
+    for(i = 0; res < 0 and i < n_base; i++)
     {
         res = try_cdp(ctx, timeout, cert, get_dp_url(sk_DIST_POINT_value(crldp, i)),
                       0, delta_crl, nonfinal, "HTTP CDP entry in certificate");

@@ -247,6 +247,7 @@ if(NOT TARGET clean_all)
     COMMAND ${CMAKE_BUILD_TOOL} clean
     COMMAND find . -name "*.o" -o -regex "./libsecutils[0-9-].*" | xargs rm
     COMMAND rm -rf debian/{tmp,libsecutils,libsecutils-dev,libsecutils-bin}
+    COMMAND rm -rf ${CMAKE_CURRENT_BINARY_DIR}/src/${PROJECT_NAME}.pc
     COMMAND find . -type d -name "build" | xargs -r rm -r
     # cowardly not doing rm -r ${CMAKE_BINARY_DIR}
 

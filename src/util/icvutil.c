@@ -5,7 +5,7 @@
 *
 * @copyright Copyright (c) Siemens Mobility GmbH, 2021
 *
-* @author David von Oheimb <david.von.oheimb@siemens.com>
+* @author Raphael Lisicki <raphael.lisicki@siemens.com>
 *
 * This work is licensed under the terms of the Apache Software License 
 * 2.0. See the COPYING file in the top-level directory.
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
         return ret;
     }
 #else
-    LOG(FL_WARN, "Not using UTA lib because SECUTILS_USE_UTA was not defined");
+    LOG(FL_WARN, "Not using UTA lib because SECUTILS_USE_UTA was not defined; cannot obtain secure ICV");
 #endif
 
     const char *prog = argv[0];

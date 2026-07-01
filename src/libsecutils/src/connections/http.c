@@ -230,6 +230,7 @@ ASN1_VALUE* CONN_load_ASN1_http(const char* url, int req_timeout,
             LOG(FL_ERR, "error attaching trivial SSL context");
             goto err;
         }
+        LOG(FL_WARN, "using trivial unauthenticated TLS for downloading %s via %s", desc, url);
 # else
         LOG(FL_ERR, "TLS is not enabled in this build");
         goto err;

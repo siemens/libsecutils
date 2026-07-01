@@ -26,6 +26,8 @@
  * @brief obtain ASN.1 response from given server
  *
  * @param url the location of the server
+ * @note when given an https URL, uses trivial unauthenticated TLS -
+ * so use with care; this is okay for retrieving CRLs and OCSP responses
  * @param timeout number of seconds the HTTP transaction may take, or 0 for infinite
  * @param max_resp_len the maximal size of the response message, or 0 for the default: 100k
  * @param content_type the content type of the request, or null

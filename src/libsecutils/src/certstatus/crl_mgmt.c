@@ -5,8 +5,6 @@
 *
 * @copyright Copyright (c) Siemens Mobility GmbH, 2021
 *
-* @author David von Oheimb <david.von.oheimb@siemens.com>
-*
 * This work is licensed under the terms of the Apache Software License
 * 2.0. See the COPYING file in the top-level directory.
 *
@@ -128,17 +126,19 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
         ASN1_TIME *now = ASN1_TIME_new();
         ASN1_TIME_set(now, time(NULL));
         const ASN1_TIME *lastUpdate = X509_CRL_get0_lastUpdate(crl);
-        const ASN1_TIME *nextUpdate = X509_CRL_get0_nextUpdate(crl);
+        const ASN1_TIME *nextUpdate = X509_CRL_get0_nextUpdate(crl); /* may be NULL */
 
         CDP_get_x509_time(now, time_buf, sizeof(time_buf));
         LOG(FL_TRACE, "current time: %s", time_buf);
         CDP_get_x509_time(lastUpdate, time_buf, sizeof(time_buf));
         LOG(FL_TRACE, "CRL lastUpdate: %s", time_buf);
-        CDP_get_x509_time(nextUpdate, time_buf, sizeof(time_buf));
-        LOG(FL_TRACE, "CRL nextUpdate: %s", time_buf);
+        if (nextUpdate != NULL) {
+            CDP_get_x509_time(nextUpdate, time_buf, sizeof(time_buf));
+            LOG(FL_TRACE, "CRL nextUpdate: %s", time_buf);
+        }
 
         int isBeforeStart = ASN1_TIME_compare(now, lastUpdate) < 0;
-        int isAfterEnd = ASN1_TIME_compare(nextUpdate, now) <= 0;
+        int isAfterEnd = nextUpdate != NULL && ASN1_TIME_compare(nextUpdate, now) <= 0;
         int isAfterPublish = 0;
 
         int nextPublishIdx = X509_CRL_get_ext_by_NID(crl, NID_crl_next_publish, 0);
@@ -152,7 +152,15 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
 #if OPENSSL_VERSION_NUMBER < 0x10101000L
                 LOG(FL_ERR, "CRL nextPublish extension is present, but ASN1_TIME_set_string_X509 is not supported for OpenSSL version <1.1, sorry");
 #else
-                const char *nextPublishString = (const char*)ASN1_STRING_get0_data(data);
+                const char *nextPublishString = (const char *)ASN1_STRING_get0_data(data);
+                int len = ASN1_STRING_length(data);
+
+                if (nextPublishString == NULL || len <= 0
+                    || memchr(nextPublishString, '\0', (size_t)len) != NULL) {
+                    LOG(FL_WARN, "ignoring nextPublishString that is invalid or has embedded NUL byte");
+                    goto ignore;
+                }
+
                 while (*nextPublishString && !((*nextPublishString) & 0xE0)) {
                     ++nextPublishString;
                 }
@@ -165,6 +173,7 @@ static X509_CRL *get_crl_from_cache(const char * cachefile)
                     LOG(FL_ERR, "CRL nextPublish extension is present, but time cannot be determined");
                 }
                 ASN1_TIME_free(nextPublish);
+            ignore: ;
 #endif
             }
         }
@@ -232,7 +241,8 @@ static X509_CRL *get_crl_by_download_or_from_cache(const CRLMGMT_DATA *data,
     }
 
     crl = CONN_load_crl_http(url, timeout, data->max_download_size, desc);
-    if (usecache && crl != NULL) {
+    if (usecache && crl != NULL
+        && X509_CRL_get0_nextUpdate(crl) != NULL /* otherwise would not know when to remove it again */) {
         put_crl_into_cache(crl, cachefile);
     }
     return crl;
