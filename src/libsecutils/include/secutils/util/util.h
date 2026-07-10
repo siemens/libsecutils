@@ -201,6 +201,10 @@ STACK_OF(X509) *X509_STORE_get1_all_certs(X509_STORE *store);
 #  define X509_VERIFY_PARAM_get1_ip_asc(vpm) ((void)(vpm), NULL) /* dummy */
 # endif
 
+#if defined(_WIN32) && !defined(strncasecmp)
+#define strncasecmp _strnicmp
+#endif
+
 /*!*****************************************************************************
  * @brief initialize the OpenSSL crypto library
  * @param version expected OpenSSL version number
