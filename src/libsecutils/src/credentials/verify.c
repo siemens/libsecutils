@@ -178,7 +178,9 @@ int CREDENTIALS_print_cert_verify_cb(int ok, X509_STORE_CTX* store_ctx)
                 }
             }
         }
+#ifndef SECUTILS_NO_TLS
     end:
+#endif
         OPENSSL_free(expected_to_free);
     }
     return ok;
