@@ -24,7 +24,7 @@
 #include <operators.h>
 
 /* adapted from OpenSSL:apps/include/apps.h */
-static opt_t vpm_opts[] = { OPT_V_OPTIONS, OPT_END };
+static const opt_t vpm_opts[] = { OPT_V_OPTIONS, OPT_END };
 
 /* Parse a long integer, put it into *result; return false on failure */
 static bool parse_long(const char* str, long* result)
@@ -131,14 +131,14 @@ static const char* prev_item(const char* opt, const char* end)
 }
 
 /* get str value for name from a comma-separated hierarchy of config sections */
-static const char* conf_get_string(const CONF* src_conf, const char* sections,
+static const char* conf_get_string(const CONF* conf, const char* sections,
                                    const char* name)
 {
     const char* end = sections + strlen(sections);
     while((end = prev_item(sections, end)) not_eq 0)
     {
         const char* res;
-        if((res = NCONF_get_string(src_conf, opt_item, name)) not_eq 0)
+        if((res = NCONF_get_string(conf, opt_item, name)) not_eq 0)
         {
             return res;
         }
@@ -147,16 +147,16 @@ static const char* conf_get_string(const CONF* src_conf, const char* sections,
 }
 
 /* get long val for name from a comma-separated hierarchy of config sections */
-static bool conf_get_number_e(const CONF* conf_, const char* sections,
+static bool conf_get_number_e(const CONF* conf, const char* sections,
                               const char* name, long* p_result)
 {
-    const char* str = conf_get_string(conf_, sections, name);
+    const char* str = conf_get_string(conf, sections, name);
     return str is_eq 0 ? false : parse_long(str, p_result);
 }
 
-bool CONF_update_vpm(CONF* conf, const char* sections, X509_VERIFY_PARAM* vpm)
+bool CONF_update_vpm(const CONF* conf, const char* sections, X509_VERIFY_PARAM* vpm)
 {
-    opt_t* vopt;
+    const opt_t* vopt;
     if(conf is_eq 0 or sections is_eq 0 or vpm is_eq 0)
     {
         LOG(FL_ERR, "null argument");
@@ -185,7 +185,7 @@ bool CONF_update_vpm(CONF* conf, const char* sections, X509_VERIFY_PARAM* vpm)
 }
 
 
-bool CONF_read_options(CONF* conf, const char* sections, opt_t* opt)
+bool CONF_read_options(const CONF* conf, const char* sections, const opt_t* opt)
 {
     const char* str;
     long val = 0;
@@ -274,7 +274,7 @@ bool CONF_read_options(CONF* conf, const char* sections, opt_t* opt)
 
 
 CONF* CONF_load_options(OPTIONAL uta_ctx* ctx, const char* file,
-                        const char* sections, OPTIONAL opt_t* opts)
+                        const char* sections, const opt_t* opts)
 {
     if(sections is_eq 0)
     {
@@ -322,7 +322,7 @@ char* CONF_load_string(OPTIONAL uta_ctx* ctx, const char* file,
         return 0;
     }
 
-    opt_t opts[] = {{key, OPT_TXT, {.txt = 0}, {&val}, ""}, {0}};
+    const opt_t opts[] = {{key, OPT_TXT, {.txt = 0}, {&val}, ""}, {0}};
     CONF* conf = CONF_load_options(ctx, file, sections, opts);
     if(0 is_eq conf)
     {
