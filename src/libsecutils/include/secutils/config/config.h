@@ -32,11 +32,17 @@
 CONF* CONF_load_config(OPTIONAL uta_ctx* ctx, const char* file);
 
 /*!
- * @brief read options from configuration section(s)
+ * @brief read options from configuration section(s) and save the
+ * configured values in the variables referenced in the given table of options
  * @param conf configuration structure to read from
  * @param sections comma-separated list of names of the section(s) to read
  * @param opts pointer to the table of the config options
  * @return true on success, else false
+ * @note If an option in the 'opts' list is not mentioned in the config section(s),
+ * the variable referenced in the option entry is not changed.
+ * If an option is mentioned in the config section(s) but with an empty value,
+ * the referenced variable is reset to the given option default value.
+ * Otherwise the referenced variable is assigned the configured value.
  */
 bool CONF_read_options(CONF* conf, const char* sections, opt_t* opts);
 
@@ -56,7 +62,12 @@ bool CONF_update_vpm(CONF* conf, const char* sections, X509_VERIFY_PARAM* vpm);
  * @param file config file to be loaded
  * @param sections comma-separated list of names of the section(s) to read
  * @param opts pointer to the table of the config options
- * @return configuration structure, to be freed by caller, or 0 on error
+ * @return configuration structure, to be freed by caller, or null on error
+ * @note If an option in the 'opts' list is not mentioned in the config section(s),
+ * the variable referenced in the option entry is not changed.
+ * If an option is mentioned in the config section(s) but with an empty value,
+ * the referenced variable is reset to the given option default value.
+ * Otherwise the referenced variable is assigned the configured value.
  */
 CONF* CONF_load_options(OPTIONAL uta_ctx* ctx, const char* file,
                         const char* sections, OPTIONAL opt_t* opts);
@@ -67,7 +78,7 @@ CONF* CONF_load_options(OPTIONAL uta_ctx* ctx, const char* file,
  * @param file config file to be loaded
  * @param sections comma-separated list of names of the section(s) to read
  * @param key name of the (string) option to be read
- * @return string value, to be OPENSSL_free()-d by caller, or 0 on error
+ * @return string value, to be OPENSSL_free()-d by caller, or null on error
  */
 /* used by FILES_load_key_autofmt_dv and FILES_get_dv() (via read_dv()) if USE_DVFILE is enabled */
 char* CONF_load_string(OPTIONAL uta_ctx* ctx, const char* file,

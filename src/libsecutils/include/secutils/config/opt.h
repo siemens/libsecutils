@@ -53,7 +53,7 @@ typedef struct opt_t
     const char* name; /** option name */
     opttype_t type;   /** option type, selects in below unions */
     union varval_union default_value; /** default value for the option */
-    union varref_union varref_u; /** reference to the variable holding the value */
+    union varref_union varref_u; /** reference to the variable to receive the option value */
     const char* help_str; /** a short description of the option for help output */
 } opt_t; /** an option with its name, type, default value, variable, and help string */
 
