@@ -254,10 +254,13 @@ char *UTIL_first_item(char *str);
 char *UTIL_next_item(char *str);
 
 /*!*****************************************************************************
- * @brief get the (last) file name extension in the given file (path) name
+ * @brief get the (last) file name extension in the given file (path) name,
+ * not including the '.'
  *
  * @param filename the file name to analyze
- * @return pointer within the filename on success, else null
+ * @return pointer within the filename to non-empty string on success, else null
+ * @note If no '.' is present, the returned pointer equals the input filename.
+ *       If the filename is empty or ends with '.', returns null.
  ******************************************************************************/
 const char *UTIL_file_ext(OPTIONAL const char *filename);
 
