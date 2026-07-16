@@ -94,9 +94,8 @@ CONF* CONF_load_config(OPTIONAL ossl_unused uta_ctx* ctx, const char* file)
 
 
 #define SECTION_NAME_MAX 40 /* max length of section name */
-static char opt_item[SECTION_NAME_MAX+1];
 /* get previous name from a comma-separated list of names */
-static const char* prev_item(const char* opt, const char* end)
+static const char* prev_item(char item[], const char* opt, const char* end)
 {
     if(end is_eq opt)
     {
@@ -107,21 +106,21 @@ static const char* prev_item(const char* opt, const char* end)
     {
         beg--;
     }
-    int len = (int)(end - beg);
+    size_t len = (size_t)(end - beg);
     if(len > SECTION_NAME_MAX)
     {
         len = SECTION_NAME_MAX;
     }
     if(len not_eq 0)
     {
-        strncpy(opt_item, beg, len);
+        strncpy(item, beg, len);
     }
-    opt_item[len] = '\0';
+    item[len] = '\0';
     if(end - beg > SECTION_NAME_MAX)
     {
         LOG(FL_WARN,
             "using only first %d characters of section name starting with \"%s\"",
-            SECTION_NAME_MAX, opt_item);
+            SECTION_NAME_MAX, item);
     }
     while(beg not_eq opt and (beg[-1] is_eq ',' or isspace(beg[-1])))
     {
@@ -134,11 +133,12 @@ static const char* prev_item(const char* opt, const char* end)
 static const char* conf_get_string(const CONF* conf, const char* sections,
                                    const char* name)
 {
+    char section[SECTION_NAME_MAX+1];
     const char* end = sections + strlen(sections);
-    while((end = prev_item(sections, end)) not_eq 0)
+    while((end = prev_item(section, sections, end)) not_eq 0)
     {
         const char* res;
-        if((res = NCONF_get_string(conf, opt_item, name)) not_eq 0)
+        if((res = NCONF_get_string(conf, section, name)) not_eq 0)
         {
             return res;
         }
@@ -287,13 +287,14 @@ CONF* CONF_load_options(OPTIONAL uta_ctx* ctx, const char* file,
         return 0;
     }
 
+    char section[SECTION_NAME_MAX+1];
     const char *end = sections + strlen(sections);
-    while((end = prev_item(sections, end)) not_eq 0)
+    while((end = prev_item(section, sections, end)) not_eq 0)
     {
-        if(0 is_eq NCONF_get_section(conf, opt_item))
+        if(0 is_eq NCONF_get_section(conf, section))
         {
             LOG(FL_ERR,
-                "no [%s] section found in config file '%s'", opt_item, file);
+                "no [%s] section found in config file '%s'", section, file);
             /* could also issue just a warning, adding the hint that 
                thus will use just [default] and unnamed section if present */
             goto err;
