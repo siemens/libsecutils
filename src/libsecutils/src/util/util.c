@@ -87,25 +87,20 @@ char *UTIL_next_item(char *opt) /* in list separated by comma and/or spaces */
 }
 
 
-const char* UTIL_file_ext(OPTIONAL const char* filename)
+const char *UTIL_file_ext(OPTIONAL const char *name)
 {
-    const char* ext = 0;
-    const char* next = filename;
-    if(filename not_eq 0)
-    {
-        do
-        {
-            ext = next;
-            next = strchr(next, '.');
-            if(next not_eq 0)
-            {
-                next++;
-            }
-        } while(next);
-    }
-    return ext;
-}
+    const char *ext;
 
+    if (name == NULL)
+        return NULL;
+    do {
+        ext = name;
+        name = strchr(name, '.');
+        if (name != NULL)
+            name++;
+    } while (name != NULL);
+    return *ext == '\0' ? NULL : ext;
+}
 
 void* UTIL_read_file(const char* filename, int* lenp)
 {
