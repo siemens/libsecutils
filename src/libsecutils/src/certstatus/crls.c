@@ -305,7 +305,11 @@ static const char* get_dp_url(DIST_POINT* dp)
                 LOG(FL_WARN, "ignoring CDP URI that is invalid, too short, or has embedded NUL byte");
                 continue;
             }
-            if (CONN_IS_HTTP(uptr) || HAS_CASE_PREFIX(uptr, "file:"))
+            if (CONN_IS_HTTP(uptr)
+#if 0 // #ifndef NDEBUG
+                || HAS_CASE_PREFIX(uptr, "file:")
+#endif
+                )
             {
                 return uptr;
             }
