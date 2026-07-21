@@ -60,9 +60,9 @@ int check_ocsp_resp(X509_STORE* ts, STACK_OF(X509) *untrusted,
 
 /*!
  * @brief check cert revocation status via OCSP.
- * @note tries using any AIA entries (if enabled) then try any given fallback OCSP responder URLs, in the given order
- * @note This does not limit the use of URLs taken from AIA entries in the certificate.
- * Thus any referenced online endpoints and local file locations may get accessed.
+ * @note tries using any HTTP-based AIA entries (if enabled) then try any given fallback OCSP responder URLs, in the given order
+ * @note This does not further limit the use of URLs taken from AIA entries
+ * in the certificate. Thus any given http: locations may get accessed.
  * @note to avoid performance penalty on OCSP responders, does not use nonce for
  * replay protection when retrieving OCSP response unless defined SECUTILS_OCSP_USE_NONCE
  *

@@ -24,6 +24,7 @@
 # include <credentials/cert.h>
 # include <credentials/store.h>
 # include <credentials/verify.h>
+# include <connections/conn.h> /* for CONN_IS_HTTP() */
 # include <connections/http.h>
 # ifndef SECUTILS_NO_TLS
 #  include <connections/tls.h>
@@ -309,8 +310,10 @@ int check_cert_status_ocsp(X509_STORE_CTX* ctx, STACK_OF(X509) *untrusted,
 
     for(i = 0; res < 0 and i < sk_OPENSSL_STRING_num(ocsps); i++)
     {
-        res = try_ocsp(ctx, untrusted, cert, issuer, timeout,
-                       sk_OPENSSL_STRING_value(ocsps, i), NULL, "OCSP responder from AIA");
+        const char *url = sk_OPENSSL_STRING_value(ocsps, i);
+        if (CONN_IS_HTTP(url))
+            res = try_ocsp(ctx, untrusted, cert, issuer, timeout,
+                           url, NULL, "HTTP-based OCSP responder from AIA");
     }
     char* url;
     char* next;
