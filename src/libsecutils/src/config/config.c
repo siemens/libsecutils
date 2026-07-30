@@ -164,7 +164,8 @@ bool CONF_update_vpm(const CONF* conf, const char* sections, X509_VERIFY_PARAM* 
     }
     for(vopt = vpm_opts; vopt->name not_eq 0; vopt++)
     {
-        static const char* val;
+        const char *val;
+
         if((val = conf_get_string(conf, sections, vopt->name)) not_eq 0)
         {
             if(vopt->type is_eq OPT_BOOL and UTIL_atoint(val) is_eq 0)
