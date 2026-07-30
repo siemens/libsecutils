@@ -13,18 +13,14 @@
 * SPDX-License-Identifier: Apache-2.0
 */
 
-#include <openssl/bn.h>
-#include <openssl/ec.h>
-#include <openssl/rsa.h>
-#include <errno.h>
-#include <stdlib.h> /* for strtoul() */
-#include <ctype.h> /* for isspace() */
-#include <limits.h> /* for UINT_MAX */
 #include <credentials/key.h>
 #include <util/log.h>
 
-#include <operators.h>
-
+#if OPENSSL_VERSION_NUMBER < OPENSSL_V_3_0_0
+#include <openssl/bn.h>
+#include <openssl/ec.h>
+#include <openssl/rsa.h>
+#endif
 
 EVP_PKEY *KEY_new(const char *spec)
 {
