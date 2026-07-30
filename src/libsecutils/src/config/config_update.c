@@ -22,7 +22,7 @@
 
 static void skip_space(char** p)
 {
-    while(isspace(**p))
+    while(isspace((unsigned char)**p))
     {
         (*p)++;
     }
@@ -102,7 +102,7 @@ static size_t refactor_entry(char *src_p, char *dest_p, const char *const key_p,
         }
         pos_p++;
     }
-    while(isspace(*(pos_p - 1)))
+    while(isspace((unsigned char)*(pos_p - 1)))
     {
         pos_p--;
     }
