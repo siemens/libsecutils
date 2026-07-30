@@ -139,7 +139,7 @@ bool LOG_console(OPTIONAL const char* func, OPTIONAL const char* file, int linen
  * @return true success and false on failure
  */
 bool LOG_generic(OPTIONAL const char* func, OPTIONAL const char* file, int lineno, severity level,
-                 const char* msg, bool use_console, bool use_syslog);
+                 const char* msg, bool use_syslog, bool use_console);
 
 /*!
  * @brief log an alert/error/warning/note/info/debug/trace message
