@@ -102,7 +102,7 @@ static const char* prev_item(char item[], const char* opt, const char* end)
         return 0;
     }
     const char* beg = end;
-    while(beg not_eq opt and beg[-1] not_eq ',' and not isspace(beg[-1]))
+    while(beg not_eq opt and beg[-1] not_eq ',' and not isspace((unsigned char)beg[-1]))
     {
         beg--;
     }
@@ -122,7 +122,7 @@ static const char* prev_item(char item[], const char* opt, const char* end)
             "using only first %d characters of section name starting with \"%s\"",
             SECTION_NAME_MAX, item);
     }
-    while(beg not_eq opt and (beg[-1] is_eq ',' or isspace(beg[-1])))
+    while(beg not_eq opt and (beg[-1] is_eq ',' or isspace((unsigned char)beg[-1])))
     {
         beg--;
     }
