@@ -39,13 +39,13 @@ typedef enum
 union varval_union {
     const char* txt; /** String value */
     long num;  /** Integer value, or vpm_opt */
-    int bit;  /** Boolean value */
+    bool bit;  /** Boolean value */
 };
 
 union varref_union {
     const char** txt; /** Pointer to string variable, or null */
     long* num;  /** Pointer to integer variable */
-    int* bit;  /** Pointer to Boolean variable */
+    bool* bit;  /** Pointer to Boolean variable */
 };
 
 typedef struct opt_t
