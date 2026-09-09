@@ -247,7 +247,7 @@ static char* get_dirname(const char* path)
 static char* get_basename(const char* path)
 {
     char* ret_val;
-    char* pos;
+    const char* pos;
 
     if(0 not_eq (pos = strrchr(path, '/')))
     {
