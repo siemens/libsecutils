@@ -50,6 +50,7 @@ static const int UTIL_max_name_len = 128;  /*!< max length of file name */
 # define OPENSSL_V_3_0_0 0x30000000L
 # define OPENSSL_V_3_5_0 0x30500000L
 # define OPENSSL_V_4_0_0 0x40000000L
+# define OPENSSL_V_4_1_0 0x40100000L
 
 # ifndef OpenSSL_version_num
 #  if OPENSSL_VERSION_NUMBER < 0x10100000L
@@ -199,6 +200,11 @@ typedef void OSSL_LIB_CTX;
 STACK_OF(X509) *X509_STORE_get1_all_certs(X509_STORE *store);
 #  define X509_VERIFY_PARAM_get0_email(vpm) ((void)(vpm), NULL) /* dummy */
 #  define X509_VERIFY_PARAM_get1_ip_asc(vpm) ((void)(vpm), NULL) /* dummy */
+# endif
+
+# if OPENSSL_VERSION_NUMBER < OPENSSL_V_4_1_0
+#  define ASN1_STRING_get_length ASN1_STRING_length
+#  define vsnprintf BIO_vsnprintf
 # endif
 
 #if defined(_WIN32) && !defined(strncasecmp)
