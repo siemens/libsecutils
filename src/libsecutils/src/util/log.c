@@ -258,7 +258,7 @@ bool LOG(OPTIONAL const char* func, OPTIONAL const char* file, int lineno, sever
     bool res;
 
     va_start(arg_ptr, fmt);
-    BIO_vsnprintf(msg, sizeof(msg), fmt, arg_ptr);
+    vsnprintf(msg, sizeof(msg), fmt, arg_ptr);
     res = (LOG_fn ? *LOG_fn : &LOG_default)(func, file, lineno, level, msg);
     va_end(arg_ptr);
     return res;
