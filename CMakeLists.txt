@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.18)
 
 project(
   security-utilities
-  VERSION 2.2.0 # always 3 components for correct versioning
+  VERSION 2.3.0 # always 3 components for correct versioning
   LANGUAGES C)
 set(CMAKE_PROJECT_DESCRIPTION "Wrapper library for OpenSSL providing utilities for credential loading and storage with optional integrity protection, certificate validation including status checks using CRLs and/or OCSP, TLS connection and configuration file handling helpers, and logging. This aims at simplifying use of commonly needed functionality.")
 set(CMAKE_PROJECT_HOMEPAGE_URL "https://github.com/siemens/libsecutils")
