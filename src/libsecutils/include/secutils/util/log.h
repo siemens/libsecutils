@@ -104,6 +104,18 @@ bool LOG_default(OPTIONAL const char* func, OPTIONAL const char* file, int linen
                  const char* msg);
 
 /*!
+ * @brief as before, but send to syslog (only), do not print to console
+ * @param func the name of the reporting function or component, or null
+ * @param file the current source file path name, or null
+ * @param lineno the current line number, or 0
+ * @param level the nature of the message, i.e., its severity level
+ * @param msg the message text
+ * @return true success and false on failure
+ */
+bool LOG_syslog(OPTIONAL const char* func, OPTIONAL const char* file, int lineno, severity level,
+                const char* msg);
+
+/*!
  * @brief as before, but print to console (stdout) only, do not send to syslog
  * @param func the name of the reporting function or component, or null
  * @param file the current source file path name, or null
@@ -127,7 +139,7 @@ bool LOG_console(OPTIONAL const char* func, OPTIONAL const char* file, int linen
  * @return true success and false on failure
  */
 bool LOG_generic(OPTIONAL const char* func, OPTIONAL const char* file, int lineno, severity level,
-                 const char* msg, bool use_console, bool use_syslog);
+                 const char* msg, bool use_syslog, bool use_console);
 
 /*!
  * @brief log an alert/error/warning/note/info/debug/trace message

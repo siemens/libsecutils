@@ -50,6 +50,7 @@ static const int UTIL_max_name_len = 128;  /*!< max length of file name */
 # define OPENSSL_V_3_0_0 0x30000000L
 # define OPENSSL_V_3_5_0 0x30500000L
 # define OPENSSL_V_4_0_0 0x40000000L
+# define OPENSSL_V_4_1_0 0x40100000L
 
 # ifndef OpenSSL_version_num
 #  if OPENSSL_VERSION_NUMBER < 0x10100000L
@@ -201,6 +202,15 @@ STACK_OF(X509) *X509_STORE_get1_all_certs(X509_STORE *store);
 #  define X509_VERIFY_PARAM_get1_ip_asc(vpm) ((void)(vpm), NULL) /* dummy */
 # endif
 
+# if OPENSSL_VERSION_NUMBER < OPENSSL_V_4_1_0
+#  define ASN1_STRING_get_length ASN1_STRING_length
+#  define vsnprintf BIO_vsnprintf
+# endif
+
+#if defined(_WIN32) && !defined(strncasecmp)
+#define strncasecmp _strnicmp
+#endif
+
 /*!*****************************************************************************
  * @brief initialize the OpenSSL crypto library
  * @param version expected OpenSSL version number
@@ -250,10 +260,13 @@ char *UTIL_first_item(char *str);
 char *UTIL_next_item(char *str);
 
 /*!*****************************************************************************
- * @brief get the (last) file name extension in the given file (path) name
+ * @brief get the (last) file name extension in the given file (path) name,
+ * not including the '.'
  *
  * @param filename the file name to analyze
- * @return pointer within the filename on success, else null
+ * @return pointer within the filename to non-empty string on success, else null
+ * @note If no '.' is present, the returned pointer equals the input filename.
+ *       If the filename is empty or ends with '.', returns null.
  ******************************************************************************/
 const char *UTIL_file_ext(OPTIONAL const char *filename);
 
@@ -331,6 +344,8 @@ bool UTIL_get_random(void *buf, size_t len);
 #define HAS_CASE_PREFIX(s, p) (strncasecmp(s, p "", sizeof(p) - 1) == 0)
 /* As before, and if check succeeds, advance |str| past the prefix |pre| */
 #define CHECK_AND_SKIP_CASE_PREFIX(str, pre) (HAS_CASE_PREFIX(str, pre) ? ((str) += sizeof(pre) - 1, 1) : 0)
+/* Check if the string literal |suffix| is a case-insensitive suffix of |str| */
+#define HAS_CASE_SUFFIX(str, suffix) (strlen(str) < sizeof(suffix) - 1 ? 0 : OPENSSL_strcasecmp(str + strlen(str) - sizeof(suffix) + 1, suffix "") == 0)
 /* Advance string pointer s, which must a modifiable lvalue, past scheme according to RFC 3986: ALPHA *( ALPHA / DIGIT / "+" / "-" / "." ) */
 #define UTIL_SKIP_SCHEME(s)                                                        \
     do {                                                                           \

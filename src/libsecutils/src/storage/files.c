@@ -281,8 +281,8 @@ char* FILES_get_pass(OPTIONAL const char* source, OPTIONAL const char* desc)
         }
         /* Cannot do BIO_gets on an fd BIO so add a buffering BIO */
         bio = BIO_push(BIO_new(BIO_f_buffer()), bio);
-#endif
     }
+#endif
     else if(strcmp(source, sec_STDIN_STR) is_eq 0)
     {
         bio = dup_bio_in(FORMAT_TEXT);
@@ -325,27 +325,22 @@ typedef struct pw_cb_data
 } PW_CB_DATA;
 
 
-static int password_callback(char* buf, int bufsiz, int verify, void* cb_tmp)
+static int password_callback(char *buf, int bufsiz, ossl_unused int verify, void *cb_tmp)
 {
-    int res = 0 * verify; /* make (artificial) use of 'verify' */
-    const char* password = 0;
-    PW_CB_DATA* cb_data = (PW_CB_DATA*)cb_tmp;
+    size_t len = 0;
+    const char *password = NULL;
+    PW_CB_DATA *cb_data = (PW_CB_DATA *)cb_tmp;
 
-    if((cb_data not_eq 0) and (cb_data->password not_eq 0))
-    {
+    if (cb_data != NULL && cb_data->password != NULL)
         password = cb_data->password;
-    }
 
-    if(password not_eq 0)
-    {
-        res = strlen(password);
-        if(res > bufsiz)
-        {
-            res = bufsiz;
-        }
-        memcpy(buf, password, res); /* copy password and length(res) into buf */
+    if (password != NULL) {
+        len = strlen(password);
+        if (len > (size_t)bufsiz)
+            len = (size_t)bufsiz;
+        memcpy(buf, password, len);
     }
-    return res; /* the size */
+    return (int)len;
 }
 
 /* adapted from OpenSSL:apps/lib/apps.c

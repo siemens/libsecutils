@@ -85,7 +85,7 @@ const char *CDP_get_uri_from_general_names(
         uri = GENERAL_NAME_get0_value(name_entry, &gtype);
         if (gtype == GEN_URI) {
             const char *asn1_uri = (const char *)ASN1_STRING_get0_data(uri);
-            int len = ASN1_STRING_length(uri);
+            int len = ASN1_STRING_get_length(uri);
 
             if (asn1_uri == NULL || len <= 6 || memchr(asn1_uri, '\0', (size_t)len) != NULL) {
                 LOG(FL_WARN, "ignoring CDP URI that is invalid, too short, or has embedded NUL byte");
@@ -163,7 +163,7 @@ const char *CDP_get_crl_distribution_point_from_distpoint(
                 ASN1_OBJECT     *obj    = X509_NAME_ENTRY_get_object(entry);
                 ASN1_STRING     *data   = X509_NAME_ENTRY_get_data(entry);
                 const unsigned char *dat_str    = ASN1_STRING_get0_data(data);
-                int                  extlen     = ASN1_STRING_length(data);
+                int                  extlen     = ASN1_STRING_get_length(data);
             }
 #endif
         }

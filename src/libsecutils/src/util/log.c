@@ -123,6 +123,12 @@ bool LOG_default(OPTIONAL const char* func, OPTIONAL const char* file, int linen
     return LOG_generic(func, file, lineno, level, msg, 1, 1);
 }
 
+bool LOG_syslog(OPTIONAL const char *func, OPTIONAL const char *file,
+                 int lineno, severity level, const char *msg)
+{
+    return LOG_generic(func, file, lineno, level, msg, 1, 0);
+}
+
 bool LOG_console(OPTIONAL const char* func, OPTIONAL const char* file, int lineno, severity level, const char* msg)
 {
     return LOG_generic(func, file, lineno, level, msg, 0, 1);
@@ -185,8 +191,14 @@ bool LOG_generic(OPTIONAL const char* func, OPTIONAL const char* file, int linen
     if (len < 0)
         len = 0; /* on error, cannot assume any string written to loc buffer */
     /* print function name, source file name, and line number only if debugging is enabled at build time */
-    if (snprintf(loc + len, sizeof(loc) - (size_t)len, ":%s():%s:%d:", func, file, lineno) < 0)
-        loc[0] = '\0'; /* on error, resort to empty string */
+    else
+        len = (int)strlen(loc); /* the actual length printed */
+    if (snprintf(loc + len, sizeof(loc) - (size_t)len, ":%s():%s:%d:", func, file, lineno) < 0) {
+        loc[len] = '\0'; /* make sure to undo on error */
+        /* 2nd try: append the function name only */
+        if (snprintf(loc + len, sizeof(loc) - (size_t)len, ":%s():", func) < 0)
+            loc[len] = '\0'; /* make sure to undo on error */
+    }
 #endif
 
     /* print string corresponding to level */
@@ -246,7 +258,7 @@ bool LOG(OPTIONAL const char* func, OPTIONAL const char* file, int lineno, sever
     bool res;
 
     va_start(arg_ptr, fmt);
-    BIO_vsnprintf(msg, sizeof(msg), fmt, arg_ptr);
+    vsnprintf(msg, sizeof(msg), fmt, arg_ptr);
     res = (LOG_fn ? *LOG_fn : &LOG_default)(func, file, lineno, level, msg);
     va_end(arg_ptr);
     return res;
