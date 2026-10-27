@@ -26,16 +26,17 @@ if(MSVC)
 else()
   # GCC/Clang compiler flags
   target_compile_options(secutils_compilation_options INTERFACE
-    -Wall -Woverflow -Wextra -Wmissing-prototypes -Wstrict-prototypes -Wswitch
-    -Wsign-compare -Wformat -Wtype-limits -Wundef -Wunused-parameter -Wformat-security
-    -Wpointer-arith # -Wc99-extensions -Wlanguage-extension-token
+    -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes
+    -Wsign-compare -Wformat -Wformat-security -Wtype-limits -Wundef
+    -Wpointer-arith -Wunused-parameter # -Wc99-extensions -Wlanguage-extension-token
     -pedantic
     # -Werror is enabled only for development and CI using Makefile_v1 without NDEBUG
 
+    # -Wno-declaration-after-statement -Wno-vla -Wno-format-truncation
     # TODO clean up code and re-enable warnings instead:
-    # Using here "no-" variants to cancel options potentially set in parent project(s):
-    -Wno-conversion -Wno-sign-conversion
-    -Wno-shadow -Wno-declaration-after-statement -Wno-vla -Wno-gnu-folding-constant
+    -Wno-gnu-folding-constant
+    # Using below "no-" variants to cancel options potentially set in parent project(s):
+    -Wno-conversion -Wno-sign-conversion -Wno-shadow
   )
 endif()
 target_compile_definitions(secutils_compilation_options INTERFACE PEDANTIC)
