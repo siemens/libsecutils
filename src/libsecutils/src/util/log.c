@@ -22,6 +22,10 @@
 
 #include <assert.h>
 
+#if OPENSSL_VERSION_NUMBER < OPENSSL_V_4_1_0 && !defined(vsnprintf)
+# define vsnprintf BIO_vsnprintf
+#endif
+
 /*
  * use the GNU-specific `strerror_r`
  * https://man7.org/linux/man-pages/man3/strerror.3.html : SYNOPSIS
