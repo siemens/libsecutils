@@ -204,7 +204,6 @@ STACK_OF(X509) *X509_STORE_get1_all_certs(X509_STORE *store);
 
 # if OPENSSL_VERSION_NUMBER < OPENSSL_V_4_1_0
 #  define ASN1_STRING_get_length ASN1_STRING_length
-#  define vsnprintf BIO_vsnprintf
 # endif
 
 #if defined(_WIN32) && !defined(strncasecmp)
