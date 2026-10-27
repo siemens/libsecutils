@@ -343,7 +343,13 @@ bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
     while(0 not_eq p_dirent)
     {
         char full_path[UTIL_max_path_len + 1];
-        snprintf(full_path, sizeof(full_path), "%s/%s", trust_dir, p_dirent->d_name);
+        int len = snprintf(full_path, sizeof(full_path), "%s/%s", trust_dir, p_dirent->d_name);
+        if(len < 0 or (size_t)len >= sizeof(full_path))
+        {
+            LOG(FL_ERR, "cannot construct path for '%s/%s'", trust_dir, p_dirent->d_name);
+            found = false;
+            goto err;
+        }
 
         struct stat f_stat;
         memset(&f_stat, 0x00, sizeof(struct stat));
@@ -422,7 +428,13 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
     while(0 not_eq p_dirent)
     {
         char full_path[UTIL_max_path_len + 1];
-        snprintf(full_path, sizeof(full_path), "%s/%s", crl_dir, p_dirent->d_name);
+        int len = snprintf(full_path, sizeof(full_path), "%s/%s", crl_dir, p_dirent->d_name);
+        if(len < 0 or (size_t)len >= sizeof(full_path))
+        {
+            LOG(FL_ERR, "cannot construct path for '%s/%s'", crl_dir, p_dirent->d_name);
+            found = false;
+            goto err;
+        }
 
         struct stat f_stat;
         memset(&f_stat, 0x00, sizeof(struct stat));

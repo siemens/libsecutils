@@ -141,11 +141,13 @@ else
 endif
 override CFLAGS += $(DEBUG_FLAGS) \
  -Wall -Woverflow -Wextra -Wswitch -Wmissing-prototypes -Wstrict-prototypes \
- -Wformat -Wformat-security -Wtype-limits -Wundef \
- -Wsign-compare -Wpointer-arith -Wunused-parameter
+ -Wsign-compare -Wformat -Wformat-security -Wtype-limits -Wundef \
+ -Wpointer-arith -Wunused-parameter
 # TODO clean up code and re-enable warnings instead:
-override CFLAGS += -Wno-conversion -Wno-sign-conversion \
- -Wno-shadow -Wno-declaration-after-statement -Wno-vla -Wno-gnu-folding-constant
+override CFLAGS += -Wno-gnu-folding-constant
+# -Wno-declaration-after-statement -Wno-vla
+# Using below "no-" variants to cancel options potentially set in parent project(s):
+override CFLAGS += -Wno-conversion -Wno-sign-conversion -Wno-shadow
 override CFLAGS += -pedantic -DPEDANTIC
 
 ################################################################################
@@ -186,7 +188,8 @@ ifeq ($(DEB_TARGET_ARCH),) # not during Debian packaging
   override LDFLAGS += -Wl,-rpath,$(OPENSSL_LIB)
 endif
 ifneq ($(SECUTILS_USE_UTA),)
-    override LDFLAGS += -luta
+    override LDFLAGS += -luta -L/usr/local/lib
+    override CFLAGS += -I/usr/local/include
 endif
 ifneq ($(SECUTILS_NO_TLS),)
     override CFLAGS += -DSECUTILS_NO_TLS=1
