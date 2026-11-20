@@ -354,14 +354,16 @@ if(NOT DEBIAN_BUILD)
     set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_PACKAGE_NAME "libsecutils2")
     set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_FILE_NAME DEB-DEFAULT)
     set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_PACKAGE_SECTION "libs")
-    # see also https://gitlab.kitware.com/cmake/cmake/-/issues/21834
-    # Custom postinst/postrm suppress CPack's auto-generated ldconfig calls;
-    # ldconfig is handled by the activate-noawait trigger instead (maintscript-calls-ldconfig)
-    set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_PACKAGE_CONTROL_EXTRA
-      "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/triggers"
-      "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/postinst"
-      "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/postrm")
-    set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
+    # CPack 4.4+ generates the ldconfig trigger itself; supplying it as an
+    # extra control file would incorrectly make it executable in strict mode.
+    if(CMAKE_VERSION VERSION_LESS "4.4")
+      # Older CPack versions need a custom trigger to avoid direct ldconfig calls.
+      set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_PACKAGE_CONTROL_EXTRA
+        "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/triggers"
+        "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/postinst"
+        "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/postrm")
+      set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
+    endif()
 
     set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_DEVELOPMENT_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-dev")
     set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_DEVELOPMENT_FILE_NAME DEB-DEFAULT)
