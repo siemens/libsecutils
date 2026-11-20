@@ -40,6 +40,17 @@ jobs:
           [[ -d tmp/usr/local/include ]] && (echo "uninstall incomplete: include/ remains"; false)
           [[ -d tmp/usr/local/share ]] && (echo "uninstall incomplete: share/ remains"; false)
           make deb
+          control_dir=$(mktemp -d)
+          dpkg-deb --ctrl-tarfile libsecutils2_*.deb | tar -xpf - -C "$control_dir"
+          stat -c '%a %n' "$control_dir/triggers"
+          test "$(stat -c %a "$control_dir/triggers")" = 644
+          grep -Fx 'activate-noawait ldconfig' "$control_dir/triggers"
+          for script in postinst postrm; do
+            if [ -e "$control_dir/$script" ]; then
+              stat -c '%a %n' "$control_dir/$script"
+              test "$(stat -c %a "$control_dir/$script")" = 755
+            fi
+          done
           lintian --fail-on error,warning *.deb
 
   make-with-uta:
