@@ -286,16 +286,15 @@ static size_t update_config_section(FILE* file_p, const char* file_name, size_t 
 
 
 /* copy the rest of the file into the buffer */
-static size_t copy_remaining_config(FILE *file_p, size_t file_len,
-                                    char *input_line)
+static size_t copy_remaining_config(FILE *file_p, size_t file_len, char *line)
 {
-    size_t line_len = strnlen(input_line, c_line_buf_size); /* first line of next section already read */
-    copy_file_line(file_buffer, input_line, line_len);
+    size_t line_len = strnlen(line, c_line_buf_size); /* first line of next section already read */
+    copy_file_line(file_buffer, line, line_len);
 
-    while(0 not_eq fgets(input_line, c_line_buf_size, file_p))
+    while(0 not_eq fgets(line, c_line_buf_size, file_p))
     {
-        line_len = strnlen(input_line, c_line_buf_size);
-        copy_file_line(file_buffer, input_line, line_len);
+        line_len = strnlen(line, c_line_buf_size);
+        copy_file_line(file_buffer, line, line_len);
     }
     return file_len; /* TODO check: file_len is not updated */
 }

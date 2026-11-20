@@ -264,7 +264,7 @@ static char* get_basename(const char* path)
 /**
  * @brief returns canonicalized absolute path
  * @param path path which should be canonicalized
- * @param pointer to buffer for canonicalized output, MUST be at least PATH_MAX characters long
+ * @param canonicalized pointer to buffer for canonicalized output, MUST be at least PATH_MAX characters long
  * @note  the pointer has to be freed by OPENSSL_free()
  */
 static char* get_canonicalized(const char* path, char* canonicalized)
