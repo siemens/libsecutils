@@ -160,7 +160,7 @@ char* CONN_get_host(const char* uri)
     {
         uri = skip_scheme(uri);
         uri = skip_userinfo(uri);
-        char* end;
+        const char* end;
         if(*uri is_eq '[')
         {
             end = strrchr(++uri, ']');
@@ -249,7 +249,7 @@ BIO* CONN_new(const char* host, const char* port)
         return 0;
     }
 
-    char *host_port = strchr(host, ':');
+    const char *host_port = strchr(host, ':');
     if(0 is_eq host_port and 0 is_eq port)
     {
         LOG(FL_ERR, "no port given");
