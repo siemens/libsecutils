@@ -354,14 +354,26 @@ if(NOT DEBIAN_BUILD)
     set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_PACKAGE_NAME "libsecutils2")
     set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_FILE_NAME DEB-DEFAULT)
     set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_PACKAGE_SECTION "libs")
-    # see also https://gitlab.kitware.com/cmake/cmake/-/issues/21834
-    # Custom postinst/postrm suppress CPack's auto-generated ldconfig calls;
-    # ldconfig is handled by the activate-noawait trigger instead (maintscript-calls-ldconfig)
-    set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_PACKAGE_CONTROL_EXTRA
-      "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/triggers"
-      "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/postinst"
-      "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/postrm")
-    set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
+    # CPack 4.4+ generates the ldconfig trigger itself; supplying it as an
+    # extra control file would incorrectly make it executable in strict mode.
+    if(CMAKE_VERSION VERSION_LESS "4.4")
+      # see also https://gitlab.kitware.com/cmake/cmake/-/issues/21834
+      # Older CPack versions need a custom trigger to avoid direct ldconfig calls.
+      # Custom postinst/postrm suppress CPack's auto-generated ldconfig calls.
+      set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_PACKAGE_CONTROL_EXTRA
+        "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/triggers"
+        "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/postinst"
+        "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/postrm")
+      set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_RUNTIME_PACKAGE_CONTROL_STRICT_PERMISSION TRUE)
+      if(CMAKE_SYSTEM_NAME MATCHES "Linux")
+        install(FILES
+          "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/libsecutils2.lintian-overrides"
+          DESTINATION "share/lintian/overrides"
+          RENAME "libsecutils2"
+          COMPONENT security-utilities_library_Runtime
+        )
+      endif()
+    endif()
 
     set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_DEVELOPMENT_PACKAGE_NAME "${CPACK_PACKAGE_NAME}-dev")
     set(CPACK_DEBIAN_SECURITY-UTILITIES_LIBRARY_DEVELOPMENT_FILE_NAME DEB-DEFAULT)
@@ -476,14 +488,6 @@ if(NOT DEBIAN_BUILD)
         DESTINATION "share/doc/${COMPONENT_DOC_SUBDIR}"
         COMPONENT ${component}
       )
-      if(${component} STREQUAL "security-utilities_library_Runtime")
-        install(FILES
-          "${CMAKE_CURRENT_SOURCE_DIR}/debian/extra/libsecutils2.lintian-overrides"
-          DESTINATION "share/lintian/overrides"
-          RENAME "libsecutils2"
-          COMPONENT ${component}
-        )
-      endif()
     endif()
   endforeach()
 
@@ -494,8 +498,8 @@ if(NOT DEBIAN_BUILD)
       OUTPUT "${pack_full_name}"
       DEPENDS build
       COMMENT "Building packages possibly including doxygen run"
-      COMMAND cpack --config CPackConfig.cmake # -D CPACK_PACKAGING_INSTALL_PREFIX=
-      COMMAND cpack --config CPackSourceConfig.cmake
+      COMMAND "${CMAKE_CPACK_COMMAND}" --config CPackConfig.cmake # -D CPACK_PACKAGING_INSTALL_PREFIX=
+      COMMAND "${CMAKE_CPACK_COMMAND}" --config CPackSourceConfig.cmake
       )
     add_custom_target(${EXT} DEPENDS ${pack_full_name})
   endif()
