@@ -15,6 +15,7 @@ mk
 CMakeCache.txt
 Makefile
 *.cmake
+/src/security-utilities.pc
 install_manifest*.txt
 changelog.gz
 CMakeFiles/
