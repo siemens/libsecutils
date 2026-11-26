@@ -216,14 +216,14 @@ bool UTIL_iterate_dir(bool (*fn)(const char* file, void* arg), void* arg, const 
         }
         else
         {
-            if(f_stat.st_mode bitand S_IFREG)
+            if(S_ISREG(f_stat.st_mode))
             {
                 if(not(*fn)(full_path, arg))
                 {
                     goto err;
                 }
             }
-            else if(recursive and (f_stat.st_mode bitand S_IFDIR) and (0 not_eq strncmp(p_dirent->d_name, ".", 1)))
+            else if(recursive and S_ISDIR(f_stat.st_mode) and (0 not_eq strncmp(p_dirent->d_name, ".", 1)))
             {
                 if(not UTIL_iterate_dir(fn, arg, full_path, recursive))
                 {

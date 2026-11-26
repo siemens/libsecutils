@@ -363,14 +363,14 @@ bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
         }
         else
         {
-            if(f_stat.st_mode bitand S_IFREG)
+            if(S_ISREG(f_stat.st_mode))
             {
                 if(STORE_load_more_check(pstore, full_path, FORMAT_PEM, 0 /* do not report load errors twice */, vpm, ctx))
                 {
                     found = true;
                 }
             }
-            else if(recursive and (f_stat.st_mode bitand S_IFDIR) and (0 not_eq strncmp(p_dirent->d_name, ".", 1)))
+            else if(recursive and S_ISDIR(f_stat.st_mode) and (0 not_eq strncmp(p_dirent->d_name, ".", 1)))
             {
                 if(not STORE_load_check_dir(pstore, full_path, desc, recursive, vpm, ctx))
                 {
@@ -449,7 +449,7 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
         }
         else
         {
-            if(f_stat.st_mode bitand S_IFREG)
+            if(S_ISREG(f_stat.st_mode))
             {
                 if(ctx is_eq 0
 #ifdef SECUTILS_USE_ICV
@@ -475,7 +475,7 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
                     LOG(FL_ERR, "ICV check failed for CRL %s", p_dirent->d_name);
                 }
             }
-            else if(recursive and (f_stat.st_mode bitand S_IFDIR) and (0 not_eq strncmp(p_dirent->d_name, ".", 1)))
+            else if(recursive and S_ISDIR(f_stat.st_mode) and (0 not_eq strncmp(p_dirent->d_name, ".", 1)))
             {
                 if(not STORE_load_crl_dir(pstore, full_path, desc, recursive, ctx))
                 {
