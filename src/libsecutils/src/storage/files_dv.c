@@ -399,7 +399,7 @@ bool FILES_store_key_dv(const EVP_PKEY* pkey, const char* file, file_format_t fo
                         OPTIONAL uta_ctx* ctx, OPTIONAL const char* desc)
 {
     bool res = false;
-    char pass_buf[strlen(sec_PASS_STR) + MAX_UTA_PASS_LEN];
+    char pass_buf[sizeof(sec_pass_prefix) - 1 + MAX_UTA_PASS_LEN];
     char *source = 0;
     if(pass is_eq 0 and ctx not_eq 0)
     {
@@ -423,7 +423,7 @@ EVP_PKEY* FILES_load_key_autofmt_dv(const char* key, file_format_t file_format, 
                                     OPTIONAL uta_ctx* ctx, OPTIONAL const char* engine, OPTIONAL const char* desc)
 {
     EVP_PKEY* pkey = 0;
-    char pass_buf[strlen(sec_PASS_STR) + MAX_UTA_PASS_LEN];
+    char pass_buf[sizeof(sec_pass_prefix) - 1 + MAX_UTA_PASS_LEN];
     char *source = 0;
     if(pass is_eq 0 and ctx not_eq 0)
     {
@@ -448,7 +448,7 @@ STACK_OF(X509)
                                   OPTIONAL uta_ctx* ctx, OPTIONAL const char* desc)
 {
     STACK_OF(X509)* certs = 0;
-    char pass_buf[strlen(sec_PASS_STR) + MAX_UTA_PASS_LEN];
+    char pass_buf[sizeof(sec_pass_prefix) - 1 + MAX_UTA_PASS_LEN];
     char* source = 0;
     if(pass is_eq 0 and ctx not_eq 0)
     {

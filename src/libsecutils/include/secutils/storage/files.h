@@ -40,13 +40,15 @@ typedef enum
 } file_format_t;                  /*! type of format for security-related files or other input */
 
 /**< string constants used for the 'source' parameter of some credentials load/store functions */
-static const char* const sec_PASS_STR = "pass:";
+#define sec_pass_prefix "pass:"
+enum { sec_pass_limit = 256 };
+static const char* const sec_PASS_STR = sec_pass_prefix;
 static const char* const sec_ENGINE_STR = "engine:";
 static const char* const sec_ENV_STR = "env:";
 static const char* const sec_FILE_STR = "file:";
 static const char* const sec_FD_STR = "fd:";
 static const char* const sec_STDIN_STR = "stdin";
-static const int sec_PASS_MAX_LEN = 256;
+static const int sec_PASS_MAX_LEN = sec_pass_limit;
 
 /*!
  * @brief map password source specification to password

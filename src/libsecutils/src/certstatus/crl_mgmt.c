@@ -366,7 +366,7 @@ X509_CRL *CRLMGMT_load_crl_by_url(
         desc? desc : "(no source description)", url);
 
     const char      *effective_url  = url;
-    const size_t    CDP_PROXY_URL_LEN   = 4096;
+    enum { CDP_PROXY_URL_LEN = 4096 };
     char            cdp_proxy_url[CDP_PROXY_URL_LEN];
 
     if (data->proxy_url == NULL) {
@@ -404,7 +404,7 @@ X509_CRL *CRLMGMT_load_crl_by_cert(
         return NULL;
     }
 
-    const size_t ISSUER_NAME_LEN = 4096;
+    enum { ISSUER_NAME_LEN = 4096 };
     char issuer_name[ISSUER_NAME_LEN];
 
     if (!CDP_get_x509_name(X509_get_issuer_name(cert), issuer_name, ISSUER_NAME_LEN, XN_FLAG_RFC2253)) {
@@ -412,7 +412,7 @@ X509_CRL *CRLMGMT_load_crl_by_cert(
         return NULL;
     }
 
-    const size_t URL_LEN = 4096;
+    enum { URL_LEN = 4096 };
     char url[URL_LEN];
     LOG(FL_DEBUG, "cdp proxy given, appending cert issuer to proxy %s", data->proxy_url);
     int res = UTIL_safe_string_copy(data->proxy_url, url, URL_LEN, NULL);

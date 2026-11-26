@@ -173,7 +173,7 @@ static void unbuffer(FILE* fp)
 }
 
 
-#define MODESTR_LEN1 (strlen("rb") + 1)
+#define MODESTR_LEN1 sizeof("rb")
 static BIO* bio_open_default_(const char* filename, char mode, file_format_t format, bool quiet)
 {
     BIO* ret;
@@ -226,7 +226,7 @@ static BIO* bio_open_default(const char* filename, char mode, file_format_t form
 char* FILES_get_pass(OPTIONAL const char* source, OPTIONAL const char* desc)
 {
     BIO* bio = 0;
-    char buf[sec_PASS_MAX_LEN + 1];
+    char buf[sec_pass_limit + 1];
     const char* pass = 0;
 
     if(source is_eq 0)
@@ -1851,7 +1851,7 @@ char *FILES_get_dir(const char* base_ev, const char* base_default, const char *a
     }
 
     // concatenated_path must stay in the function global scope (-> result)
-    char concatenated_path[UTIL_max_path_len];
+    char concatenated_path[util_path_limit];
     if (0 not_eq add_path)
     {
         const int length_needed = snprintf(concatenated_path, sizeof(concatenated_path), "%s/%s", result, add_path);

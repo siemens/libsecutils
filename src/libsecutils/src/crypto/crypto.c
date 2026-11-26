@@ -228,7 +228,7 @@ bool AESGCM_decrypt_final(EVP_CIPHER_CTX* osslctx, const uint8_t* tag, size_t ta
         return true;
     }
 
-    uint8_t local_tag[tag_len];
+    uint8_t local_tag[EVP_GCM_TLS_TAG_LEN];
     memcpy(local_tag, tag, tag_len);
     if(EVP_CIPHER_CTX_ctrl(osslctx, EVP_CTRL_GCM_SET_TAG, tag_len, local_tag) not_eq 1)
     {

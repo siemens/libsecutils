@@ -203,7 +203,7 @@ bool UTIL_iterate_dir(bool (*fn)(const char* file, void* arg), void* arg, const 
     struct dirent* p_dirent = readdir(p_dir);
     while(0 not_eq p_dirent)
     {
-        char full_path[UTIL_max_path_len];
+        char full_path[util_path_limit];
         /* constant 2 takes into account end of string and format string content */
         snprintf(full_path, sizeof(full_path), "%.*s/%.*s", UTIL_max_path_len - UTIL_max_name_len - 2, path,
                  UTIL_max_name_len, p_dirent->d_name);

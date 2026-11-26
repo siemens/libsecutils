@@ -32,7 +32,7 @@ else()
     -pedantic
     # -Werror is enabled only for development and CI using Makefile_v1 without NDEBUG
 
-    # -Wno-declaration-after-statement -Wno-vla -Wno-format-truncation
+    # -Wno-declaration-after-statement -Wno-format-truncation
     # TODO clean up code and re-enable warnings instead:
     -Wno-gnu-folding-constant
     # Using below "no-" variants to cancel options potentially set in parent project(s):

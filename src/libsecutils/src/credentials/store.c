@@ -346,7 +346,7 @@ bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
             continue;
         }
 
-        char full_path[UTIL_max_path_len + 1];
+        char full_path[util_path_limit + 1];
         int len = snprintf(full_path, sizeof(full_path), "%s/%s", trust_dir, p_dirent->d_name);
         if(len < 0 or (size_t)len >= sizeof(full_path))
         {
@@ -434,7 +434,7 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
             continue;
         }
 
-        char full_path[UTIL_max_path_len + 1];
+        char full_path[util_path_limit + 1];
         int len = snprintf(full_path, sizeof(full_path), "%s/%s", crl_dir, p_dirent->d_name);
         if(len < 0 or (size_t)len >= sizeof(full_path))
         {

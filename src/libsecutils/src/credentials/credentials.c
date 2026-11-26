@@ -287,7 +287,7 @@ CREDENTIALS* CREDENTIALS_load_dv(OPTIONAL const char* certs, OPTIONAL const char
                                  OPTIONAL const char* desc)
 {
     CREDENTIALS* creds = 0;
-    char pass_buf[strlen(sec_PASS_STR) + MAX_UTA_PASS_LEN];
+    char pass_buf[sizeof(sec_pass_prefix) - 1 + MAX_UTA_PASS_LEN];
     strcpy(pass_buf, sec_PASS_STR);
     if(FILES_get_pass_dv(pass_buf + strlen(sec_PASS_STR), ctx, key, false /* read */, desc))
     {
@@ -365,7 +365,7 @@ bool CREDENTIALS_save_dv(const CREDENTIALS* creds, OPTIONAL const char* certs, O
                          OPTIONAL uta_ctx* ctx, OPTIONAL const char* desc)
 {
     bool res = false;
-    char pass_buf[strlen(sec_PASS_STR) + MAX_UTA_PASS_LEN];
+    char pass_buf[sizeof(sec_pass_prefix) - 1 + MAX_UTA_PASS_LEN];
     strcpy(pass_buf, sec_PASS_STR);
     if(FILES_get_pass_dv(pass_buf + strlen(sec_PASS_STR), ctx, key, true /* write */, desc))
     {

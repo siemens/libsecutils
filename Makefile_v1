@@ -145,7 +145,7 @@ override CFLAGS += $(DEBUG_FLAGS) \
  -Wpointer-arith -Wunused-parameter
 # TODO clean up code and re-enable warnings instead:
 override CFLAGS += -Wno-gnu-folding-constant
-# -Wno-declaration-after-statement -Wno-vla
+# -Wno-declaration-after-statement
 # Using below "no-" variants to cancel options potentially set in parent project(s):
 override CFLAGS += -Wno-conversion -Wno-sign-conversion -Wno-shadow
 override CFLAGS += -pedantic -DPEDANTIC
