@@ -52,7 +52,9 @@ The following network and development tools are needed or recommended.
 * CMake (for using [`CMakeLists.txt`](CMakeLists.txt), tested versions include 3.18.4, 3.22.1, 3.27.7, 3.31.5, 4.3.0, 4.5.0)
 * GNU make (tested versions include 3.81, 4.1, 4.2.1, 4.3)
 * GNU C compiler (gcc, tested versions include 5.4.0, 8.3.0, 12.2.0, 15.2.0)
-  or clang (tested versions include 14.0.3, 17.0.3, 19.1.1, 22.1.1)
+  or clang (tested versions include 14.0.3, 17.0.3, 19.1.1, 22.1.1)\
+  The code requires C99 or later and uses its features, such as declarations after statements,
+  by design. The compiler's default C standard is used, which for the versions listed is newer anyway.
 
 The following OSS components are used.
 * OpenSSL development edition, at least version 3.0. Tested, among others,
