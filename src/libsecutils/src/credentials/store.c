@@ -346,9 +346,10 @@ bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
         int len = snprintf(full_path, sizeof(full_path), "%s/%s", trust_dir, p_dirent->d_name);
         if(len < 0 or (size_t)len >= sizeof(full_path))
         {
-            LOG(FL_ERR, "cannot construct path for '%s/%s'", trust_dir, p_dirent->d_name);
-            found = false;
-            goto err;
+            /* skip like other unreadable entries, do not fail the whole directory */
+            LOG(FL_WARN, "path too long, skipping '%s/%s'", trust_dir, p_dirent->d_name);
+            p_dirent = readdir(p_dir);
+            continue;
         }
 
         struct stat f_stat;
@@ -431,9 +432,9 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
         int len = snprintf(full_path, sizeof(full_path), "%s/%s", crl_dir, p_dirent->d_name);
         if(len < 0 or (size_t)len >= sizeof(full_path))
         {
-            LOG(FL_ERR, "cannot construct path for '%s/%s'", crl_dir, p_dirent->d_name);
-            found = false;
-            goto err;
+            LOG(FL_WARN, "path too long, skipping '%s/%s'", crl_dir, p_dirent->d_name);
+            p_dirent = readdir(p_dir);
+            continue;
         }
 
         struct stat f_stat;
