@@ -339,8 +339,7 @@ bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
         goto err;
     }
 
-    struct dirent* p_dirent = readdir(p_dir);
-    while(0 not_eq p_dirent)
+    for(struct dirent* p_dirent = readdir(p_dir); 0 not_eq p_dirent; p_dirent = readdir(p_dir))
     {
         char full_path[UTIL_max_path_len + 1];
         int len = snprintf(full_path, sizeof(full_path), "%s/%s", trust_dir, p_dirent->d_name);
@@ -348,7 +347,6 @@ bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
         {
             /* skip like other unreadable entries, do not fail the whole directory */
             LOG(FL_WARN, "path too long, skipping '%s/%s'", trust_dir, p_dirent->d_name);
-            p_dirent = readdir(p_dir);
             continue;
         }
 
@@ -376,7 +374,6 @@ bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
                 }
             }
         }
-        p_dirent = readdir(p_dir);
     }
 
     if(not found)
@@ -425,15 +422,13 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
         goto err;
     }
 
-    struct dirent* p_dirent = readdir(p_dir);
-    while(0 not_eq p_dirent)
+    for(struct dirent* p_dirent = readdir(p_dir); 0 not_eq p_dirent; p_dirent = readdir(p_dir))
     {
         char full_path[UTIL_max_path_len + 1];
         int len = snprintf(full_path, sizeof(full_path), "%s/%s", crl_dir, p_dirent->d_name);
         if(len < 0 or (size_t)len >= sizeof(full_path))
         {
             LOG(FL_WARN, "path too long, skipping '%s/%s'", crl_dir, p_dirent->d_name);
-            p_dirent = readdir(p_dir);
             continue;
         }
 
@@ -477,7 +472,6 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
                 }
             }
         }
-        p_dirent = readdir(p_dir);
     }
 
     /* set up cert CRL check callback for checking full chain */
