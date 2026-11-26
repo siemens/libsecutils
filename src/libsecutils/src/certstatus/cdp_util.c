@@ -260,7 +260,7 @@ void LOG_cert_CDP(
     severity            level,
     const X509          *cert)
 {
-    const size_t    CDP_LEN         = 2048;
+    enum { CDP_LEN = 2048 };
     char            cdp[CDP_LEN];
 
     if (CDP_get_x509_name(X509_get_subject_name(cert), cdp, CDP_LEN,XN_FLAG_ONELINE & ~ASN1_STRFLGS_ESC_MSB)) {

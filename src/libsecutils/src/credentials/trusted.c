@@ -98,9 +98,8 @@ X509_STORE* CREDENTIALS_get_trust_store(component_creds_id cid, OPTIONAL X509_VE
         cid = TRUST_CONFIG_SECTION_DEFAULT;
         LOG(FL_WARN, "No component identifier given, using '%s'", cid);
     }
-    const int buflen = 81;
-    char desc[buflen];
-    snprintf(desc, buflen, "trust store contents for component '%s'", cid);
+    char desc[81];
+    snprintf(desc, sizeof(desc), "trust store contents for component '%s'", cid);
 
     conf = CONF_load_options(ctx, config_file(), cid, vars);
     if(0 is_eq conf)

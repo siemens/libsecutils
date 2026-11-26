@@ -41,7 +41,8 @@
 
 static const char *const
 UTIL_SECUTILS_NAME = "secutils";           /*!< short name of this library */
-static const int UTIL_max_path_len = 512;  /*!< max length of file path name */
+enum { util_path_limit = 512 };
+static const int UTIL_max_path_len = util_path_limit; /*!< max length of file path name */
 static const int UTIL_max_name_len = 128;  /*!< max length of file name */
 
 # define OPENSSL_V_1_0_2 0x10002000L

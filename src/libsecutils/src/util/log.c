@@ -33,7 +33,7 @@
 #define _GNU_SOURCE
 
 static LOG_cb_t LOG_fn = 0; /*!< this variable is shared between threads */
-static const size_t loc_len = 256;
+enum { loc_len = 256 };
 
 static severity verbosity = LOG_WARNING;
 
