@@ -341,6 +341,11 @@ bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
 
     for(struct dirent* p_dirent = readdir(p_dir); 0 not_eq p_dirent; p_dirent = readdir(p_dir))
     {
+        if(0 is_eq strcmp(p_dirent->d_name, ".") or 0 is_eq strcmp(p_dirent->d_name, ".."))
+        {
+            continue;
+        }
+
         char full_path[UTIL_max_path_len + 1];
         int len = snprintf(full_path, sizeof(full_path), "%s/%s", trust_dir, p_dirent->d_name);
         if(len < 0 or (size_t)len >= sizeof(full_path))
@@ -424,6 +429,11 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
 
     for(struct dirent* p_dirent = readdir(p_dir); 0 not_eq p_dirent; p_dirent = readdir(p_dir))
     {
+        if(0 is_eq strcmp(p_dirent->d_name, ".") or 0 is_eq strcmp(p_dirent->d_name, ".."))
+        {
+            continue;
+        }
+
         char full_path[UTIL_max_path_len + 1];
         int len = snprintf(full_path, sizeof(full_path), "%s/%s", crl_dir, p_dirent->d_name);
         if(len < 0 or (size_t)len >= sizeof(full_path))
