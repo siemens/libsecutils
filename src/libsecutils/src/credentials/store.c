@@ -464,6 +464,7 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
                         if(not STORE_add_crls(pstore, crls))
                         {
                             LOG(FL_ERR, "Adding CRLs to trust store failed");
+                            sk_X509_CRL_pop_free(crls, X509_CRL_free);
                             goto err;
                         }
                         sk_X509_CRL_pop_free(crls, X509_CRL_free);
