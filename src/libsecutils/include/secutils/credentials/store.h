@@ -230,6 +230,7 @@ bool STORE_load_check_dir(X509_STORE** pstore, const char* trust_dir,
  * @param ctx (optional) pointer to UTA context for checking file integrity&authenticity using ICV
  * @note if ctx is null or SECUTILS_USE_ICV not defined, no ICV-based check is done
  * @note at least one valid CRL file must be found in each visited directory
+ * @note entries with overlong paths are skipped, so their CRLs are not checked
  * @return true on success, false on error/failure
  ******************************************************************************/
 bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const char* desc, bool recursive, OPTIONAL uta_ctx* ctx);
