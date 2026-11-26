@@ -452,8 +452,11 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
         {
             if(f_stat.st_mode bitand S_IFREG)
             {
+                if(ctx is_eq 0
 #ifdef SECUTILS_USE_ICV
-                if (FILES_check_icv(ctx, full_path))
+                   or FILES_check_icv(ctx, full_path)
+#endif
+                   )
                 {
                     STACK_OF(X509_CRL)* crls = FILES_load_crls_autofmt(full_path, FORMAT_PEM, 0 /* timeout not relevant for files */, desc);
                     if(0 not_eq crls)
@@ -471,7 +474,6 @@ bool STORE_load_crl_dir(X509_STORE* pstore, const char* crl_dir, OPTIONAL const 
                 {
                     LOG(FL_ERR, "ICV check failed for CRL %s", p_dirent->d_name);
                 }
-#endif /* SECUTILS_USE_ICV */
             }
             else if(recursive and (f_stat.st_mode bitand S_IFDIR) and (0 not_eq strncmp(p_dirent->d_name, ".", 1)))
             {
