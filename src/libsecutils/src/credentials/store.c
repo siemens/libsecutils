@@ -394,8 +394,7 @@ err:
         closedir(p_dir);
     }
 
-    int cert_num = STORE_certs_num(*pstore);
-    if(not found and cert_num is_eq 0)
+    if(pstore not_eq 0 and not found and STORE_certs_num(*pstore) is_eq 0)
     {
         STORE_free(*pstore);
         *pstore = 0;
