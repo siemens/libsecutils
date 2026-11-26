@@ -145,9 +145,9 @@ override CFLAGS += $(DEBUG_FLAGS) \
  -Wpointer-arith -Wunused-parameter
 # TODO clean up code and re-enable warnings instead:
 override CFLAGS += -Wno-gnu-folding-constant
-# -Wno-declaration-after-statement
 # Using below "no-" variants to cancel options potentially set in parent project(s):
 override CFLAGS += -Wno-conversion -Wno-sign-conversion -Wno-shadow
+override CFLAGS += -Wno-declaration-after-statement # code is C99 by design
 override CFLAGS += -pedantic -DPEDANTIC
 
 ################################################################################
@@ -171,7 +171,7 @@ DEST_INC=$(DEST_PRE)
 DEST_DOC=$(DEST_PRE)/share/doc/libsecutils-dev
 OUTBIN=icvutil$(EXE)
 DEST_BIN=$(DEST_PRE)/bin
-LOCAL_CFLAGS= -fPIC # -std=gnu90 TODO clean up code and re-enable flag
+LOCAL_CFLAGS= -fPIC # the code requires C99 or later; the compiler's default standard is used
 override CFLAGS += -isystem $(OPENSSL_DIR)/include# # use of -isystem is critical for selecting wanted OpenSSL version
 override CFLAGS += -Isrc/libsecutils/include
 override CFLAGS += -Isrc/libsecutils/include/secutils

@@ -32,11 +32,12 @@ else()
     -pedantic
     # -Werror is enabled only for development and CI using Makefile_v1 without NDEBUG
 
-    # -Wno-declaration-after-statement -Wno-format-truncation
+    # -Wno-format-truncation
     # TODO clean up code and re-enable warnings instead:
     -Wno-gnu-folding-constant
     # Using below "no-" variants to cancel options potentially set in parent project(s):
     -Wno-conversion -Wno-sign-conversion -Wno-shadow
+    -Wno-declaration-after-statement # code is C99 by design
   )
 endif()
 target_compile_definitions(secutils_compilation_options INTERFACE PEDANTIC)
